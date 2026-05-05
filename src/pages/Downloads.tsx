@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, Search, ChevronDown, ChevronUp, FileText, Layout, Video, Type, Font, Software, Cloud } from "lucide-react";
+import { Download, Search, ChevronDown, ChevronUp, FileText, Layout, Video, Type, Font } from "lucide-react";
 
 const Downloads = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -9,7 +9,6 @@ const Downloads = () => {
     {
       id: "essentials",
       title: "📌 Essential Tools & Utilities",
-      icon: <Software size={20} />,
       items: [
         { name: "Classic Menu for Office 2007", description: "Office 2007/2003/2013/2016/2024 compatibility" },
         { name: "Windows 10 Activator", description: "Activate Windows 10" },
@@ -20,7 +19,6 @@ const Downloads = () => {
     {
       id: "graphics",
       title: "🎨 Graphics & Design",
-      icon: <Layout size={20} />,
       items: [
         { name: "Adobe Photoshop", description: "Professional image editing" },
         { name: "Adobe PageMaker", description: "Desktop publishing software" },
@@ -32,7 +30,6 @@ const Downloads = () => {
     {
       id: "video",
       title: "🎥 Video & Screen Recording",
-      icon: <Video size={20} />,
       items: [
         { name: "Any Video Converter", description: "Convert video formats" },
         { name: "Screen Recorder", description: "Record screen activities" },
@@ -42,7 +39,6 @@ const Downloads = () => {
     {
       id: "typing",
       title: "⌨️ Typing Software",
-      icon: <Type size={20} />,
       items: [
         { name: "Rapid Typing", description: "Typing tutor software" },
         { name: "Typshala", description: "Nepali typing practice" },
@@ -51,7 +47,6 @@ const Downloads = () => {
     {
       id: "fonts",
       title: "🔤 Nepali Fonts",
-      icon: <Font size={20} />,
       items: [
         { name: "Fontasy Himali", description: "Nepali font family" },
         { name: "Preeti Font", description: "Popular Nepali font" },
@@ -63,13 +58,22 @@ const Downloads = () => {
     {
       id: "office",
       title: "📊 Office & Accounting",
-      icon: <FileText size={20} />,
       items: [
         { name: "Save As PDF/XPS", description: "Export documents to PDF/XPS format" },
         { name: "Tally Accounting", description: "Accounting software" },
       ]
     }
   ];
+
+  const getIcon = (title: string) => {
+    if (title.includes("Essential")) return "🛠️";
+    if (title.includes("Graphics")) return "🎨";
+    if (title.includes("Video")) return "🎥";
+    if (title.includes("Typing")) return "⌨️";
+    if (title.includes("Fonts")) return "🔤";
+    if (title.includes("Office")) return "📊";
+    return "📦";
+  };
 
   const filteredCategories = downloadCategories.map(category => ({
     ...category,
@@ -116,7 +120,7 @@ const Downloads = () => {
                 className="w-full flex items-center justify-between p-5 bg-gradient-to-r from-blue-50 to-white hover:from-blue-100 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className="text-blue-600">{category.icon}</span>
+                  <span className="text-2xl">{getIcon(category.title)}</span>
                   <h2 className="text-lg font-semibold text-gray-800">{category.title}</h2>
                   <span className="text-sm text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
                     {category.items.length}
@@ -143,7 +147,6 @@ const Downloads = () => {
                         </div>
                         <button
                           onClick={() => {
-                            // For now, just alert. You can add actual download links.
                             alert(`Download: ${item.name}\n\nAdd your download link here.`);
                           }}
                           className="ml-3 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1"
