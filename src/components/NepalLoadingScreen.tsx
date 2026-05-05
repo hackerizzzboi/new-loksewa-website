@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import nepalMap from "@/assets/map.png";
+import nepalFlag from "@/assets/flag.png";
 
 interface NepalLoadingScreenProps {
   onComplete: () => void;
@@ -10,6 +12,7 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
   const [cursorVisible, setCursorVisible] = useState(true);
   const [showMap, setShowMap] = useState(false);
   const [showFlag, setShowFlag] = useState(false);
+  const [bgColor, setBgColor] = useState(0);
 
   const fullQuote = "नेपाली हामी रहौँला कहाँ, नेपालै नरहे।";
 
@@ -35,12 +38,20 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
 
   // Show map and flag with delay
   useEffect(() => {
-    const mapTimer = setTimeout(() => setShowMap(true), 500);
-    const flagTimer = setTimeout(() => setShowFlag(true), 1000);
+    const mapTimer = setTimeout(() => setShowMap(true), 300);
+    const flagTimer = setTimeout(() => setShowFlag(true), 800);
     return () => {
       clearTimeout(mapTimer);
       clearTimeout(flagTimer);
     };
+  }, []);
+
+  // Background color cycling
+  useEffect(() => {
+    const colorInterval = setInterval(() => {
+      setBgColor(prev => (prev + 1) % 6);
+    }, 3000);
+    return () => clearInterval(colorInterval);
   }, []);
 
   // Loading progress
@@ -58,167 +69,201 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
     return () => clearInterval(interval);
   }, [onComplete]);
 
+  const bgGradients = [
+    "from-red-600 via-white to-red-600",
+    "from-blue-600 via-white to-blue-600",
+    "from-green-600 via-white to-green-600",
+    "from-purple-600 via-white to-purple-600",
+    "from-orange-600 via-white to-orange-600",
+    "from-pink-600 via-white to-pink-600"
+  ];
+
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-red-600 via-white to-red-600 z-50 flex flex-col items-center justify-center overflow-hidden">
+    <div className={`fixed inset-0 bg-gradient-to-br ${bgGradients[bgColor]} z-50 flex flex-col items-center justify-center overflow-hidden transition-all duration-1000`}>
       
-      {/* Animated Background */}
-      <div className="absolute inset-0">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-red-500/10 via-transparent to-transparent"></div>
+      {/* Animated Background Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(30)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full animate-float-particle"
+            style={{
+              width: Math.random() * 10 + 5 + 'px',
+              height: Math.random() * 10 + 5 + 'px',
+              left: Math.random() * 100 + '%',
+              top: Math.random() * 100 + '%',
+              backgroundColor: i % 2 === 0 ? '#DC143C' : '#003893',
+              animationDuration: Math.random() * 5 + 3 + 's',
+              animationDelay: Math.random() * 5 + 's',
+              opacity: Math.random() * 0.3 + 0.1
+            }}
+          ></div>
+        ))}
+      </div>
+
+      {/* Animated Circles */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-red-500/10 animate-pulse-slow"></div>
+        <div className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-blue-500/10 animate-pulse-slow delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-yellow-500/5 animate-pulse-slow delay-2000"></div>
       </div>
 
       {/* Main Content Container */}
       <div className="relative z-10 text-center px-4 max-w-4xl mx-auto w-full">
         
-        {/* Nepal Map - Above Quote */}
-        <div className={`mb-6 transform transition-all duration-1000 ${showMap ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-          <div className="relative inline-block">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
-            <svg 
-              viewBox="0 0 200 150" 
-              className="w-48 h-36 md:w-80 md:h-60 lg:w-96 lg:h-72 mx-auto drop-shadow-2xl animate-float"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              {/* Nepal Map Shape - Simplified silhouette of Nepal */}
-              <path 
-                d="M40,80 L50,60 L65,50 L80,45 L95,40 L110,42 L125,45 L135,50 L145,55 L155,65 L160,75 L162,85 L158,95 L150,105 L140,110 L125,115 L110,118 L95,120 L80,118 L65,115 L55,108 L48,100 L42,92 L40,85 Z" 
-                fill="#DC143C" 
-                stroke="#003893" 
-                strokeWidth="2.5"
-                className="animate-draw"
+        {/* Nepal Map - Above Quote with Glow */}
+        <div className={`mb-6 transform transition-all duration-1000 ${showMap ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-20 opacity-0 scale-50'}`}>
+          <div className="relative inline-block group">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-blue-500 rounded-2xl blur-3xl opacity-50 animate-pulse group-hover:opacity-100 transition-all duration-500"></div>
+            <div className="relative animate-float">
+              <img 
+                src={nepalMap} 
+                alt="Nepal Map" 
+                className="w-48 h-36 md:w-80 md:h-60 lg:w-96 lg:h-72 mx-auto object-contain drop-shadow-2xl rounded-2xl animate-glow"
+                style={{
+                  filter: 'drop-shadow(0 0 20px rgba(220,20,60,0.5))'
+                }}
               />
-              {/* Mountains/Himalayas */}
-              <path d="M60,55 L70,40 L80,55 L90,42 L100,55 L110,38 L120,55 L130,45 L140,55" stroke="#003893" strokeWidth="2" fill="none" className="animate-mountain"/>
-              {/* Sun */}
-              <circle cx="150" cy="45" r="6" fill="#FFD700" className="animate-pulse-slow"/>
-            </svg>
+            </div>
           </div>
-          <p className="text-red-700 text-xs md:text-sm font-mono mt-2 animate-pulse">🏔️ हिमालयको काखमा 🏔️</p>
+          <div className="flex justify-center gap-2 mt-3">
+            <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-bounce-smooth"></span>
+            <span className="text-red-700 text-xs md:text-sm font-mono font-bold animate-pulse">🏔️ हिमालयको काखमा 🏔️</span>
+            <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-bounce-smooth delay-500"></span>
+          </div>
         </div>
 
-        {/* Quote */}
+        {/* Quote with Rainbow Animation */}
         <div className="mb-8">
           <div className="relative inline-block">
-            <div className="absolute -inset-2 bg-gradient-to-r from-red-500/20 to-blue-500/20 blur-xl rounded-full"></div>
-            <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-red-700 leading-relaxed relative z-10 font-hindi">
+            <div className="absolute -inset-4 bg-gradient-to-r from-red-500 via-yellow-500 to-blue-500 blur-2xl opacity-50 animate-spin-slow"></div>
+            <div className="absolute -inset-2 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
+            <h1 className="text-xl md:text-3xl lg:text-4xl font-bold text-red-700 leading-relaxed relative z-10 bg-white/30 backdrop-blur px-6 py-4 rounded-2xl shadow-2xl animate-text-glow">
               {typedText}
-              <span className={`inline-block w-0.5 h-5 md:h-8 bg-red-600 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+              <span className={`inline-block w-0.5 h-5 md:h-8 bg-red-600 ml-1 ${cursorVisible ? 'opacity-100 animate-pulse' : 'opacity-0'}`}></span>
             </h1>
           </div>
         </div>
 
-        {/* Nepal Flag - Below Quote */}
-        <div className={`mb-8 transform transition-all duration-1000 ${showFlag ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
+        {/* Nepal Flag - Below Quote with Crazy Animation */}
+        <div className={`mb-8 transform transition-all duration-1000 ${showFlag ? 'translate-y-0 opacity-100 scale-100 rotate-0' : 'translate-y-20 opacity-0 scale-50 rotate-12'}`}>
           <div className="relative inline-block group">
-            <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-blue-600 rounded-lg blur-2xl opacity-50 animate-pulse"></div>
-            <div className="relative w-32 h-28 md:w-48 md:h-40 lg:w-64 lg:h-52 mx-auto animate-flag-wave">
-              <svg viewBox="0 0 100 120" className="w-full h-full drop-shadow-2xl">
-                {/* Nepal Flag Shape */}
-                <polygon 
-                  points="30,10 70,10 70,40 90,40 70,60 90,80 70,80 70,110 30,110 30,10" 
-                  fill="#DC143C" 
-                  stroke="#003893" 
-                  strokeWidth="2"
-                  className="animate-draw-flag"
-                />
-                {/* Blue Border */}
-                <polygon 
-                  points="28,8 72,8 72,38 92,38 72,58 92,78 72,78 72,112 28,112 28,8" 
-                  fill="none" 
-                  stroke="#003893" 
-                  strokeWidth="3.5"
-                />
-                {/* Sun */}
-                <circle cx="50" cy="55" r="10" fill="white" className="animate-spin-slow"/>
-                {/* Moon */}
-                <path d="M50,38 Q58,50 50,62 Q42,50 50,38" fill="white"/>
-                <circle cx="50" cy="47" r="4" fill="#DC143C"/>
-                {/* Stars */}
-                <circle cx="50" cy="28" r="1.5" fill="white" className="animate-twinkle"/>
-                <circle cx="50" cy="82" r="1.5" fill="white" className="animate-twinkle delay-500"/>
-                <circle cx="32" cy="55" r="1.5" fill="white" className="animate-twinkle delay-1000"/>
-                <circle cx="68" cy="55" r="1.5" fill="white" className="animate-twinkle delay-1500"/>
-                <circle cx="38" cy="38" r="1" fill="white" className="animate-twinkle"/>
-                <circle cx="62" cy="38" r="1" fill="white" className="animate-twinkle delay-500"/>
-                <circle cx="38" cy="72" r="1" fill="white" className="animate-twinkle delay-1000"/>
-                <circle cx="62" cy="72" r="1" fill="white" className="animate-twinkle delay-1500"/>
-              </svg>
+            <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-blue-600 rounded-2xl blur-3xl opacity-50 animate-pulse-slow group-hover:opacity-100 transition-all duration-500"></div>
+            <div className="relative animate-flag-wave">
+              {/* Multiple glow layers */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-yellow-500 to-red-500 rounded-full blur-2xl opacity-30 animate-pulse"></div>
+              <div className="absolute -inset-2 bg-gradient-to-r from-blue-500 to-red-500 rounded-full blur-xl opacity-40 animate-pulse-slow"></div>
+              <img 
+                src={nepalFlag} 
+                alt="Nepal Flag" 
+                className="w-32 h-28 md:w-48 md:h-40 lg:w-64 lg:h-52 mx-auto object-contain drop-shadow-2xl rounded-xl animate-float"
+                style={{
+                  filter: 'drop-shadow(0 0 30px rgba(0,56,147,0.5))'
+                }}
+              />
             </div>
-            <div className="absolute -left-2 top-0 w-2 h-28 md:h-40 lg:h-52 bg-gradient-to-b from-blue-600 to-red-600 rounded-full animate-flag-pole"></div>
           </div>
-          <p className="text-blue-700 text-xs md:text-sm font-mono mt-3 animate-pulse">🇳🇵 जय नेपाल 🇳🇵</p>
+          <div className="flex justify-center items-center gap-3 mt-3">
+            <div className="flex gap-1">
+              <span className="inline-block w-3 h-3 rounded-full bg-red-500 animate-bounce-smooth"></span>
+              <span className="inline-block w-3 h-3 rounded-full bg-blue-500 animate-bounce-smooth delay-200"></span>
+              <span className="inline-block w-3 h-3 rounded-full bg-white animate-bounce-smooth delay-400"></span>
+            </div>
+            <span className="text-blue-700 text-xs md:text-sm font-mono font-bold animate-pulse">🇳🇵 जय नेपाल 🇳🇵</span>
+            <div className="flex gap-1">
+              <span className="inline-block w-3 h-3 rounded-full bg-red-500 animate-bounce-smooth delay-600"></span>
+              <span className="inline-block w-3 h-3 rounded-full bg-blue-500 animate-bounce-smooth delay-800"></span>
+              <span className="inline-block w-3 h-3 rounded-full bg-white animate-bounce-smooth delay-1000"></span>
+            </div>
+          </div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="w-48 md:w-64 lg:w-80 mx-auto mt-4">
-          <div className="h-1 bg-gray-300 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-gradient-to-r from-red-600 to-blue-600 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min(progress, 100)}%` }}
-            ></div>
+        {/* Animated Progress Bar */}
+        <div className="w-48 md:w-64 lg:w-80 mx-auto mt-6">
+          <div className="relative">
+            <div className="h-2 bg-gray-300 rounded-full overflow-hidden shadow-inner">
+              <div 
+                className="h-full bg-gradient-to-r from-red-600 via-yellow-500 to-blue-600 rounded-full transition-all duration-300 relative"
+                style={{ width: `${Math.min(progress, 100)}%` }}
+              >
+                <div className="absolute inset-0 bg-white/30 animate-shimmer"></div>
+              </div>
+            </div>
+            {/* Progress percentage with glow */}
+            <div className="absolute -top-6 right-0">
+              <span className="text-xs font-bold text-red-600 animate-pulse">{Math.floor(Math.min(progress, 100))}%</span>
+            </div>
           </div>
+        </div>
+
+        {/* Loading Text with dots */}
+        <div className="flex justify-center gap-2 mt-4">
+          {[0, 1, 2, 3, 4].map(i => (
+            <div 
+              key={i} 
+              className="w-2 h-2 rounded-full animate-bounce-smooth" 
+              style={{ 
+                backgroundColor: i % 2 === 0 ? '#DC143C' : '#003893',
+                animationDelay: `${i * 0.15}s`
+              }}
+            ></div>
+          ))}
         </div>
       </div>
 
       <style>{`
         @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-15px) scale(1.02); }
         }
         @keyframes flag-wave {
-          0%, 100% { transform: skewX(0deg); }
-          50% { transform: skewX(2deg); }
+          0%, 100% { transform: skewX(0deg) scale(1); }
+          25% { transform: skewX(3deg) scale(1.02); }
+          75% { transform: skewX(-3deg) scale(1.02); }
         }
-        @keyframes flag-pole {
-          0%, 100% { height: 112px; }
-          50% { height: 116px; }
+        @keyframes float-particle {
+          0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+          50% { opacity: 0.5; }
+          100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
         @keyframes pulse-slow {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.1); }
+          0%, 100% { opacity: 0.3; transform: scale(1); }
+          50% { opacity: 0.7; transform: scale(1.2); }
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes twinkle {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 1; }
+        @keyframes bounce-smooth {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-12px); }
         }
-        @keyframes draw {
-          0% { stroke-dasharray: 300; stroke-dashoffset: 300; fill-opacity: 0; }
-          100% { stroke-dasharray: 300; stroke-dashoffset: 0; fill-opacity: 1; }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
         }
-        @keyframes mountain {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-3px); }
+        @keyframes text-glow {
+          0%, 100% { text-shadow: 0 0 5px rgba(220,20,60,0.3); }
+          50% { text-shadow: 0 0 20px rgba(220,20,60,0.6); }
+        }
+        @keyframes glow {
+          0%, 100% { filter: drop-shadow(0 0 5px rgba(220,20,60,0.3)); }
+          50% { filter: drop-shadow(0 0 25px rgba(220,20,60,0.8)); }
         }
         .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-flag-wave { animation: flag-wave 2s ease-in-out infinite; }
-        .animate-flag-pole { animation: flag-pole 2s ease-in-out infinite; }
-        .animate-pulse-slow { animation: pulse-slow 2s ease-in-out infinite; }
+        .animate-flag-wave { animation: flag-wave 2s ease-in-out infinite; transform-origin: center; }
+        .animate-float-particle { animation: float-particle 8s linear infinite; }
+        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
         .animate-spin-slow { animation: spin-slow 4s linear infinite; }
-        .animate-twinkle { animation: twinkle 2s ease-in-out infinite; }
-        .animate-draw { animation: draw 1.5s ease-out forwards; stroke-dasharray: 300; stroke-dashoffset: 300; }
-        .animate-draw-flag { animation: draw 1s ease-out forwards; stroke-dasharray: 200; stroke-dashoffset: 200; }
-        .animate-mountain { animation: mountain 3s ease-in-out infinite; }
-        .delay-500 { animation-delay: 0.5s; }
+        .animate-bounce-smooth { animation: bounce-smooth 0.8s ease-in-out infinite; }
+        .animate-shimmer { animation: shimmer 1.5s ease-in-out infinite; }
+        .animate-text-glow { animation: text-glow 1.5s ease-in-out infinite; }
+        .animate-glow { animation: glow 2s ease-in-out infinite; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .delay-800 { animation-delay: 0.8s; }
         .delay-1000 { animation-delay: 1s; }
-        .delay-1500 { animation-delay: 1.5s; }
-        @media (min-width: 768px) {
-          .animate-flag-pole { height: 160px; }
-          @keyframes flag-pole {
-            0%, 100% { height: 160px; }
-            50% { height: 165px; }
-          }
-        }
-        @media (min-width: 1024px) {
-          .animate-flag-pole { height: 208px; }
-          @keyframes flag-pole {
-            0%, 100% { height: 208px; }
-            50% { height: 215px; }
-          }
-        }
       `}</style>
     </div>
   );
