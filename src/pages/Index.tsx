@@ -14,7 +14,7 @@ const quickAccess = [
   { label: "Syllabus", icon: "📋", path: "/syllabus", color: "quick-card-purple" },
   { label: "Typing", icon: "⌨️", path: "/typing", color: "quick-card-amber" },
   { label: "Notes", icon: "📒", path: "/notes", color: "quick-card-navy" },
-  { label: "Downloads", icon: "📰", path: "/news", color: "quick-card-pink" },
+  { label: "Downloads", icon: "📰", path: "/downloads", color: "quick-card-pink" },
 ];
 
 const importantLinks = [
