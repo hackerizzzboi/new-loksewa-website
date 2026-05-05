@@ -61,21 +61,21 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
   }, [onComplete]);
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center overflow-hidden">
+    <div className="fixed inset-0 bg-black z-[9999] flex flex-col items-center justify-center overflow-hidden">
       
       {/* Animated Gold Particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(80)].map((_, i) => (
+        {[...Array(100)].map((_, i) => (
           <div
             key={i}
             className="absolute rounded-full animate-float-particle"
             style={{
-              width: Math.random() * 4 + 1 + 'px',
-              height: Math.random() * 4 + 1 + 'px',
+              width: Math.random() * 3 + 1 + 'px',
+              height: Math.random() * 3 + 1 + 'px',
               left: Math.random() * 100 + '%',
               top: Math.random() * 100 + '%',
               background: '#FFD700',
-              opacity: Math.random() * 0.5 + 0.2,
+              opacity: Math.random() * 0.6 + 0.2,
               animationDuration: Math.random() * 8 + 4 + 's',
               animationDelay: Math.random() * 5 + 's',
             }}
@@ -85,66 +85,44 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
 
       {/* Animated Glowing Orbs */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-red-500/10 animate-pulse-slow blur-3xl"></div>
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-red-500/10 animate-pulse-slow blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-blue-500/10 animate-pulse-slow delay-1000 blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-yellow-500/10 animate-pulse-slow delay-2000 blur-3xl"></div>
       </div>
 
-      {/* Main Content - Centered */}
-      <div className="relative z-10 text-center px-6 w-full max-w-4xl mx-auto">
+      {/* Main Content */}
+      <div className="relative z-10 text-center px-4 w-full max-w-4xl mx-auto">
         
         {/* Nepal Map */}
-        <div className={`mb-8 transition-all duration-1000 ${showMap ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-20'}`}>
-          <div className="relative inline-block">
-            {/* Subtle glow behind map */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-            <img 
-              src={nepalMap} 
-              alt="Nepal Map" 
-              className="w-48 h-36 sm:w-56 sm:h-44 md:w-72 md:h-56 lg:w-80 lg:h-64 mx-auto object-contain"
-              style={{
-                filter: 'drop-shadow(0 0 20px rgba(255,215,0,0.4))'
-              }}
-            />
-          </div>
+        <div className={`mb-6 transition-all duration-1000 ${showMap ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-20'}`}>
+          <img 
+            src={nepalMap} 
+            alt="Nepal Map" 
+            className="w-48 h-36 sm:w-56 sm:h-44 md:w-64 md:h-52 lg:w-80 lg:h-64 mx-auto object-contain drop-shadow-2xl"
+          />
         </div>
 
-        {/* Quote - Red Color, No Borders */}
-        <div className="mb-10">
-          <div className="relative inline-block">
-            {/* Red glow behind quote */}
-            <div className="absolute -inset-4 bg-red-500/20 rounded-full blur-2xl animate-pulse"></div>
-            
-            <div className="relative px-4 py-3 sm:px-6 sm:py-4">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-red-600 leading-relaxed">
-                {typedText}
-                <span className={`inline-block w-0.5 h-7 sm:h-8 md:h-10 bg-red-600 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
-              </h1>
-            </div>
-          </div>
+        {/* Quote - Red Text, No Borders */}
+        <div className="mb-8">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-red-600 leading-relaxed">
+            {typedText}
+            <span className={`inline-block w-0.5 h-6 sm:h-7 md:h-8 bg-red-600 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+          </h1>
         </div>
 
         {/* Nepal Flag */}
-        <div className={`mb-10 transition-all duration-1000 ${showFlag ? 'opacity-100 scale-100 translate-y-0 rotate-0' : 'opacity-0 scale-50 translate-y-20 rotate-12'}`}>
-          <div className="relative inline-block">
-            {/* Subtle glow behind flag */}
-            <div className="absolute -inset-4 bg-gradient-to-r from-red-500 to-blue-500 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-            
-            <img 
-              src={nepalFlag} 
-              alt="Nepal Flag" 
-              className="w-32 h-28 sm:w-40 sm:h-36 md:w-52 md:h-48 lg:w-64 lg:h-56 mx-auto object-contain animate-flag-wave"
-              style={{
-                filter: 'drop-shadow(0 0 25px rgba(255,215,0,0.5))'
-              }}
-            />
-          </div>
+        <div className={`mb-8 transition-all duration-1000 ${showFlag ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-50 translate-y-20'}`}>
+          <img 
+            src={nepalFlag} 
+            alt="Nepal Flag" 
+            className="w-32 h-28 sm:w-40 sm:h-36 md:w-48 md:h-44 lg:w-56 lg:h-52 mx-auto object-contain animate-flag-wave drop-shadow-2xl"
+          />
         </div>
 
         {/* Progress Bar */}
-        <div className="w-48 sm:w-64 md:w-80 mx-auto mt-6">
+        <div className="w-40 sm:w-56 md:w-64 mx-auto mt-4">
           <div className="relative">
-            <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-1 bg-gray-800 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-gradient-to-r from-red-500 via-yellow-400 to-red-500 rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(progress, 100)}%` }}
@@ -152,18 +130,18 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
                 <div className="absolute inset-0 bg-white/30 animate-shimmer"></div>
               </div>
             </div>
-            <div className="absolute -top-6 right-0">
+            <div className="absolute -top-5 right-0">
               <span className="text-xs font-bold text-yellow-500">{Math.floor(Math.min(progress, 100))}%</span>
             </div>
           </div>
         </div>
 
         {/* Loading Dots */}
-        <div className="flex justify-center gap-2 mt-5">
+        <div className="flex justify-center gap-2 mt-4">
           {[0, 1, 2, 3, 4].map(i => (
             <div 
               key={i} 
-              className="w-2 h-2 rounded-full animate-bounce-smooth" 
+              className="w-1.5 h-1.5 rounded-full animate-bounce-smooth" 
               style={{ 
                 backgroundColor: '#FFD700',
                 animationDelay: `${i * 0.15}s`
@@ -181,8 +159,8 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
           100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
         @keyframes pulse-slow {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(1.2); }
+          0%, 100% { opacity: 0.2; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.15); }
         }
         @keyframes flag-wave {
           0%, 100% { transform: skewX(0deg); }
@@ -191,7 +169,7 @@ const NepalLoadingScreen = ({ onComplete }: NepalLoadingScreenProps) => {
         }
         @keyframes bounce-smooth {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
+          50% { transform: translateY(-6px); }
         }
         @keyframes shimmer {
           0% { transform: translateX(-100%); }
