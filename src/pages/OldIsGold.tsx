@@ -11,13 +11,28 @@ const OldIsGold = () => {
     set.year.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Get set number safely
+  const getSetNumber = (id: string): number => {
+    const parts = id.split("-");
+    if (parts.length === 2) {
+      return parseInt(parts[1]) || 0;
+    }
+    return 0;
+  };
+
   // Color schemes for different set ranges
   const getSetColors = (setNumber: number) => {
     if (setNumber >= 75) return { bg: "from-purple-500 to-indigo-600", badge: "bg-purple-100 text-purple-700", border: "border-purple-200", hover: "hover:border-purple-300" };
-    if (setNumber <= 10) return { bg: "from-blue-500 to-cyan-600", badge: "bg-blue-100 text-blue-700", border: "border-blue-200", hover: "hover:border-blue-300" };
+    if (setNumber >= 1 && setNumber <= 10) return { bg: "from-blue-500 to-cyan-600", badge: "bg-blue-100 text-blue-700", border: "border-blue-200", hover: "hover:border-blue-300" };
     if (setNumber <= 30) return { bg: "from-emerald-500 to-teal-600", badge: "bg-emerald-100 text-emerald-700", border: "border-emerald-200", hover: "hover:border-emerald-300" };
     if (setNumber <= 50) return { bg: "from-orange-500 to-amber-600", badge: "bg-orange-100 text-orange-700", border: "border-orange-200", hover: "hover:border-orange-300" };
     return { bg: "from-slate-500 to-gray-600", badge: "bg-slate-100 text-slate-700", border: "border-slate-200", hover: "hover:border-slate-300" };
+  };
+
+  // Clean title (remove year from end if present)
+  const cleanTitle = (title: string): string => {
+    // Remove year patterns like " २०७३", " 2075", " २०७९-०२-१५" from end
+    return title.replace(/\s+\d{4}(?:-\d{2}-\d{2})?$/, '').replace(/\s+२०७[0-9](?:-?\d{2}-?\d{2})?$/, '');
   };
 
   return (
@@ -84,8 +99,9 @@ const OldIsGold = () => {
         {/* Sets Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredSets.map((set) => {
-            const setNumber = parseInt(set.id.split("-")[1]);
+            const setNumber = getSetNumber(set.id);
             const colors = getSetColors(setNumber);
+            const cleanedTitle = cleanTitle(set.title);
             
             return (
               <Link
@@ -109,9 +125,9 @@ const OldIsGold = () => {
                     )}
                   </div>
 
-                  {/* Title - Clean without year in title */}
-                  <h3 className="font-bold text-slate-800 mb-2 line-clamp-2 min-h-[48px]">
-                    {set.title.replace(/\s\d{4}$/, '').replace(/\s\d{4}-\d{2}-\d{2}$/, '')}
+                  {/* Title - Clean without year */}
+                  <h3 className="font-bold text-slate-800 mb-2 line-clamp-2 min-h-[48px] text-sm">
+                    {cleanedTitle}
                   </h3>
 
                   {/* Year and Questions */}
