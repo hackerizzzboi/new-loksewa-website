@@ -48,11 +48,11 @@ const OldIsGold = () => {
   };
 
   const getBadgeColor = (setNumber: number) => {
-    if (setNumber >= 75) return "bg-gradient-to-r from-purple-500 to-pink-500";
-    if (setNumber <= 10) return "bg-gradient-to-r from-blue-500 to-cyan-500";
-    if (setNumber <= 30) return "bg-gradient-to-r from-emerald-500 to-teal-500";
-    if (setNumber <= 50) return "bg-gradient-to-r from-orange-500 to-amber-500";
-    return "bg-gradient-to-r from-indigo-500 to-blue-500";
+    if (setNumber >= 75) return "from-purple-500 to-pink-500";
+    if (setNumber <= 10) return "from-blue-500 to-cyan-500";
+    if (setNumber <= 30) return "from-emerald-500 to-teal-500";
+    if (setNumber <= 50) return "from-orange-500 to-amber-500";
+    return "from-indigo-500 to-blue-500";
   };
 
   const cleanTitle = (title: string): string => {
@@ -61,20 +61,13 @@ const OldIsGold = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Animated Background Particles */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-1000"></div>
-      </div>
-
-      {/* Hero Section with Animation */}
+      {/* Hero Section */}
       <div className="relative bg-gradient-to-r from-blue-900 via-purple-900 to-pink-900 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%239C92AC" fill-opacity="0.05"%3E%3Cpath d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-20"></div>
-        <div className="relative container mx-auto px-4 py-16 text-center animate-fade-in-down">
-          <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur rounded-3xl mb-6 animate-bounce-slow">
+        <div className="relative container mx-auto px-4 py-16 text-center">
+          <div className="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur rounded-3xl mb-6">
             <Award size={48} className="text-yellow-400" />
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
+          <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-yellow-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
             Old is Gold
           </h1>
           <p className="text-xl text-blue-200 mb-6">पुराना प्रश्नपत्रहरू अभ्यास गर्नुहोस्</p>
@@ -93,7 +86,7 @@ const OldIsGold = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8 max-w-7xl relative z-10">
+      <div className="container mx-auto px-4 py-8 max-w-7xl z-10">
         {/* Search and Controls */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="flex-1 relative">
@@ -106,7 +99,7 @@ const OldIsGold = () => {
                 setSearchTerm(e.target.value);
                 setVisibleCount(20);
               }}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 backdrop-blur"
+              className="w-full pl-12 pr-4 py-3 rounded-xl bg-gray-800/50 border border-gray-700 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
             />
           </div>
           
@@ -137,7 +130,7 @@ const OldIsGold = () => {
             { label: "Exam Sets", value: "74", color: "from-purple-500 to-pink-500", icon: "📝" },
             { label: "Bonus Sets", value: "3", color: "from-orange-500 to-amber-500", icon: "⭐" },
           ].map((stat, i) => (
-            <div key={i} className="bg-gray-800/40 backdrop-blur rounded-xl p-4 text-center border border-gray-700/50 hover:scale-105 transition-transform duration-300 animate-fade-in-up" style={{ animationDelay: `${i * 100}ms` }}>
+            <div key={i} className="bg-gray-800/40 rounded-xl p-4 text-center border border-gray-700/50 hover:scale-105 transition-transform duration-300">
               <div className="text-3xl mb-2">{stat.icon}</div>
               <div className={`text-2xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>{stat.value}</div>
               <div className="text-xs text-gray-400 mt-1">{stat.label}</div>
@@ -145,9 +138,9 @@ const OldIsGold = () => {
           ))}
         </div>
 
-        {/* Sets Grid with Animation */}
+        {/* Sets Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" ref={scrollRef}>
-          {visibleSets.map((set, index) => {
+          {visibleSets.map((set) => {
             const setNumber = getSetNumber(set.id);
             const gradient = getGradient(setNumber);
             const badgeColor = getBadgeColor(setNumber);
@@ -157,16 +150,12 @@ const OldIsGold = () => {
               <Link
                 key={set.id}
                 to={`/quiz/old-is-gold/${set.id}`}
-                className="group relative bg-gray-800/40 backdrop-blur rounded-xl border border-gray-700/50 overflow-hidden hover:scale-105 transition-all duration-300 animate-fade-in-up"
-                style={{ animationDelay: `${(index % 12) * 50}ms` }}
+                className="group relative bg-gray-800/40 rounded-xl border border-gray-700/50 overflow-hidden hover:scale-105 transition-all duration-300"
               >
-                {/* Animated Gradient Border */}
-                <div className={`absolute inset-0 bg-gradient-to-r ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-xl`}></div>
-                
                 {/* Top Gradient Bar */}
                 <div className={`h-1.5 bg-gradient-to-r ${gradient}`}></div>
                 
-                <div className="p-5 relative z-10">
+                <div className="p-5">
                   {/* Set Number */}
                   <div className="flex items-center justify-between mb-3">
                     <div className={`bg-gradient-to-r ${badgeColor} text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg`}>
@@ -180,7 +169,7 @@ const OldIsGold = () => {
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-bold text-white mb-2 text-base line-clamp-2 min-h-[48px] group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-yellow-400 group-hover:to-pink-400 group-hover:bg-clip-text transition-all">
+                  <h3 className="font-bold text-white mb-2 text-base min-h-[48px] line-clamp-2">
                     {cleanedTitle}
                   </h3>
 
@@ -199,7 +188,7 @@ const OldIsGold = () => {
                   {/* Start Button */}
                   <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-700/50">
                     <span className="text-xs text-gray-500">अभ्यास गर्नुहोस्</span>
-                    <span className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 group-hover:gap-2 transition-all group-hover:text-white">
+                    <span className="inline-flex items-center gap-1 text-sm font-medium text-blue-400 group-hover:gap-2 transition-all">
                       Start <ChevronRight size={14} />
                     </span>
                   </div>
@@ -215,7 +204,7 @@ const OldIsGold = () => {
             <div className="inline-flex items-center gap-2 text-gray-400">
               <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
               <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-              <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              <div className="w-2 h-2 bg-purple-500 rounded-full" style={{ animation: 'pulse 1s ease-in-out infinite' }}></div>
               <span className="ml-2">Loading more sets...</span>
             </div>
           </div>
@@ -238,15 +227,15 @@ const OldIsGold = () => {
           <div className="text-center mt-8 p-4 bg-gradient-to-r from-green-600/20 to-emerald-600/20 rounded-xl border border-green-500/30">
             <div className="flex items-center justify-center gap-2 text-green-400">
               <Award size={20} />
-              <span>🎉 सबै {filteredSets.length} प्रश्नपत्रहरू लोड भए! राम्रोसँग अभ्यास गर्नुहोस् 🎉</span>
+              <span>🎉 सबै {filteredSets.length} प्रश्नपत्रहरू लोड भए! 🎉</span>
             </div>
           </div>
         )}
 
         {/* Empty State */}
         {filteredSets.length === 0 && (
-          <div className="text-center py-16 bg-gray-800/40 backdrop-blur rounded-xl">
-            <div className="text-6xl mb-4 animate-bounce">🔍</div>
+          <div className="text-center py-16 bg-gray-800/40 rounded-xl">
+            <div className="text-6xl mb-4">🔍</div>
             <p className="text-gray-400 text-lg">कुनै प्रश्नपत्र फेला परेन</p>
             <button onClick={() => setSearchTerm("")} className="mt-4 text-blue-400 hover:text-blue-300">
               Clear Search
@@ -254,74 +243,6 @@ const OldIsGold = () => {
           </div>
         )}
       </div>
-
-      {/* CSS Animations */}
-      <style>{`
-        @keyframes fade-in-down {
-          from {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-10px);
-          }
-        }
-        
-        @keyframes gradient {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
-        }
-        
-        .animate-fade-in-down {
-          animation: fade-in-down 0.6s ease-out;
-        }
-        
-        .animate-fade-in-up {
-          animation: fade-in-up 0.5s ease-out forwards;
-          opacity: 0;
-        }
-        
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
-        }
-        
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 3s ease infinite;
-        }
-        
-        .delay-1000 {
-          animation-delay: 1s;
-        }
-      `}</style>
     </div>
   );
 };
