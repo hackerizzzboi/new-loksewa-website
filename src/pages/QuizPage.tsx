@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { practiceQuestions, getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, shuffleArray, type Question } from "@/data/questions";
+import { set1Questions } from "@/data/set1Questions";
+import { CheckCircle, XCircle } from "lucide-react";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -30,7 +32,20 @@ const QuizPage = () => {
     if (category === "practice" && setId && practiceQuestions[setId]) {
       qs = shuffleArray(practiceQuestions[setId]);
     } else if (category === "old-is-gold" && setId) {
-      qs = getOldIsGoldQuestions(setId);
+      // Use exact questions for Set 1, otherwise use generated ones
+      if (setId === "set-1") {
+        // Convert set1Questions to match Question type
+        qs = set1Questions.map(q => ({
+          id: q.id.toString(),
+          question: q.text,
+          options: q.options,
+          correct: q.correctAnswer,
+          explanation: q.explanation
+        }));
+        qs = shuffleArray(qs);
+      } else {
+        qs = getOldIsGoldQuestions(setId);
+      }
     } else if (category === "online-exam" && setId) {
       qs = getWeeklyTestQuestions(setId);
       const test = weeklyTests.find(t => t.id === setId);
@@ -122,30 +137,68 @@ const QuizPage = () => {
           </div>
         </div>
 
-        {/* Review */}
+        {/* Review Answers - WITH ✓ and ✗ */}
         <h2 className="text-lg font-heading font-bold mb-4">📋 Review Answers</h2>
         <div className="space-y-4">
           {questions.map((q, i) => {
             const userAns = answers[q.id];
             const isCorrect = userAns === q.correct;
             const isUnanswered = userAns === undefined || userAns === null;
+            
             return (
-              <div key={q.id} className={`bg-card rounded-xl p-4 border-l-4 ${isUnanswered ? "border-muted-foreground" : isCorrect ? "border-success" : "border-destructive"}`}>
-                <div className="flex justify-between items-start mb-2">
+              <div key={q.id} className={`bg-card rounded-xl p-4 border-l-4 ${isUnanswered ? "border-muted-foreground" : isCorrect ? "border-green-500" : "border-red-500"}`}>
+                <div className="flex justify-between items-start mb-3">
                   <p className="font-semibold text-sm">{i + 1}. {q.question}</p>
-                  <span className={`text-xs px-2 py-0.5 rounded ${isUnanswered ? "bg-muted" : isCorrect ? "bg-success/20 text-success" : "bg-destructive/20 text-destructive"}`}>
-                    {isUnanswered ? "Not answered" : isCorrect ? "✓ Correct" : "✗ Wrong"}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    {!isUnanswered && (
+                      isCorrect ? (
+                        <span className="flex items-center gap-1 text-green-600 bg-green-100 px-2 py-0.5 rounded-full text-xs font-semibold">
+                          <CheckCircle size={14} /> Correct
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1 text-red-600 bg-red-100 px-2 py-0.5 rounded-full text-xs font-semibold">
+                          <XCircle size={14} /> Wrong
+                        </span>
+                      )
+                    )}
+                    {isUnanswered && (
+                      <span className="text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full text-xs font-semibold">
+                        Not answered
+                      </span>
+                    )}
+                  </div>
                 </div>
+                
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                  {q.options.map((opt, oi) => (
-                    <div key={oi} className={`p-2 rounded-lg ${oi === q.correct ? "bg-success/10 border border-success/30 font-semibold" : userAns === oi && oi !== q.correct ? "bg-destructive/10 border border-destructive/30" : "bg-muted/50"}`}>
-                      {String.fromCharCode(65 + oi)}) {opt}
-                      {oi === q.correct && " ✓"}
-                    </div>
-                  ))}
+                  {q.options.map((opt, oi) => {
+                    const isCorrectOption = oi === q.correct;
+                    const isUserSelectedWrong = userAns === oi && !isCorrectOption;
+                    
+                    return (
+                      <div 
+                        key={oi} 
+                        className={`p-2 rounded-lg flex items-center gap-2 ${
+                          isCorrectOption 
+                            ? "bg-green-100 border border-green-400 text-green-800 font-semibold" 
+                            : isUserSelectedWrong 
+                              ? "bg-red-100 border border-red-400 text-red-800 line-through"
+                              : "bg-gray-50"
+                        }`}
+                      >
+                        <span className="font-bold">{String.fromCharCode(65 + oi)}.</span>
+                        <span className="flex-1">{opt}</span>
+                        {isCorrectOption && <CheckCircle size={16} className="text-green-600 flex-shrink-0" />}
+                        {isUserSelectedWrong && <XCircle size={16} className="text-red-600 flex-shrink-0" />}
+                      </div>
+                    );
+                  })}
                 </div>
-                {q.explanation && <p className="text-xs text-muted-foreground mt-2 italic">💡 {q.explanation}</p>}
+                
+                {q.explanation && (
+                  <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100 italic">
+                    💡 {q.explanation}
+                  </p>
+                )}
               </div>
             );
           })}
@@ -224,7 +277,7 @@ const QuizPage = () => {
               onClick={() => setCurrent(i)}
               className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors ${
                 i === current ? "bg-primary text-primary-foreground" :
-                answers[q.id] !== undefined && answers[q.id] !== null ? "bg-success/20 text-success" :
+                answers[q.id] !== undefined && answers[q.id] !== null ? "bg-green-500 text-white" :
                 "bg-muted"
               }`}
             >
