@@ -6,7 +6,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Layout from "@/components/Layout";
 import Index from "./pages/Index";
-import Practice from "./pages/MCQ";
+import Practice from "./pages/Practice";
 import QuizPage from "./pages/QuizPage";
 import OldIsGold from "./pages/OldIsGold";
 import OnlineExam from "./pages/OnlineExam";
