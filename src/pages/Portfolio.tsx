@@ -5,9 +5,7 @@ import {
   Briefcase, GraduationCap, Code, Shield, FileText, 
   Download, Zap, Target, Eye, Heart, Star, Terminal,
   Lock, Server, Bug, User, FileJson, Sparkles, Rocket, 
-  CheckCircle, Calendar, Clock, Trophy, Cpu, Wifi, 
-  Globe, Database, Cloud, Layers, Crown, GitBranch,
-  Activity, Bell, Coffee, Compass, Diamond, Feather
+  CheckCircle, Calendar, Clock, Trophy, Cpu
 } from "lucide-react";
 
 const Portfolio = () => {
@@ -20,25 +18,12 @@ const Portfolio = () => {
   const [typedText, setTypedText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState("");
   const [terminalInput, setTerminalInput] = useState("");
-  const [terminalOutput, setTerminalOutput] = useState<string[]>(["> Welcome to DHRX Security Terminal", "> Type 'help' for commands", ""]);
+  const [terminalOutput, setTerminalOutput] = useState<string[]>(["[WELCOME TO DHRX SECURITY TERMINAL]", "[Type 'help' for commands]", ""]);
   
-  const heroRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Time
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setCurrentTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fullText = "> DHIRAJ SHAHI // CYBERSECURITY EXPERT // ETHICAL HACKER <";
+  const fullText = "DHIRAJ SHAHI // CYBERSECURITY EXPERT // ETHICAL HACKER";
 
   // Typing effect
   useEffect(() => {
@@ -99,13 +84,13 @@ const Portfolio = () => {
     canvas.height = window.innerHeight;
 
     const particles: Array<{ x: number; y: number; radius: number; speedX: number; speedY: number; color: string }> = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 80; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         radius: Math.random() * 2 + 1,
-        speedX: (Math.random() - 0.5) * 1,
-        speedY: (Math.random() - 0.5) * 1,
+        speedX: (Math.random() - 0.5) * 0.8,
+        speedY: (Math.random() - 0.5) * 0.8,
         color: `hsl(${Math.random() * 60 + 260}, 70%, 60%)`
       });
     }
@@ -165,7 +150,7 @@ const Portfolio = () => {
       const cmd = terminalInput.toLowerCase();
       let output = "";
       if (cmd === "help") {
-        output = "Available commands: about, skills, experience, certs, contact, clear, help, whoami";
+        output = "Commands: about, skills, experience, certs, contact, clear, help, whoami";
       } else if (cmd === "whoami") {
         output = "Dhiraj Shahi | Cybersecurity Expert | Ethical Hacker";
       } else if (cmd === "about") {
@@ -183,7 +168,7 @@ const Portfolio = () => {
         setTerminalInput("");
         return;
       } else if (cmd !== "") {
-        output = `Command '${cmd}' not found. Type 'help' for available commands.`;
+        output = `Command '${cmd}' not found. Type 'help' for commands.`;
       }
       if (output) {
         setTerminalOutput(prev => [...prev, `> ${cmd}`, output, ""]);
@@ -195,7 +180,7 @@ const Portfolio = () => {
   const portfolioData = {
     name: "Dhiraj Shahi",
     title: "Cybersecurity Expert | Ethical Hacker",
-    bio: "A passionate cybersecurity professional with expertise in ethical hacking, penetration testing, and network security. Skilled in identifying vulnerabilities and securing digital assets. Also proficient in web development and computer operations, bringing a unique blend of security and development skills to protect modern digital infrastructure.",
+    bio: "A passionate cybersecurity professional with expertise in ethical hacking, penetration testing, and network security. Skilled in identifying vulnerabilities and securing digital assets.",
     email: "dhirajshahif15@gmail.com",
     phone: "+977 9709954775",
     location: "Surkhet, Nepal",
@@ -205,13 +190,12 @@ const Portfolio = () => {
       { name: "Network Security", level: 92, icon: "🌐", color: "from-blue-500 to-cyan-500" },
       { name: "Vulnerability Assessment", level: 85, icon: "🎯", color: "from-purple-500 to-pink-500" },
       { name: "Kali Linux", level: 90, icon: "💻", color: "from-gray-700 to-gray-500" },
-      { name: "Web Security", level: 82, icon: "🛡️", color: "from-green-500 to-emerald-500" },
-      { name: "MS Office Suite", level: 95, icon: "📊", color: "from-blue-600 to-blue-400" }
+      { name: "Web Security", level: 82, icon: "🛡️", color: "from-green-500 to-emerald-500" }
     ],
     experience: [
-      { title: "Senior Security Analyst", company: "Cybersecurity Firm", period: "2024 - Present", desc: "Leading security assessments, penetration testing, and vulnerability management for enterprise clients." },
-      { title: "Ethical Hacking Consultant", company: "Freelance", period: "2023 - Present", desc: "Providing security consulting services including network audits and security training." },
-      { title: "Web Security Developer", company: "Tech Solutions", period: "2022 - 2024", desc: "Developed secure web applications and implemented security best practices." }
+      { title: "Senior Security Analyst", company: "Cybersecurity Firm", period: "2024 - Present", desc: "Leading security assessments and penetration testing." },
+      { title: "Ethical Hacking Consultant", company: "Freelance", period: "2023 - Present", desc: "Providing security consulting services." },
+      { title: "Web Security Developer", company: "Tech Solutions", period: "2022 - 2024", desc: "Developed secure web applications." }
     ],
     certifications: [
       { name: "Certified Red Team Analyst", issuer: "Red Team Leaders", date: "2025", icon: "🔴" },
@@ -272,13 +256,10 @@ const Portfolio = () => {
 
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? 'bg-black/95 backdrop-blur-md py-2 shadow-2xl border-b border-purple-500/20' : 'bg-transparent py-4'}`}>
-        <div className="container mx-auto px-4 flex justify-between items-center">
+        <div className="container mx-auto px-4 flex justify-between items-center flex-wrap gap-2">
           <div className="flex items-center gap-2 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="relative">
-              <Shield size={32} className="text-purple-500 group-hover:scale-110 transition duration-300" />
-              <div className="absolute inset-0 bg-purple-500 blur-lg opacity-50 group-hover:opacity-100 transition"></div>
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 via-red-400 to-purple-400 bg-clip-text text-transparent group-hover:scale-105 transition">DHRX</span>
+            <Shield size={32} className="text-purple-500 group-hover:scale-110 transition duration-300" />
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 via-red-400 to-purple-400 bg-clip-text text-transparent">DHRX</span>
           </div>
           <div className="hidden md:flex gap-2">
             {["about", "skills", "experience", "certifications", "contact"].map(tab => (
@@ -299,7 +280,7 @@ const Portfolio = () => {
       </nav>
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-20">
+      <section className="relative min-h-screen flex items-center justify-center pt-20">
         <div className="container mx-auto px-4 text-center">
           <div className="relative inline-block mb-8">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-red-600 blur-2xl opacity-50 animate-pulse"></div>
@@ -307,24 +288,24 @@ const Portfolio = () => {
               <Shield size={56} className="text-white animate-pulse" />
             </div>
             <div className="absolute -bottom-2 -right-2 w-10 h-10 rounded-full bg-green-500 flex items-center justify-center animate-bounce border-2 border-white">
-              <span className="text-white text-xs font-bold">✓</span>
+              <span className="text-white text-xs font-bold">OK</span>
             </div>
           </div>
           
-          <div className="font-mono text-green-400 text-sm mb-4 animate-pulse">>_ SECURE_CONNECTION_ESTABLISHED | {currentTime}</div>
+          <div className="font-mono text-green-400 text-sm mb-4 animate-pulse">[SECURE CONNECTION ESTABLISHED]</div>
           
           <div className="h-16 mb-4">
-            <h1 className="text-2xl md:text-4xl font-mono font-bold">
+            <h1 className="text-xl md:text-3xl font-mono font-bold">
               <span className="bg-gradient-to-r from-purple-400 via-red-400 to-purple-400 bg-clip-text text-transparent animate-gradient">
                 {typedText}
               </span>
-              <span className={`inline-block w-1 h-6 bg-purple-500 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+              <span className={`inline-block w-1 h-5 bg-purple-500 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
             </h1>
           </div>
           
           <div className="flex flex-wrap justify-center gap-3 mb-6">
-            {["🔒 Ethical Hacker", "🛡️ Security Analyst", "💻 Pen Tester", "🚀 Developer"].map((badge, i) => (
-              <span key={i} className="px-4 py-2 bg-white/10 rounded-full text-white text-sm backdrop-blur border border-white/20 animate-float" style={{ animationDelay: `${i * 0.1}s` }}>
+            {["Ethical Hacker", "Security Analyst", "Pen Tester", "Developer"].map((badge, i) => (
+              <span key={i} key={i} className="px-4 py-2 bg-white/10 rounded-full text-white text-sm backdrop-blur border border-white/20 animate-float" style={{ animationDelay: `${i * 0.1}s` }}>
                 {badge}
               </span>
             ))}
@@ -336,10 +317,10 @@ const Portfolio = () => {
           
           <div className="mt-8 flex justify-center gap-4">
             <button onClick={() => setActiveTab("contact")} className="px-8 py-3 rounded-full bg-gradient-to-r from-purple-600 to-red-600 text-white font-semibold hover:shadow-2xl transition-all hover:scale-105 animate-float">
-              Hire Me 🚀
+              Hire Me
             </button>
             <button onClick={exportToJSON} className="px-8 py-3 rounded-full border border-purple-500 text-purple-400 font-semibold hover:bg-purple-500/10 transition-all hover:scale-105">
-              Download CV 📄
+              Download CV
             </button>
           </div>
         </div>
@@ -359,7 +340,7 @@ const Portfolio = () => {
               <div className="w-3 h-3 rounded-full bg-red-500"></div>
               <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
-              <span className="text-gray-400 text-xs ml-2">dhrx@security:~</span>
+              <span className="text-gray-400 text-xs ml-2">dhrx@security</span>
             </div>
             <div className="p-4 font-mono text-sm">
               {terminalOutput.map((line, i) => (
@@ -383,19 +364,17 @@ const Portfolio = () => {
         </div>
       </section>
 
-      {/* Main Content */}
-      <section className="py-20">
+      {/* Stats Grid */}
+      <section className="py-10">
         <div className="container mx-auto px-4 max-w-6xl">
-          
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-20">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
             {[
               { value: "3+", label: "CERTIFICATIONS", icon: <Award size={28} />, color: "from-purple-500 to-pink-500" },
               { value: "10+", label: "SKILLS", icon: <Zap size={28} />, color: "from-blue-500 to-cyan-500" },
               { value: "4+", label: "PROJECTS", icon: <Briefcase size={28} />, color: "from-green-500 to-emerald-500" },
               { value: "500+", label: "HOURS", icon: <Clock size={28} />, color: "from-orange-500 to-red-500" }
             ].map((stat, i) => (
-              <div key={i} className="group relative bg-white/5 backdrop-blur rounded-2xl p-6 text-center hover:scale-110 transition-all duration-500 cursor-pointer overflow-hidden animate-fade-up" style={{ animationDelay: `${i * 0.1}s` }}>
+              <div key={i} className="group relative bg-white/5 backdrop-blur rounded-2xl p-6 text-center hover:scale-110 transition-all duration-500 cursor-pointer overflow-hidden">
                 <div className={`absolute inset-0 bg-gradient-to-r ${stat.color} opacity-0 group-hover:opacity-20 transition-opacity`}></div>
                 <div className={`text-${stat.color.split('-')[1]}-400 mb-3 group-hover:scale-110 transition`}>{stat.icon}</div>
                 <div className={`text-3xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>{stat.value}</div>
@@ -405,36 +384,36 @@ const Portfolio = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="bg-white/5 backdrop-blur rounded-3xl p-8 border border-white/10 shadow-2xl animate-scale-up">
+          <div className="bg-white/5 backdrop-blur rounded-3xl p-6 md:p-8 border border-white/10 shadow-2xl">
             
             {activeTab === "about" && (
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="space-y-4">
-                  <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                    <div className="w-1 h-8 bg-purple-500 rounded-full"></div> Professional Journey
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <div className="w-1 h-6 bg-purple-500 rounded-full"></div> Professional Journey
                   </h3>
-                  <p className="text-gray-300 leading-relaxed">{portfolioData.bio}</p>
-                  <div className="grid grid-cols-2 gap-3 pt-4">
-                    {["🔒 Vulnerability Assessment", "🐛 Ethical Hacking", "🌐 Network Security", "💻 Web Security"].map((item, i) => (
-                      <div key={i} className="flex items-center gap-2 text-gray-300 text-sm p-2 bg-white/5 rounded-lg hover:bg-white/10 transition">
-                        <CheckCircle size={14} className="text-green-400" /> {item}
+                  <p className="text-gray-300 leading-relaxed text-sm">{portfolioData.bio}</p>
+                  <div className="grid grid-cols-2 gap-2 pt-3">
+                    {["Vulnerability Assessment", "Ethical Hacking", "Network Security", "Web Security"].map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 text-gray-300 text-xs p-2 bg-white/5 rounded-lg">
+                        <CheckCircle size={12} className="text-green-400" /> {item}
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-purple-900/30 to-red-900/30 rounded-2xl p-6 border border-purple-500/30">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Eye size={20} className="text-purple-400" /> Contact Info</h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-gray-300 p-3 bg-white/5 rounded-xl"><MapPin size={18} className="text-purple-400" /> {portfolioData.location}</div>
-                    <div className="flex items-center gap-3 text-gray-300 p-3 bg-white/5 rounded-xl"><Mail size={18} className="text-purple-400" /> {portfolioData.email}</div>
-                    <div className="flex items-center gap-3 text-gray-300 p-3 bg-white/5 rounded-xl"><Phone size={18} className="text-purple-400" /> {portfolioData.phone}</div>
+                <div className="bg-gradient-to-br from-purple-900/30 to-red-900/30 rounded-xl p-5 border border-purple-500/30">
+                  <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2"><Eye size={18} className="text-purple-400" /> Contact Info</h3>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-gray-300 text-sm p-2 bg-white/5 rounded-lg"><MapPin size={14} className="text-purple-400" /> {portfolioData.location}</div>
+                    <div className="flex items-center gap-2 text-gray-300 text-sm p-2 bg-white/5 rounded-lg"><Mail size={14} className="text-purple-400" /> {portfolioData.email}</div>
+                    <div className="flex items-center gap-2 text-gray-300 text-sm p-2 bg-white/5 rounded-lg"><Phone size={14} className="text-purple-400" /> {portfolioData.phone}</div>
                   </div>
                   <div className="mt-4 pt-3 border-t border-purple-500/20">
-                    <h3 className="text-md font-semibold text-white mb-3">Connect</h3>
-                    <div className="flex gap-3">
-                      <a href={portfolioData.social.facebook} target="_blank" className="p-3 bg-white/10 rounded-xl hover:bg-blue-600 transition-all hover:scale-110"><Facebook size={20} /></a>
-                      <a href={portfolioData.social.github} target="_blank" className="p-3 bg-white/10 rounded-xl hover:bg-gray-600 transition-all hover:scale-110"><Github size={20} /></a>
-                      <a href={portfolioData.social.linkedin} target="_blank" className="p-3 bg-white/10 rounded-xl hover:bg-blue-700 transition-all hover:scale-110"><Linkedin size={20} /></a>
+                    <h3 className="text-xs font-semibold text-white mb-2">Connect</h3>
+                    <div className="flex gap-2">
+                      <a href={portfolioData.social.facebook} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-blue-600 transition"><Facebook size={16} /></a>
+                      <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-gray-600 transition"><Github size={16} /></a>
+                      <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-blue-700 transition"><Linkedin size={16} /></a>
                     </div>
                   </div>
                 </div>
@@ -442,14 +421,14 @@ const Portfolio = () => {
             )}
 
             {activeTab === "skills" && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {portfolioData.skills.map((skill, idx) => (
-                  <div key={idx} className="group relative" onMouseEnter={() => setHoveredCard(idx)} onMouseLeave={() => setHoveredCard(null)}>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-white font-medium flex items-center gap-2 text-lg"><span className="text-2xl">{skill.icon}</span> {skill.name}</span>
-                      <span className="text-purple-400 font-mono">{skill.level}%</span>
+                  <div key={idx} className="group" onMouseEnter={() => setHoveredCard(idx)} onMouseLeave={() => setHoveredCard(null)}>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-white text-sm font-medium flex items-center gap-1"><span>{skill.icon}</span> {skill.name}</span>
+                      <span className="text-purple-400 text-xs">{skill.level}%</span>
                     </div>
-                    <div className="w-full bg-gray-800 rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-gray-800 rounded-full h-2 overflow-hidden">
                       <div className={`h-full bg-gradient-to-r ${skill.color} rounded-full transition-all duration-1000 ${hoveredCard === idx ? 'shadow-lg' : ''}`} style={{ width: `${skill.level}%` }}></div>
                     </div>
                   </div>
@@ -458,14 +437,13 @@ const Portfolio = () => {
             )}
 
             {activeTab === "experience" && (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {portfolioData.experience.map((exp, idx) => (
-                  <div key={idx} className="group relative bg-gradient-to-r from-white/5 to-transparent rounded-xl p-6 border-l-4 border-purple-500 hover:scale-[1.02] transition-all duration-300">
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+                  <div key={idx} className="group relative bg-gradient-to-r from-white/5 to-transparent rounded-xl p-4 border-l-4 border-purple-500 hover:scale-[1.01] transition-all">
                     <div className="relative">
-                      <h3 className="text-xl font-bold text-white">{exp.title}</h3>
-                      <p className="text-purple-400 text-sm mb-2">{exp.company} • {exp.period}</p>
-                      <p className="text-gray-300">{exp.desc}</p>
+                      <h3 className="text-md font-bold text-white">{exp.title}</h3>
+                      <p className="text-purple-400 text-xs mb-1">{exp.company} • {exp.period}</p>
+                      <p className="text-gray-300 text-xs">{exp.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -473,29 +451,29 @@ const Portfolio = () => {
             )}
 
             {activeTab === "certifications" && (
-              <div className="grid md:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-3 gap-4">
                 {portfolioData.certifications.map((cert, idx) => (
-                  <div key={idx} className="group relative bg-gradient-to-br from-purple-900/30 to-red-900/30 rounded-2xl p-6 text-center border border-purple-500/30 hover:scale-105 transition-all duration-300 cursor-pointer">
-                    <div className="text-6xl mb-4 group-hover:animate-bounce">{cert.icon}</div>
-                    <h4 className="text-lg font-bold text-white mb-2">{cert.name}</h4>
-                    <p className="text-gray-400 text-sm">{cert.issuer}</p>
-                    <p className="text-gray-500 text-xs mt-2 flex items-center justify-center gap-1"><Calendar size={12} /> {cert.date}</p>
+                  <div key={idx} className="group bg-gradient-to-br from-purple-900/30 to-red-900/30 rounded-xl p-4 text-center border border-purple-500/30 hover:scale-105 transition-all cursor-pointer">
+                    <div className="text-4xl mb-2 group-hover:animate-bounce">{cert.icon}</div>
+                    <h4 className="text-sm font-bold text-white mb-1">{cert.name}</h4>
+                    <p className="text-gray-400 text-xs">{cert.issuer}</p>
+                    <p className="text-gray-500 text-2xs mt-1">{cert.date}</p>
                   </div>
                 ))}
               </div>
             )}
 
             {activeTab === "contact" && (
-              <div className="text-center py-12">
-                <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-red-500 flex items-center justify-center mb-6 animate-bounce">
-                  <Mail size={40} className="text-white" />
+              <div className="text-center py-8">
+                <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-red-500 flex items-center justify-center mb-4 animate-bounce">
+                  <Mail size={32} className="text-white" />
                 </div>
-                <h3 className="text-3xl font-bold text-white mb-4">Ready to Secure Your Digital Assets?</h3>
-                <p className="text-gray-400 mb-8 max-w-md mx-auto">Let's discuss how I can help protect your organization from cyber threats.</p>
-                <div className="flex flex-col items-center gap-3">
-                  <div className="flex items-center gap-3 text-gray-300"><Mail size={18} className="text-purple-400" /> {portfolioData.email}</div>
-                  <div className="flex items-center gap-3 text-gray-300"><Phone size={18} className="text-purple-400" /> {portfolioData.phone}</div>
-                  <div className="flex items-center gap-3 text-gray-300"><MapPin size={18} className="text-purple-400" /> {portfolioData.location}</div>
+                <h3 className="text-xl font-bold text-white mb-2">Ready to Work Together?</h3>
+                <p className="text-gray-400 text-sm mb-5 max-w-md mx-auto">Let's discuss how I can help secure your digital assets.</p>
+                <div className="flex flex-col items-center gap-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-300"><Mail size={14} className="text-purple-400" /> {portfolioData.email}</div>
+                  <div className="flex items-center gap-2 text-gray-300"><Phone size={14} className="text-purple-400" /> {portfolioData.phone}</div>
+                  <div className="flex items-center gap-2 text-gray-300"><MapPin size={14} className="text-purple-400" /> {portfolioData.location}</div>
                 </div>
               </div>
             )}
@@ -504,16 +482,16 @@ const Portfolio = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 text-center border-t border-white/10">
-        <p className="text-gray-500 text-sm flex items-center justify-center gap-2">
-          <Shield size={14} /> Secured by Dhiraj Shahi • Cybersecurity Professional • 2024
+      <footer className="py-6 text-center border-t border-white/10">
+        <p className="text-gray-500 text-xs flex items-center justify-center gap-2">
+          <Shield size={12} /> Secured by Dhiraj Shahi • Cybersecurity Professional • 2024
         </p>
       </footer>
 
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
+          50% { transform: translateY(-8px); }
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
@@ -521,10 +499,10 @@ const Portfolio = () => {
         }
         @keyframes scroll {
           0% { transform: translateY(0); opacity: 1; }
-          100% { transform: translateY(15px); opacity: 0; }
+          100% { transform: translateY(12px); opacity: 0; }
         }
         @keyframes fade-up {
-          from { opacity: 0; transform: translateY(30px); }
+          from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes scale-up {
@@ -536,10 +514,10 @@ const Portfolio = () => {
           50% { background-position: 100% 50%; }
         }
         .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-spin-slow { animation: spin-slow 4s linear infinite; }
+        .animate-spin-slow { animation: spin-slow 3s linear infinite; }
         .animate-scroll { animation: scroll 1.5s ease-in-out infinite; }
-        .animate-fade-up { animation: fade-up 0.6s ease-out forwards; opacity: 0; }
-        .animate-scale-up { animation: scale-up 0.5s ease-out; }
+        .animate-fade-up { animation: fade-up 0.5s ease-out forwards; opacity: 0; }
+        .animate-scale-up { animation: scale-up 0.4s ease-out; }
         .animate-gradient { background-size: 200% 200%; animation: gradient 3s ease infinite; }
       `}</style>
     </div>
