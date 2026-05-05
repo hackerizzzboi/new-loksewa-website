@@ -5,7 +5,8 @@ import {
   Briefcase, GraduationCap, Code, Shield, FileText, 
   Download, Zap, Target, Eye, Heart, Star, User,
   CheckCircle, Calendar, Clock, Trophy, Sparkles, Rocket,
-  Flame, Droplet, GraduationCap as GradCap
+  TrendingUp, Activity, Globe, Cpu, Lock, Server, Bug,
+  Flame, Droplet, Monitor, Sun, Moon
 } from "lucide-react";
 
 const Portfolio = () => {
@@ -29,6 +30,7 @@ const Portfolio = () => {
   const animationRef = useRef<number>();
   const raindropsRef = useRef<any[]>([]);
   const particlesRef = useRef<any[]>([]);
+  const isVisibleRef = useRef(true);
 
   const fullName = "Dhiraj Shahi";
   
@@ -81,7 +83,23 @@ const Portfolio = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Optimized canvas animation with bigger particles
+  // Intersection Observer for canvas visibility
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (canvasRef.current) {
+      observer.observe(canvasRef.current);
+    }
+    
+    return () => observer.disconnect();
+  }, []);
+
+  // Optimized canvas animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -92,7 +110,7 @@ const Portfolio = () => {
     let height = window.innerHeight;
     let frameCount = 0;
     let lastTimestamp = 0;
-    const targetFPS = 30;
+    const targetFPS = 30; // Limit FPS for better performance on mobile
     const frameInterval = 1000 / targetFPS;
 
     const resizeCanvas = () => {
@@ -101,31 +119,57 @@ const Portfolio = () => {
       canvas.width = width;
       canvas.height = height;
       
-      // Reinitialize particles with BIGGER sizes
+      // Reinitialize particles based on new dimensions
       if (bgType === "rain") {
-        const dropCount = Math.min(Math.floor(width * 0.25), 120);
+        const dropCount = Math.min(Math.floor(width * 0.3), 150);
         raindropsRef.current = [];
         for (let i = 0; i < dropCount; i++) {
           raindropsRef.current.push({
             x: Math.random() * width,
             y: Math.random() * height,
-            length: Math.random() * 25 + 15, // BIGGER raindrops (was 8-15)
-            speed: Math.random() * 6 + 4, // Slightly faster
-            opacity: Math.random() * 0.4 + 0.2,
-            width: Math.random() * 2 + 1.5 // Thicker raindrops
+            length: Math.random() * 15 + 8,
+            speed: Math.random() * 5 + 3,
+            opacity: Math.random() * 0.3 + 0.15
           });
         }
       } else {
-        const particleCount = Math.min(Math.floor(width * 0.2), 80);
+        const particleCount = Math.min(Math.floor(width * 0.25), 100);
         particlesRef.current = [];
         for (let i = 0; i < particleCount; i++) {
           particlesRef.current.push({
             x: Math.random() * width,
             y: Math.random() * height,
-            size: Math.random() * 6 + 3, // BIGGER fire particles (was 1.5-3)
-            speed: Math.random() * 2.5 + 1.5,
-            alpha: Math.random() * 0.5 + 0.3,
-            flicker: Math.random() * 0.5
+            size: Math.random() * 3 + 1.5,
+            speed: Math.random() * 2 + 1,
+            alpha: Math.random() * 0.4 + 0.2
+          });
+        }
+      }
+    };
+
+    const initEffects = () => {
+      if (bgType === "rain") {
+        const dropCount = Math.min(Math.floor(width * 0.3), 150);
+        raindropsRef.current = [];
+        for (let i = 0; i < dropCount; i++) {
+          raindropsRef.current.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            length: Math.random() * 15 + 8,
+            speed: Math.random() * 5 + 3,
+            opacity: Math.random() * 0.3 + 0.15
+          });
+        }
+      } else {
+        const particleCount = Math.min(Math.floor(width * 0.25), 100);
+        particlesRef.current = [];
+        for (let i = 0; i < particleCount; i++) {
+          particlesRef.current.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            size: Math.random() * 3 + 1.5,
+            speed: Math.random() * 2 + 1,
+            alpha: Math.random() * 0.4 + 0.2
           });
         }
       }
@@ -138,15 +182,7 @@ const Portfolio = () => {
         ctx.moveTo(drop.x, drop.y);
         ctx.lineTo(drop.x, drop.y + drop.length);
         ctx.strokeStyle = `rgba(100, 150, 255, ${drop.opacity})`;
-        ctx.lineWidth = drop.width || 2;
-        ctx.stroke();
-        
-        // Add a subtle glow effect to raindrops
-        ctx.beginPath();
-        ctx.moveTo(drop.x - 0.5, drop.y);
-        ctx.lineTo(drop.x - 0.5, drop.y + drop.length);
-        ctx.strokeStyle = `rgba(150, 200, 255, ${drop.opacity * 0.5})`;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
         
         drop.y += drop.speed;
@@ -161,38 +197,27 @@ const Portfolio = () => {
     const drawFire = () => {
       for (let i = 0; i < particlesRef.current.length; i++) {
         const p = particlesRef.current[i];
-        
-        // Draw main fire particle
         ctx.beginPath();
-        const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
-        gradient.addColorStop(0, `rgba(255, 200, 50, ${p.alpha})`);
-        gradient.addColorStop(0.5, `rgba(255, 100, 0, ${p.alpha * 0.7})`);
-        gradient.addColorStop(1, `rgba(255, 0, 0, 0)`);
-        ctx.fillStyle = gradient;
+        ctx.fillStyle = `rgba(255, ${Math.random() * 80 + 70}, 0, ${p.alpha})`;
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
         
-        // Add inner glow
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 100, ${p.alpha * 0.8})`;
-        ctx.fill();
-        
-        // Movement with flicker effect
         p.y -= p.speed;
-        p.x += (Math.random() - 0.5) * 1.2;
-        p.size += (Math.random() - 0.5) * 0.3;
-        p.size = Math.max(2, Math.min(p.size, 8));
+        p.x += (Math.random() - 0.5) * 0.8;
         
         if (p.y < 0) {
           p.y = height;
           p.x = Math.random() * width;
-          p.size = Math.random() * 6 + 3;
         }
       }
     };
 
     const animate = (timestamp: number) => {
+      if (!isVisibleRef.current) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      
       if (timestamp - lastTimestamp >= frameInterval) {
         if (bgType === "rain") {
           ctx.clearRect(0, 0, width, height);
@@ -209,9 +234,11 @@ const Portfolio = () => {
     };
 
     resizeCanvas();
+    initEffects();
     
     const handleResize = () => {
       resizeCanvas();
+      initEffects();
     };
     
     window.addEventListener('resize', handleResize);
@@ -253,6 +280,11 @@ const Portfolio = () => {
     }, 200);
     return () => clearInterval(progressInterval);
   }, []);
+
+  const handleCardClick = (e: React.MouseEvent, index: number) => {
+    setShakeCard(index);
+    setTimeout(() => setShakeCard(null), 300);
+  };
 
   const portfolioData = {
     name: "Dhiraj Shahi",
@@ -347,10 +379,10 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      {/* Canvas Background with bigger particles */}
+      {/* Optimized Canvas Background */}
       <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none will-change-transform"></canvas>
       
-      {/* Background Toggle Switch */}
+      {/* Background Toggle Switch - Optimized for mobile */}
       <div className="fixed bottom-4 right-4 z-50 flex gap-2 bg-black/60 backdrop-blur rounded-full p-1 border border-gray-700">
         <button
           onClick={() => setBgType("rain")}
@@ -549,6 +581,7 @@ const Portfolio = () => {
                 key={i} 
                 className="group relative bg-gray-900/50 backdrop-blur rounded-xl md:rounded-2xl p-2 md:p-6 text-center border border-gray-800 hover:border-blue-500/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-up"
                 style={{ animationDelay: `${i * 0.1}s` }}
+                onClick={(e) => handleCardClick(e, i)}
               >
                 <div className={`mb-0.5 md:mb-3 group-hover:scale-110 group-hover:rotate-12 transition duration-300`} style={{ color: stat.color }}>{stat.icon}</div>
                 <div className="text-lg md:text-3xl font-bold font-mono" style={{ color: stat.color }}>{stat.value}</div>
@@ -675,6 +708,7 @@ const Portfolio = () => {
                     <div 
                       key={idx} 
                       className={`group border-l-4 border-blue-500 pl-2 md:pl-5 py-1.5 md:py-3 hover:bg-gray-800/50 rounded-r-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer`}
+                      onClick={(e) => handleCardClick(e, idx)}
                     >
                       <h3 className="text-xs md:text-lg font-mono font-semibold text-white group-hover:text-blue-400 transition">{exp.title}</h3>
                       <p className="text-blue-400 text-[10px] md:text-sm mb-0.5 flex items-center gap-1 md:gap-2 font-mono">
@@ -695,9 +729,10 @@ const Portfolio = () => {
                     <div 
                       key={idx} 
                       className="flex items-start gap-2 md:gap-4 p-2 md:p-4 bg-gray-800/30 rounded-xl border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:scale-[1.02] cursor-pointer group"
+                      onClick={(e) => handleCardClick(e, idx)}
                     >
                       <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 animate-pulse-slow group-hover:scale-110 transition">
-                        <GradCap size={14} className="text-black md:w-[22px] md:h-[22px]" />
+                        <GraduationCap size={14} className="text-black md:w-[22px] md:h-[22px]" />
                       </div>
                       <div>
                         <h3 className="font-mono font-semibold text-white text-xs md:text-lg group-hover:text-blue-400 transition">{edu.degree}</h3>
@@ -718,6 +753,7 @@ const Portfolio = () => {
                     <div 
                       key={idx} 
                       className="group p-2 md:p-4 bg-gray-800/30 rounded-xl border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:scale-105 cursor-pointer"
+                      onClick={(e) => handleCardClick(e, idx)}
                     >
                       <div className="flex items-start gap-1.5 md:gap-3">
                         <div className="text-xl md:text-3xl group-hover:animate-bounce group-hover:scale-125 transition">🏆</div>
