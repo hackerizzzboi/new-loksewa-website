@@ -328,4 +328,3 @@ const OldIsGold = () => {
 
 export default OldIsGold;
 
-
