@@ -37,7 +37,7 @@ const App = () => (
           {/* Main app routes - INSIDE Layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
-            <Route path="/practice" element={<Practice />} />
+            <Route path="/MCQ" element={<MCQ />} />
             <Route path="/quiz/:category/:setId?" element={<QuizPage />} />
             <Route path="/old-is-gold" element={<OldIsGold />} />
             <Route path="/online-exam" element={<OnlineExam />} />
