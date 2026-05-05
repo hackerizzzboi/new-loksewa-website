@@ -13,7 +13,7 @@ import OnlineExam from "./pages/OnlineExam";
 import Syllabus from "./pages/Syllabus";
 import TypingPractice from "./pages/TypingPractice";
 import Notes from "./pages/Notes";
-import News from "./pages/News";
+import Downloads from "./pages/Downloads";  // ← Changed from News to Downloads
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,7 +44,7 @@ const App = () => (
             <Route path="/syllabus" element={<Syllabus />} />
             <Route path="/typing" element={<TypingPractice />} />
             <Route path="/notes" element={<Notes />} />
-            <Route path="/news" element={<News />} />
+            <Route path="/downloads" element={<Downloads />} />  {/* ← Changed from /news to /downloads */}
           </Route>
           
           <Route path="*" element={<NotFound />} />
