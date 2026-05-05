@@ -8,13 +8,13 @@ import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
 const EXAM_DATE = new Date("2026-06-22T10:00:00+05:45");
 
 const quickAccess = [
-  { label: "Practice", icon: "❓", path: "/practice", color: "quick-card-red" },
+  { label: "MCQ", icon: "❓", path: "/practice", color: "quick-card-red" },
   { label: "Old is Gold", icon: "🏆", path: "/old-is-gold", color: "quick-card-green" },
   { label: "अनलाइन परीक्षा", icon: "📝", path: "/online-exam", color: "quick-card-teal" },
   { label: "Syllabus", icon: "📋", path: "/syllabus", color: "quick-card-purple" },
   { label: "Typing", icon: "⌨️", path: "/typing", color: "quick-card-amber" },
   { label: "Notes", icon: "📒", path: "/notes", color: "quick-card-navy" },
-  { label: "PSC News", icon: "📰", path: "/news", color: "quick-card-pink" },
+  { label: "Downloads", icon: "📰", path: "/news", color: "quick-card-pink" },
 ];
 
 const importantLinks = [
