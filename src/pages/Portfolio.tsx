@@ -8,6 +8,7 @@ import {
   TrendingUp, Activity, Globe, Cpu, Lock, Server, Bug,
   Flame, Droplet, Monitor, Sun, Moon
 } from "lucide-react";
+import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
 
 const Portfolio = () => {
   const navigate = useNavigate();
@@ -21,8 +22,9 @@ const Portfolio = () => {
   const [currentTime, setCurrentTime] = useState("");
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingText, setLoadingText] = useState("");
-  const [bgType, setBgType] = useState("rain"); // rain or fire
+  const [bgType, setBgType] = useState("rain");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [shakeCard, setShakeCard] = useState<number | null>(null);
   
   const heroRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
@@ -79,7 +81,7 @@ const Portfolio = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Rain animation
+  // Rain/Fire animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -125,7 +127,6 @@ const Portfolio = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       if (bgType === "rain") {
-        // Rain effect - smooth falling drops
         for (let i = 0; i < raindrops.length; i++) {
           const drop = raindrops[i];
           ctx.beginPath();
@@ -143,7 +144,6 @@ const Portfolio = () => {
           }
         }
       } else {
-        // Fire effect
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
           ctx.beginPath();
@@ -374,7 +374,7 @@ const Portfolio = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-lg blur-md opacity-0 group-hover:opacity-50 transition duration-500"></div>
                 <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition duration-300">
-                  <Shield size={16} className="text-black md:w-5 md:h-5" />
+                  <Shield size={16} className="text-black" />
                 </div>
               </div>
               <div className="flex items-center gap-1">
@@ -434,8 +434,12 @@ const Portfolio = () => {
         <div ref={heroRef} className="container mx-auto px-4 text-center transition-transform duration-300">
           <div className="relative inline-block mb-6 group">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 blur-2xl opacity-50 animate-pulse-slow"></div>
-            <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition duration-500 animate-float">
-              <User size={40} className="text-black md:w-14 md:h-14" />
+            <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition duration-500 animate-float overflow-hidden">
+              <img 
+                src={dhirajPhoto} 
+                alt="Dhiraj Shahi" 
+                className="w-full h-full object-cover rounded-full"
+              />
               <div className="absolute -bottom-2 -right-2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 flex items-center justify-center border-2 border-black animate-bounce">
                 <CheckCircle size={14} className="text-black md:w-5 md:h-5" />
               </div>
@@ -499,7 +503,7 @@ const Portfolio = () => {
         </div>
       </section>
 
-      {/* Stats Section - Responsive Grid */}
+      {/* Stats Section */}
       <section className="py-8 md:py-16">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
@@ -527,7 +531,7 @@ const Portfolio = () => {
       {/* Tab Content Section */}
       <section className="py-6 md:py-10">
         <div className="container mx-auto px-4 max-w-5xl">
-          {/* Tab Buttons - Responsive */}
+          {/* Tab Buttons */}
           <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-6 md:mb-8">
             {["about", "skills", "experience", "education", "certificates", "contact"].map((tab, i) => (
               <button
@@ -545,7 +549,7 @@ const Portfolio = () => {
             ))}
           </div>
 
-          {/* Content Cards - Responsive */}
+          {/* Content Cards */}
           <div className="bg-gray-900/50 backdrop-blur rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden animate-scale-up">
             
             {/* About */}
@@ -574,13 +578,13 @@ const Portfolio = () => {
                       <Eye size={16} className="md:w-5 md:h-5" /> // SYSTEM_INFO
                     </h3>
                     <div className="space-y-2 md:space-y-3">
-                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
+                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm">
                         <MapPin size={14} className="md:w-[18px] md:h-[18px] text-blue-400" /> LOCATION: {portfolioData.location}
                       </div>
-                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
+                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm">
                         <Mail size={14} className="md:w-[18px] md:h-[18px] text-blue-400" /> EMAIL: {portfolioData.email}
                       </div>
-                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
+                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm">
                         <Phone size={14} className="md:w-[18px] md:h-[18px] text-blue-400" /> PHONE: {portfolioData.phone}
                       </div>
                     </div>
