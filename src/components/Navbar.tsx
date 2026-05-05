@@ -10,7 +10,7 @@ const navItems = [
   { label: "Syllabus", path: "/syllabus", icon: "📋" },
   { label: "Typing", path: "/typing", icon: "⌨️" },
   { label: "Notes", path: "/notes", icon: "📒" },
-  { label: "News", path: "/news", icon: "📰" },
+  { label: "Downloads", path: "/downloads", icon: "📥" },
   { label: "Admin", path: "/admin", icon: "🔒" },  // ← ADDED ADMIN LINK
 ];
 
