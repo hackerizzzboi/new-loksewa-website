@@ -13,7 +13,8 @@ import OnlineExam from "./pages/OnlineExam";
 import Syllabus from "./pages/Syllabus";
 import TypingPractice from "./pages/TypingPractice";
 import Notes from "./pages/Notes";
-import Downloads from "./pages/Downloads";  // ← Changed from News to Downloads
+import Downloads from "./pages/Downloads";
+import Portfolio from "./pages/Portfolio";  // ← ADD THIS IMPORT
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,9 @@ const App = () => (
             } 
           />
           
+          {/* Portfolio route - OUTSIDE Layout (full page) */}
+          <Route path="/portfolio" element={<Portfolio />} />
+          
           {/* Main app routes - INSIDE Layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
@@ -44,7 +48,7 @@ const App = () => (
             <Route path="/syllabus" element={<Syllabus />} />
             <Route path="/typing" element={<TypingPractice />} />
             <Route path="/notes" element={<Notes />} />
-            <Route path="/downloads" element={<Downloads />} />  {/* ← Changed from /news to /downloads */}
+            <Route path="/downloads" element={<Downloads />} />
           </Route>
           
           <Route path="*" element={<NotFound />} />
