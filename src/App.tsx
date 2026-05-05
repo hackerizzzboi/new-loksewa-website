@@ -25,56 +25,60 @@ const App = () => {
   const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
-    // Prevent scroll during loading
     if (showLoading) {
       document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
     };
   }, [showLoading]);
 
   return (
     <>
+      {/* Loading Screen - Highest z-index, covers everything */}
       {showLoading && <NepalLoadingScreen onComplete={() => setShowLoading(false)} />}
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              {/* Admin route - OUTSIDE Layout (has its own navigation) */}
-              <Route 
-                path="/admin" 
-                element={
-                  <AdminGuard>
-                    <Admin />
-                  </AdminGuard>
-                } 
-              />
-              
-              {/* Portfolio route - OUTSIDE Layout (full page) */}
-              <Route path="/portfolio" element={<Portfolio />} />
-              
-              {/* Main app routes - INSIDE Layout */}
-              <Route element={<Layout />}>
-                <Route path="/" element={<Index />} />
-                <Route path="/practice" element={<Practice />} />
-                <Route path="/quiz/:category/:setId?" element={<QuizPage />} />
-                <Route path="/old-is-gold" element={<OldIsGold />} />
-                <Route path="/online-exam" element={<OnlineExam />} />
-                <Route path="/syllabus" element={<Syllabus />} />
-                <Route path="/typing" element={<TypingPractice />} />
-                <Route path="/notes" element={<Notes />} />
-                <Route path="/downloads" element={<Downloads />} />
-              </Route>
-              
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+      
+      {/* Main App - Hidden until loading is complete */}
+      <div style={{ display: showLoading ? 'none' : 'block' }}>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route 
+                  path="/admin" 
+                  element={
+                    <AdminGuard>
+                      <Admin />
+                    </AdminGuard>
+                  } 
+                />
+                <Route path="/portfolio" element={<Portfolio />} />
+                <Route element={<Layout />}>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/practice" element={<Practice />} />
+                  <Route path="/quiz/:category/:setId?" element={<QuizPage />} />
+                  <Route path="/old-is-gold" element={<OldIsGold />} />
+                  <Route path="/online-exam" element={<OnlineExam />} />
+                  <Route path="/syllabus" element={<Syllabus />} />
+                  <Route path="/typing" element={<TypingPractice />} />
+                  <Route path="/notes" element={<Notes />} />
+                  <Route path="/downloads" element={<Downloads />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </div>
     </>
   );
 };
