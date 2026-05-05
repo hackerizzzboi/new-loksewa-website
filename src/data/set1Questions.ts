@@ -13,7 +13,7 @@ export const set1Questions: Question[] = [
     id: 1,
     text: "Which of the following is not one of the three 'Mail Merge Helper' steps?",
     options: ["Merge the two files", "Create the main document", "Set the mailing list parameters", "Create the data source"],
-    correctAnswer: 0,
+    correctAnswer: 2,
     explanation: "Mail Merge Helper has 3 steps: Create Main Document, Create Data Source, Merge the documents. 'Merge the two files' is not a step name."
   },
   {
@@ -76,7 +76,7 @@ export const set1Questions: Question[] = [
     id: 10,
     text: "Which of the following is not a valid wildcard in MS DOS?",
     options: ["*", "/", ".", "?"],
-    correctAnswer: 2,
+    correctAnswer: 1,
     explanation: "Valid wildcards are * (any characters) and ? (single character). Dot (.) is not a wildcard."
   },
   {
