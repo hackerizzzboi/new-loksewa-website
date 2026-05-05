@@ -34,7 +34,7 @@ const QuizPage = () => {
     } else if (category === "old-is-gold" && setId) {
       // Use exact questions for Set 1, otherwise use generated ones
       if (setId === "set-1") {
-        // Convert set1Questions to match Question type
+        // Convert set1Questions to match Question type - NO SHUFFLE
         qs = set1Questions.map(q => ({
           id: q.id.toString(),
           question: q.text,
@@ -42,7 +42,7 @@ const QuizPage = () => {
           correct: q.correctAnswer,
           explanation: q.explanation
         }));
-        qs = shuffleArray(qs);
+        // NO SHUFFLE - questions stay in original order 1 to 50
       } else {
         qs = getOldIsGoldQuestions(setId);
       }
