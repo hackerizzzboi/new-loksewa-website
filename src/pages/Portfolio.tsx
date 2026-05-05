@@ -21,16 +21,12 @@ const Portfolio = () => {
   const [currentTime, setCurrentTime] = useState("");
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingText, setLoadingText] = useState("");
-  const [bgType, setBgType] = useState("rain");
+  const [bgType, setBgType] = useState("rain"); // rain or fire
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const heroRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
-  const raindropsRef = useRef<any[]>([]);
-  const particlesRef = useRef<any[]>([]);
-  const isVisibleRef = useRef(true);
 
   const fullName = "Dhiraj Shahi";
   
@@ -83,171 +79,105 @@ const Portfolio = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Intersection Observer for canvas visibility
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        isVisibleRef.current = entry.isIntersecting;
-      },
-      { threshold: 0.1 }
-    );
-    
-    if (canvasRef.current) {
-      observer.observe(canvasRef.current);
-    }
-    
-    return () => observer.disconnect();
-  }, []);
-
-  // Optimized canvas animation
+  // Rain animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
-    let frameCount = 0;
-    let lastTimestamp = 0;
-    const targetFPS = 30; // Limit FPS for better performance on mobile
-    const frameInterval = 1000 / targetFPS;
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
-    const resizeCanvas = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+    let raindrops: Array<{x: number, y: number, length: number, speed: number, opacity: number}> = [];
+    let particles: Array<{x: number, y: number, size: number, speed: number, alpha: number}> = [];
+
+    const initRain = () => {
+      raindrops = [];
+      for (let i = 0; i < 200; i++) {
+        raindrops.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          length: Math.random() * 20 + 10,
+          speed: Math.random() * 8 + 4,
+          opacity: Math.random() * 0.4 + 0.2
+        });
+      }
+    };
+
+    const initFire = () => {
+      particles = [];
+      for (let i = 0; i < 150; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 4 + 2,
+          speed: Math.random() * 3 + 1,
+          alpha: Math.random() * 0.6 + 0.2
+        });
+      }
+    };
+
+    initRain();
+    initFire();
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Reinitialize particles based on new dimensions
       if (bgType === "rain") {
-        const dropCount = Math.min(Math.floor(width * 0.3), 150);
-        raindropsRef.current = [];
-        for (let i = 0; i < dropCount; i++) {
-          raindropsRef.current.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            length: Math.random() * 15 + 8,
-            speed: Math.random() * 5 + 3,
-            opacity: Math.random() * 0.3 + 0.15
-          });
+        // Rain effect - smooth falling drops
+        for (let i = 0; i < raindrops.length; i++) {
+          const drop = raindrops[i];
+          ctx.beginPath();
+          ctx.moveTo(drop.x, drop.y);
+          ctx.lineTo(drop.x, drop.y + drop.length);
+          ctx.strokeStyle = `rgba(100, 150, 255, ${drop.opacity})`;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          
+          drop.y += drop.speed;
+          
+          if (drop.y > canvas.height) {
+            drop.y = -drop.length;
+            drop.x = Math.random() * canvas.width;
+          }
         }
       } else {
-        const particleCount = Math.min(Math.floor(width * 0.25), 100);
-        particlesRef.current = [];
-        for (let i = 0; i < particleCount; i++) {
-          particlesRef.current.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            size: Math.random() * 3 + 1.5,
-            speed: Math.random() * 2 + 1,
-            alpha: Math.random() * 0.4 + 0.2
-          });
+        // Fire effect
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          ctx.beginPath();
+          const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+          gradient.addColorStop(0, `rgba(255, ${Math.random() * 100 + 50}, 0, ${p.alpha})`);
+          gradient.addColorStop(1, `rgba(255, 0, 0, 0)`);
+          ctx.fillStyle = gradient;
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+          
+          p.y -= p.speed;
+          p.x += (Math.random() - 0.5) * 1;
+          
+          if (p.y < 0) {
+            p.y = canvas.height;
+            p.x = Math.random() * canvas.width;
+          }
         }
-      }
-    };
-
-    const initEffects = () => {
-      if (bgType === "rain") {
-        const dropCount = Math.min(Math.floor(width * 0.3), 150);
-        raindropsRef.current = [];
-        for (let i = 0; i < dropCount; i++) {
-          raindropsRef.current.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            length: Math.random() * 15 + 8,
-            speed: Math.random() * 5 + 3,
-            opacity: Math.random() * 0.3 + 0.15
-          });
-        }
-      } else {
-        const particleCount = Math.min(Math.floor(width * 0.25), 100);
-        particlesRef.current = [];
-        for (let i = 0; i < particleCount; i++) {
-          particlesRef.current.push({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            size: Math.random() * 3 + 1.5,
-            speed: Math.random() * 2 + 1,
-            alpha: Math.random() * 0.4 + 0.2
-          });
-        }
-      }
-    };
-
-    const drawRain = () => {
-      for (let i = 0; i < raindropsRef.current.length; i++) {
-        const drop = raindropsRef.current[i];
-        ctx.beginPath();
-        ctx.moveTo(drop.x, drop.y);
-        ctx.lineTo(drop.x, drop.y + drop.length);
-        ctx.strokeStyle = `rgba(100, 150, 255, ${drop.opacity})`;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-        
-        drop.y += drop.speed;
-        
-        if (drop.y > height) {
-          drop.y = -drop.length;
-          drop.x = Math.random() * width;
-        }
-      }
-    };
-
-    const drawFire = () => {
-      for (let i = 0; i < particlesRef.current.length; i++) {
-        const p = particlesRef.current[i];
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(255, ${Math.random() * 80 + 70}, 0, ${p.alpha})`;
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fill();
-        
-        p.y -= p.speed;
-        p.x += (Math.random() - 0.5) * 0.8;
-        
-        if (p.y < 0) {
-          p.y = height;
-          p.x = Math.random() * width;
-        }
-      }
-    };
-
-    const animate = (timestamp: number) => {
-      if (!isVisibleRef.current) {
-        animationRef.current = requestAnimationFrame(animate);
-        return;
       }
       
-      if (timestamp - lastTimestamp >= frameInterval) {
-        if (bgType === "rain") {
-          ctx.clearRect(0, 0, width, height);
-          drawRain();
-        } else {
-          ctx.clearRect(0, 0, width, height);
-          drawFire();
-        }
-        lastTimestamp = timestamp;
-        frameCount++;
-      }
-      
-      animationRef.current = requestAnimationFrame(animate);
+      requestAnimationFrame(animate);
     };
-
-    resizeCanvas();
-    initEffects();
+    
+    animate();
     
     const handleResize = () => {
-      resizeCanvas();
-      initEffects();
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      initRain();
+      initFire();
     };
-    
     window.addEventListener('resize', handleResize);
-    animationRef.current = requestAnimationFrame(animate);
     
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
       window.removeEventListener('resize', handleResize);
     };
   }, [bgType]);
@@ -270,7 +200,7 @@ const Portfolio = () => {
       if (progress >= 100) {
         progress = 100;
         clearInterval(progressInterval);
-        setTimeout(() => setIsLoading(false), 500);
+        setTimeout(() => setIsLoading(false), 800);
       }
       setLoadingProgress(Math.min(progress, 100));
       setLoadingText(loadingMessages[msgIndex % loadingMessages.length]);
@@ -344,31 +274,33 @@ const Portfolio = () => {
   if (isLoading) {
     return (
       <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center overflow-hidden">
+        <canvas ref={canvasRef} className="fixed inset-0 w-full h-full opacity-40"></canvas>
+        
         <div className="relative z-10 text-center">
           <div className="relative mb-10">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 blur-2xl opacity-50 animate-pulse"></div>
-            <div className="w-20 h-20 md:w-28 md:h-28 mx-auto rounded-full border-4 border-blue-500/30 flex items-center justify-center bg-black/50 animate-spin-slow">
-              <Shield size={40} className="text-blue-500 animate-pulse md:w-14 md:h-14" />
+            <div className="w-28 h-28 mx-auto rounded-full border-4 border-blue-500/30 flex items-center justify-center bg-black/50 animate-spin-slow">
+              <Shield size={56} className="text-blue-500 animate-pulse" />
             </div>
           </div>
           
           <div className="space-y-4">
-            <h2 className="text-lg md:text-2xl font-mono font-bold text-blue-400">
+            <h2 className="text-xl md:text-2xl font-mono font-bold text-blue-400">
               {loadingText}
             </h2>
             
-            <div className="w-56 md:w-80 h-1.5 bg-gray-800 rounded-full overflow-hidden mx-auto">
+            <div className="w-64 md:w-80 h-1.5 bg-gray-800 rounded-full overflow-hidden mx-auto">
               <div 
                 className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full transition-all duration-300"
                 style={{ width: `${loadingProgress}%` }}
               ></div>
             </div>
             
-            <p className="text-gray-400 font-mono text-xs md:text-sm">{Math.floor(loadingProgress)}%</p>
+            <p className="text-gray-400 font-mono text-sm">{Math.floor(loadingProgress)}%</p>
             
-            <div className="flex justify-center gap-1.5 md:gap-2 mt-4">
+            <div className="flex justify-center gap-2 mt-4">
               {[0, 1, 2, 3, 4].map(i => (
-                <div key={i} className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full animate-bounce-smooth bg-blue-500" style={{ animationDelay: `${i * 0.1}s` }}></div>
+                <div key={i} className="w-2 h-2 rounded-full animate-bounce-smooth bg-blue-500" style={{ animationDelay: `${i * 0.1}s` }}></div>
               ))}
             </div>
           </div>
@@ -379,33 +311,33 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      {/* Optimized Canvas Background */}
-      <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none will-change-transform"></canvas>
+      {/* Animated Background Canvas - Rain/Fire */}
+      <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none"></canvas>
       
-      {/* Background Toggle Switch - Optimized for mobile */}
-      <div className="fixed bottom-4 right-4 z-50 flex gap-2 bg-black/60 backdrop-blur rounded-full p-1 border border-gray-700">
+      {/* Background Toggle Switch */}
+      <div className="fixed bottom-4 right-4 z-50 flex gap-2 bg-black/50 backdrop-blur rounded-full p-1 border border-gray-700">
         <button
           onClick={() => setBgType("rain")}
-          className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono transition-all duration-300 flex items-center gap-0.5 md:gap-1 ${
+          className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 flex items-center gap-1 ${
             bgType === "rain" ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
-          <Droplet size={12} className="md:w-3 md:h-3" /> RAIN
+          <Droplet size={14} /> RAIN
         </button>
         <button
           onClick={() => setBgType("fire")}
-          className={`px-2 md:px-3 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-mono transition-all duration-300 flex items-center gap-0.5 md:gap-1 ${
+          className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all duration-300 flex items-center gap-1 ${
             bgType === "fire" ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
           }`}
         >
-          <Flame size={12} className="md:w-3 md:h-3" /> FIRE
+          <Flame size={14} /> FIRE
         </button>
       </div>
 
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 bg-black/95 z-50 lg:hidden" onClick={() => setMobileMenuOpen(false)}>
-          <div className="flex flex-col items-center justify-center h-full space-y-4 px-4">
+          <div className="flex flex-col items-center justify-center h-full space-y-4">
             {["about", "skills", "experience", "education", "certificates", "contact"].map((tab) => (
               <button
                 key={tab}
@@ -413,20 +345,20 @@ const Portfolio = () => {
                   setActiveTab(tab);
                   setMobileMenuOpen(false);
                 }}
-                className="text-white text-base font-mono py-3 px-8 rounded-xl hover:bg-white/10 transition w-48 text-center"
+                className="text-white text-lg font-mono py-3 px-8 rounded-xl hover:bg-white/10 transition w-48 text-center"
               >
                 [{tab.toUpperCase()}]
               </button>
             ))}
             <button
               onClick={exportToJSON}
-              className="text-white text-base font-mono py-3 px-8 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg transition w-48 text-center"
+              className="text-white text-lg font-mono py-3 px-8 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg transition w-48 text-center"
             >
               EXPORT CV
             </button>
             <button
               onClick={() => navigate(-1)}
-              className="text-white text-base font-mono py-3 px-8 rounded-xl bg-white/10 hover:bg-white/20 transition w-48 text-center"
+              className="text-white text-lg font-mono py-3 px-8 rounded-xl bg-white/10 hover:bg-white/20 transition w-48 text-center"
             >
               CLOSE
             </button>
@@ -435,7 +367,7 @@ const Portfolio = () => {
       )}
 
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-2xl py-2 border-b border-blue-500/20' : 'bg-transparent py-3 md:py-4'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? 'bg-black/95 backdrop-blur-md shadow-2xl py-2 border-b border-blue-500/20' : 'bg-transparent py-4'}`}>
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-2 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
@@ -446,8 +378,8 @@ const Portfolio = () => {
                 </div>
               </div>
               <div className="flex items-center gap-1">
-                <span className="text-xs md:text-lg font-bold font-mono text-white">Dhiraj Shahi</span>
-                <span className="text-lg md:text-2xl">🇳🇵</span>
+                <span className="text-sm md:text-lg font-bold font-mono text-white">Dhiraj Shahi</span>
+                <span className="text-xl md:text-2xl">🇳🇵</span>
               </div>
             </div>
             
@@ -489,7 +421,7 @@ const Portfolio = () => {
               onClick={() => setMobileMenuOpen(true)}
               className="md:hidden text-white p-2 rounded-lg bg-white/10"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -502,36 +434,36 @@ const Portfolio = () => {
         <div ref={heroRef} className="container mx-auto px-4 text-center transition-transform duration-300">
           <div className="relative inline-block mb-6 group">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 blur-2xl opacity-50 animate-pulse-slow"></div>
-            <div className="relative w-24 h-24 md:w-36 md:h-36 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition duration-500 animate-float">
-              <User size={36} className="text-black md:w-14 md:h-14" />
-              <div className="absolute -bottom-2 -right-2 w-7 h-7 md:w-10 md:h-10 rounded-full bg-green-500 flex items-center justify-center border-2 border-black animate-bounce">
-                <CheckCircle size={12} className="text-black md:w-5 md:h-5" />
+            <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition duration-500 animate-float">
+              <User size={40} className="text-black md:w-14 md:h-14" />
+              <div className="absolute -bottom-2 -right-2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 flex items-center justify-center border-2 border-black animate-bounce">
+                <CheckCircle size={14} className="text-black md:w-5 md:h-5" />
               </div>
             </div>
           </div>
           
-          <div className="font-mono text-blue-400 text-[10px] md:text-sm mb-2 animate-pulse">
-            <span className="inline-block w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
+          <div className="font-mono text-blue-400 text-xs md:text-sm mb-2 animate-pulse">
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></span>
             root@dhrx:~$ ./portfolio --status=online • {currentTime}
           </div>
           
           <div className="mb-4">
-            <h1 className="text-2xl md:text-6xl lg:text-7xl font-bold font-mono tracking-wide">
+            <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold font-mono tracking-wide">
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent animate-gradient">
                 {typedText}
               </span>
-              <span className="text-2xl md:text-6xl lg:text-7xl ml-1">🇳🇵</span>
-              <span className={`inline-block w-0.5 h-5 md:h-10 bg-blue-500 ml-1 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+              <span className="text-3xl md:text-6xl lg:text-7xl ml-2">🇳🇵</span>
+              <span className={`inline-block w-1 h-6 md:h-10 bg-blue-500 ml-2 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
             </h1>
           </div>
           
-          <p className="text-sm md:text-xl text-blue-400 mb-5 animate-fade-up font-mono px-2">{portfolioData.title}</p>
+          <p className="text-base md:text-xl text-blue-400 mb-5 animate-fade-up font-mono">{portfolioData.title}</p>
           
-          <div className="flex flex-wrap justify-center gap-1.5 md:gap-3 mb-8">
+          <div className="flex flex-wrap justify-center gap-2 md:gap-3 mb-8">
             {["🔒 Ethical Hacker", "🛡️ Security Analyst", "💻 Pen Tester", "🚀 Developer"].map((badge, i) => (
               <span 
                 key={i} 
-                className="px-2 py-1 md:px-4 md:py-2 bg-gray-900/50 backdrop-blur rounded-full text-blue-400 text-[10px] md:text-sm font-mono border border-blue-500/30 hover:shadow-lg hover:scale-110 hover:border-blue-500 transition-all duration-300 animate-float cursor-pointer"
+                className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-900/50 backdrop-blur rounded-full text-blue-400 text-xs md:text-sm font-mono border border-blue-500/30 hover:shadow-lg hover:scale-110 hover:border-blue-500 transition-all duration-300 animate-float cursor-pointer"
                 style={{ animationDelay: `${i * 0.15}s` }}
               >
                 {badge}
@@ -539,20 +471,20 @@ const Portfolio = () => {
             ))}
           </div>
           
-          <p className="text-gray-300 max-w-2xl mx-auto leading-relaxed text-xs md:text-base px-4 animate-fade-up">
+          <p className="text-gray-300 max-w-2xl mx-auto leading-relaxed text-sm md:text-base px-4 animate-fade-up">
             {portfolioData.bio}
           </p>
           
-          <div className="mt-8 flex flex-wrap justify-center gap-2 md:gap-4">
+          <div className="mt-8 flex flex-wrap justify-center gap-3 md:gap-4">
             <button 
               onClick={() => setActiveTab("contact")} 
-              className="px-5 py-2 md:px-8 md:py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-black font-bold font-mono text-xs md:text-base hover:shadow-2xl hover:scale-110 transition-all duration-300 animate-float group"
+              className="px-6 py-2.5 md:px-8 md:py-3 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 text-black font-bold font-mono text-sm md:text-base hover:shadow-2xl hover:scale-110 transition-all duration-300 animate-float group"
             >
-              <span className="flex items-center gap-1 md:gap-2">HIRE ME <Rocket size={14} className="md:w-5 md:h-5 group-hover:translate-x-1 transition" /></span>
+              <span className="flex items-center gap-2">HIRE ME <Rocket size={16} className="md:w-5 md:h-5 group-hover:translate-x-1 transition" /></span>
             </button>
             <button 
               onClick={exportToJSON} 
-              className="px-5 py-2 md:px-8 md:py-3 rounded-full border-2 border-blue-500 text-blue-400 font-bold font-mono text-xs md:text-base hover:bg-blue-500 hover:text-black hover:shadow-xl hover:scale-110 transition-all duration-300"
+              className="px-6 py-2.5 md:px-8 md:py-3 rounded-full border-2 border-blue-500 text-blue-400 font-bold font-mono text-sm md:text-base hover:bg-blue-500 hover:text-black hover:shadow-xl hover:scale-110 transition-all duration-300"
             >
               DOWNLOAD CV
             </button>
@@ -561,31 +493,31 @@ const Portfolio = () => {
         
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce-slow cursor-pointer" onClick={() => window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })}>
-          <div className="w-5 h-8 md:w-6 md:h-10 border-2 border-blue-500/50 rounded-full flex justify-center">
-            <div className="w-1 h-1.5 bg-blue-500 rounded-full animate-scroll"></div>
+          <div className="w-6 h-10 border-2 border-blue-500/50 rounded-full flex justify-center">
+            <div className="w-1 h-2 bg-blue-500 rounded-full animate-scroll"></div>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-6 md:py-16">
+      {/* Stats Section - Responsive Grid */}
+      <section className="py-8 md:py-16">
         <div className="container mx-auto px-4 max-w-6xl">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
             {[
-              { value: "4+", label: "CERTIFICATIONS", icon: <Trophy size={16} className="md:w-7 md:h-7" />, color: "#FF6B6B" },
-              { value: "10+", label: "SKILLS", icon: <Zap size={16} className="md:w-7 md:h-7" />, color: "#4ECDC4" },
-              { value: "4+", label: "PROJECTS", icon: <Briefcase size={16} className="md:w-7 md:h-7" />, color: "#45B7D1" },
-              { value: "500+", label: "HOURS", icon: <Clock size={16} className="md:w-7 md:h-7" />, color: "#96CEB4" }
+              { value: "4+", label: "CERTIFICATIONS", icon: <Trophy size={20} className="md:w-7 md:h-7" />, color: "#FF6B6B" },
+              { value: "10+", label: "SKILLS", icon: <Zap size={20} className="md:w-7 md:h-7" />, color: "#4ECDC4" },
+              { value: "4+", label: "PROJECTS", icon: <Briefcase size={20} className="md:w-7 md:h-7" />, color: "#45B7D1" },
+              { value: "500+", label: "HOURS", icon: <Clock size={20} className="md:w-7 md:h-7" />, color: "#96CEB4" }
             ].map((stat, i) => (
               <div 
                 key={i} 
-                className="group relative bg-gray-900/50 backdrop-blur rounded-xl md:rounded-2xl p-2 md:p-6 text-center border border-gray-800 hover:border-blue-500/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-up"
+                className="group relative bg-gray-900/50 backdrop-blur rounded-xl md:rounded-2xl p-3 md:p-6 text-center border border-gray-800 hover:border-blue-500/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer animate-fade-up"
                 style={{ animationDelay: `${i * 0.1}s` }}
                 onClick={(e) => handleCardClick(e, i)}
               >
-                <div className={`mb-0.5 md:mb-3 group-hover:scale-110 group-hover:rotate-12 transition duration-300`} style={{ color: stat.color }}>{stat.icon}</div>
-                <div className="text-lg md:text-3xl font-bold font-mono" style={{ color: stat.color }}>{stat.value}</div>
-                <div className="text-gray-500 text-[8px] md:text-sm mt-0.5 md:mt-1 font-mono">{stat.label}</div>
+                <div className={`mb-1 md:mb-3 group-hover:scale-110 group-hover:rotate-12 transition duration-300`} style={{ color: stat.color }}>{stat.icon}</div>
+                <div className="text-xl md:text-3xl font-bold font-mono" style={{ color: stat.color }}>{stat.value}</div>
+                <div className="text-gray-500 text-[10px] md:text-sm mt-0.5 md:mt-1 font-mono">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -593,15 +525,15 @@ const Portfolio = () => {
       </section>
 
       {/* Tab Content Section */}
-      <section className="py-4 md:py-10">
+      <section className="py-6 md:py-10">
         <div className="container mx-auto px-4 max-w-5xl">
-          {/* Tab Buttons */}
-          <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-4 md:mb-8">
+          {/* Tab Buttons - Responsive */}
+          <div className="flex flex-wrap justify-center gap-1 md:gap-2 mb-6 md:mb-8">
             {["about", "skills", "experience", "education", "certificates", "contact"].map((tab, i) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-2 py-1 md:px-5 md:py-2.5 rounded-full text-[9px] md:text-sm font-mono font-bold transition-all duration-300 hover:scale-105 ${
+                className={`px-3 py-1.5 md:px-5 md:py-2.5 rounded-full text-[10px] md:text-sm font-mono font-bold transition-all duration-300 hover:scale-105 ${
                   activeTab === tab 
                     ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-black shadow-lg' 
                     : 'bg-gray-900/50 text-gray-400 hover:text-white border border-gray-800 hover:border-blue-500/50'
@@ -613,51 +545,51 @@ const Portfolio = () => {
             ))}
           </div>
 
-          {/* Content Cards */}
+          {/* Content Cards - Responsive */}
           <div className="bg-gray-900/50 backdrop-blur rounded-xl md:rounded-2xl border border-gray-800 overflow-hidden animate-scale-up">
             
             {/* About */}
             {activeTab === "about" && (
-              <div className="p-3 md:p-8">
-                <div className="grid md:grid-cols-2 gap-4 md:gap-8">
-                  <div className="space-y-2 md:space-y-4 animate-slide-right">
-                    <h3 className="text-base md:text-2xl font-mono font-bold text-blue-400 flex items-center gap-2">
-                      <div className="w-1 h-4 md:h-8 bg-blue-500 rounded-full"></div>
+              <div className="p-4 md:p-8">
+                <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+                  <div className="space-y-3 md:space-y-4 animate-slide-right">
+                    <h3 className="text-lg md:text-2xl font-mono font-bold text-blue-400 flex items-center gap-2">
+                      <div className="w-1 h-6 md:h-8 bg-blue-500 rounded-full"></div>
                       // ABOUT_ME
                     </h3>
-                    <p className="text-gray-300 leading-relaxed text-xs md:text-base">{portfolioData.bio}</p>
+                    <p className="text-gray-300 leading-relaxed text-sm md:text-base">{portfolioData.bio}</p>
                     <div className="pt-2">
-                      <h4 className="font-mono font-semibold text-blue-400 text-xs md:text-base mb-1 md:mb-3">// CORE_COMPETENCIES</h4>
-                      <div className="flex flex-wrap gap-1 md:gap-2">
+                      <h4 className="font-mono font-semibold text-blue-400 text-sm md:text-base mb-2 md:mb-3">// CORE_COMPETENCIES</h4>
+                      <div className="flex flex-wrap gap-1.5 md:gap-2">
                         {["Vulnerability Assessment", "Ethical Hacking", "Network Security", "Web Development"].map((item, i) => (
-                          <span key={i} className="px-1.5 py-0.5 md:px-3 md:py-1.5 bg-gray-800 rounded-full text-[9px] md:text-sm text-gray-300 font-mono hover:scale-105 hover:border hover:border-blue-500 transition-all duration-300 cursor-pointer">
+                          <span key={i} className="px-2 py-1 md:px-3 md:py-1.5 bg-gray-800 rounded-full text-[10px] md:text-sm text-gray-300 font-mono hover:scale-105 hover:border hover:border-blue-500 transition-all duration-300 cursor-pointer">
                             {item}
                           </span>
                         ))}
                       </div>
                     </div>
                   </div>
-                  <div className="bg-gray-800/50 rounded-xl p-3 md:p-6 border border-gray-700 animate-slide-left">
-                    <h3 className="text-sm md:text-xl font-mono font-bold text-blue-400 mb-2 md:mb-4 flex items-center gap-2">
-                      <Eye size={14} className="md:w-5 md:h-5" /> // SYSTEM_INFO
+                  <div className="bg-gray-800/50 rounded-xl p-4 md:p-6 border border-gray-700 animate-slide-left">
+                    <h3 className="text-base md:text-xl font-mono font-bold text-blue-400 mb-3 md:mb-4 flex items-center gap-2">
+                      <Eye size={16} className="md:w-5 md:h-5" /> // SYSTEM_INFO
                     </h3>
-                    <div className="space-y-1.5 md:space-y-3">
-                      <div className="flex items-center gap-1.5 md:gap-3 text-gray-300 p-1 md:p-2 bg-gray-900 rounded-lg font-mono text-[10px] md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
-                        <MapPin size={10} className="md:w-[18px] md:h-[18px] text-blue-400" /> LOCATION: {portfolioData.location}
+                    <div className="space-y-2 md:space-y-3">
+                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
+                        <MapPin size={14} className="md:w-[18px] md:h-[18px] text-blue-400" /> LOCATION: {portfolioData.location}
                       </div>
-                      <div className="flex items-center gap-1.5 md:gap-3 text-gray-300 p-1 md:p-2 bg-gray-900 rounded-lg font-mono text-[10px] md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
-                        <Mail size={10} className="md:w-[18px] md:h-[18px] text-blue-400" /> EMAIL: {portfolioData.email}
+                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
+                        <Mail size={14} className="md:w-[18px] md:h-[18px] text-blue-400" /> EMAIL: {portfolioData.email}
                       </div>
-                      <div className="flex items-center gap-1.5 md:gap-3 text-gray-300 p-1 md:p-2 bg-gray-900 rounded-lg font-mono text-[10px] md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
-                        <Phone size={10} className="md:w-[18px] md:h-[18px] text-blue-400" /> PHONE: {portfolioData.phone}
+                      <div className="flex items-center gap-2 md:gap-3 text-gray-300 p-1.5 md:p-2 bg-gray-900 rounded-lg font-mono text-xs md:text-sm hover:border hover:border-blue-500 transition-all duration-300">
+                        <Phone size={14} className="md:w-[18px] md:h-[18px] text-blue-400" /> PHONE: {portfolioData.phone}
                       </div>
                     </div>
-                    <div className="mt-3 md:mt-6 pt-2 md:pt-4 border-t border-gray-700">
-                      <h4 className="font-mono font-semibold text-blue-400 text-[10px] md:text-sm mb-1.5 md:mb-2">// SOCIAL_LINKS</h4>
-                      <div className="flex gap-1.5 md:gap-3">
-                        <a href={portfolioData.social.facebook} target="_blank" className="p-1 md:p-2 bg-gray-900 rounded-lg hover:bg-blue-600 hover:text-white hover:scale-110 transition-all duration-300 text-[10px] md:text-sm">FB</a>
-                        <a href={portfolioData.social.github} target="_blank" className="p-1 md:p-2 bg-gray-900 rounded-lg hover:bg-gray-600 hover:text-white hover:scale-110 transition-all duration-300 text-[10px] md:text-sm">GH</a>
-                        <a href={portfolioData.social.linkedin} target="_blank" className="p-1 md:p-2 bg-gray-900 rounded-lg hover:bg-blue-700 hover:text-white hover:scale-110 transition-all duration-300 text-[10px] md:text-sm">IN</a>
+                    <div className="mt-4 md:mt-6 pt-3 md:pt-4 border-t border-gray-700">
+                      <h4 className="font-mono font-semibold text-blue-400 text-xs md:text-sm mb-2">// SOCIAL_LINKS</h4>
+                      <div className="flex gap-2 md:gap-3">
+                        <a href={portfolioData.social.facebook} target="_blank" className="p-1.5 md:p-2 bg-gray-900 rounded-lg hover:bg-blue-600 hover:text-white hover:scale-110 transition-all duration-300 text-xs md:text-sm">FB</a>
+                        <a href={portfolioData.social.github} target="_blank" className="p-1.5 md:p-2 bg-gray-900 rounded-lg hover:bg-gray-600 hover:text-white hover:scale-110 transition-all duration-300 text-xs md:text-sm">GH</a>
+                        <a href={portfolioData.social.linkedin} target="_blank" className="p-1.5 md:p-2 bg-gray-900 rounded-lg hover:bg-blue-700 hover:text-white hover:scale-110 transition-all duration-300 text-xs md:text-sm">IN</a>
                       </div>
                     </div>
                   </div>
@@ -667,8 +599,8 @@ const Portfolio = () => {
 
             {/* Skills */}
             {activeTab === "skills" && (
-              <div className="p-3 md:p-8">
-                <div className="grid md:grid-cols-2 gap-2 md:gap-5">
+              <div className="p-4 md:p-8">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-5">
                   {portfolioData.skills.map((skill, idx) => (
                     <div 
                       key={idx} 
@@ -678,13 +610,13 @@ const Portfolio = () => {
                       onMouseEnter={() => setHoveredSkill(idx)}
                       onMouseLeave={() => setHoveredSkill(null)}
                     >
-                      <div className="flex justify-between mb-0.5">
-                        <span className="text-gray-300 font-mono text-[10px] md:text-sm flex items-center gap-1 md:gap-2">
-                          <span className="text-xs md:text-xl group-hover:animate-bounce group-hover:scale-125 transition-transform duration-300">{skill.icon}</span> {skill.name}
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-300 font-mono text-xs md:text-sm flex items-center gap-1 md:gap-2">
+                          <span className="text-base md:text-xl group-hover:animate-bounce group-hover:scale-125 transition-transform duration-300">{skill.icon}</span> {skill.name}
                         </span>
-                        <span className="text-blue-400 text-[10px] md:text-sm font-mono font-bold animate-pulse">{skill.level}%</span>
+                        <span className="text-blue-400 text-xs md:text-sm font-mono font-bold animate-pulse">{skill.level}%</span>
                       </div>
-                      <div className="w-full bg-gray-800 rounded-full h-1 md:h-2 overflow-hidden">
+                      <div className="w-full bg-gray-800 rounded-full h-1.5 md:h-2 overflow-hidden">
                         <div 
                           className="h-full rounded-full transition-all duration-1000"
                           style={{ 
@@ -702,19 +634,19 @@ const Portfolio = () => {
 
             {/* Experience */}
             {activeTab === "experience" && (
-              <div className="p-3 md:p-8">
-                <div className="space-y-2 md:space-y-5">
+              <div className="p-4 md:p-8">
+                <div className="space-y-3 md:space-y-5">
                   {portfolioData.experience.map((exp, idx) => (
                     <div 
                       key={idx} 
-                      className={`group border-l-4 border-blue-500 pl-2 md:pl-5 py-1.5 md:py-3 hover:bg-gray-800/50 rounded-r-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer`}
+                      className={`group border-l-4 border-blue-500 pl-3 md:pl-5 py-2 md:py-3 hover:bg-gray-800/50 rounded-r-lg transition-all duration-300 hover:scale-[1.01] cursor-pointer`}
                       onClick={(e) => handleCardClick(e, idx)}
                     >
-                      <h3 className="text-xs md:text-lg font-mono font-semibold text-white group-hover:text-blue-400 transition">{exp.title}</h3>
-                      <p className="text-blue-400 text-[10px] md:text-sm mb-0.5 flex items-center gap-1 md:gap-2 font-mono">
-                        <Briefcase size={10} className="md:w-[14px]" /> {exp.company} // {exp.period}
+                      <h3 className="text-sm md:text-lg font-mono font-semibold text-white group-hover:text-blue-400 transition">{exp.title}</h3>
+                      <p className="text-blue-400 text-xs md:text-sm mb-1 flex items-center gap-2 font-mono">
+                        <Briefcase size={12} className="md:w-[14px]" /> {exp.company} // {exp.period}
                       </p>
-                      <p className="text-gray-400 text-[10px] md:text-sm">{exp.desc}</p>
+                      <p className="text-gray-400 text-xs md:text-sm">{exp.desc}</p>
                     </div>
                   ))}
                 </div>
@@ -723,21 +655,21 @@ const Portfolio = () => {
 
             {/* Education */}
             {activeTab === "education" && (
-              <div className="p-3 md:p-8">
-                <div className="space-y-2 md:space-y-4">
+              <div className="p-4 md:p-8">
+                <div className="space-y-3 md:space-y-4">
                   {portfolioData.education.map((edu, idx) => (
                     <div 
                       key={idx} 
-                      className="flex items-start gap-2 md:gap-4 p-2 md:p-4 bg-gray-800/30 rounded-xl border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:scale-[1.02] cursor-pointer group"
+                      className="flex items-start gap-3 md:gap-4 p-3 md:p-4 bg-gray-800/30 rounded-xl border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:scale-[1.02] cursor-pointer group"
                       onClick={(e) => handleCardClick(e, idx)}
                     >
-                      <div className="w-8 h-8 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 animate-pulse-slow group-hover:scale-110 transition">
-                        <GraduationCap size={14} className="text-black md:w-[22px] md:h-[22px]" />
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center flex-shrink-0 animate-pulse-slow group-hover:scale-110 transition">
+                        <GraduationCap size={18} className="text-black md:w-[22px] md:h-[22px]" />
                       </div>
                       <div>
-                        <h3 className="font-mono font-semibold text-white text-xs md:text-lg group-hover:text-blue-400 transition">{edu.degree}</h3>
-                        <p className="text-gray-400 font-mono text-[10px] md:text-sm">{edu.institution}</p>
-                        <p className="text-blue-400 text-[10px] md:text-sm mt-0.5 flex items-center gap-1 font-mono"><Calendar size={8} className="md:w-3 md:h-3" /> {edu.year}</p>
+                        <h3 className="font-mono font-semibold text-white text-sm md:text-lg group-hover:text-blue-400 transition">{edu.degree}</h3>
+                        <p className="text-gray-400 font-mono text-xs md:text-sm">{edu.institution}</p>
+                        <p className="text-blue-400 text-xs md:text-sm mt-1 flex items-center gap-1 font-mono"><Calendar size={10} className="md:w-3 md:h-3" /> {edu.year}</p>
                       </div>
                     </div>
                   ))}
@@ -747,20 +679,20 @@ const Portfolio = () => {
 
             {/* Certificates */}
             {activeTab === "certificates" && (
-              <div className="p-3 md:p-8">
-                <div className="grid md:grid-cols-2 gap-2 md:gap-4">
+              <div className="p-4 md:p-8">
+                <div className="grid md:grid-cols-2 gap-3 md:gap-4">
                   {portfolioData.certificates.map((cert, idx) => (
                     <div 
                       key={idx} 
-                      className="group p-2 md:p-4 bg-gray-800/30 rounded-xl border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:scale-105 cursor-pointer"
+                      className="group p-3 md:p-4 bg-gray-800/30 rounded-xl border border-gray-700 hover:border-blue-500 transition-all duration-300 hover:scale-105 cursor-pointer"
                       onClick={(e) => handleCardClick(e, idx)}
                     >
-                      <div className="flex items-start gap-1.5 md:gap-3">
-                        <div className="text-xl md:text-3xl group-hover:animate-bounce group-hover:scale-125 transition">🏆</div>
+                      <div className="flex items-start gap-2 md:gap-3">
+                        <div className="text-2xl md:text-3xl group-hover:animate-bounce group-hover:scale-125 transition">🏆</div>
                         <div>
-                          <h4 className="font-mono font-semibold text-white text-[10px] md:text-sm group-hover:text-blue-400 transition">{cert.name}</h4>
-                          <p className="text-gray-400 text-[9px] md:text-sm font-mono">{cert.issuer}</p>
-                          <p className="text-gray-500 text-[8px] md:text-xs mt-0.5 flex items-center gap-1 font-mono"><Calendar size={7} className="md:w-2 md:h-2" /> {cert.date}</p>
+                          <h4 className="font-mono font-semibold text-white text-xs md:text-sm group-hover:text-blue-400 transition">{cert.name}</h4>
+                          <p className="text-gray-400 text-xs md:text-sm font-mono">{cert.issuer}</p>
+                          <p className="text-gray-500 text-[10px] md:text-xs mt-1 flex items-center gap-1 font-mono"><Calendar size={8} className="md:w-2 md:h-2" /> {cert.date}</p>
                         </div>
                       </div>
                     </div>
@@ -771,21 +703,21 @@ const Portfolio = () => {
 
             {/* Contact */}
             {activeTab === "contact" && (
-              <div className="p-3 md:p-8 text-center">
-                <div className="w-14 h-14 md:w-24 md:h-24 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-3 md:mb-5 animate-bounce-slow cursor-pointer group" onClick={() => window.open(`mailto:${portfolioData.email}`)}>
-                  <Mail size={20} className="text-black md:w-9 md:h-9 group-hover:scale-110 transition" />
+              <div className="p-4 md:p-8 text-center">
+                <div className="w-16 h-16 md:w-24 md:h-24 mx-auto rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-4 md:mb-5 animate-bounce-slow cursor-pointer group" onClick={() => window.open(`mailto:${portfolioData.email}`)}>
+                  <Mail size={24} className="text-black md:w-9 md:h-9 group-hover:scale-110 transition" />
                 </div>
-                <h3 className="text-base md:text-2xl font-mono font-bold text-white mb-1 md:mb-2">// CONTACT_ME</h3>
-                <p className="text-gray-400 font-mono text-xs md:text-base mb-3 md:mb-6 max-w-md mx-auto px-2">Ready to collaborate on security projects or development work</p>
-                <div className="space-y-1.5 max-w-sm mx-auto">
-                  <div className="flex items-center gap-1.5 text-gray-300 p-1.5 bg-gray-800/50 rounded-lg font-mono text-[10px] md:text-sm hover:bg-gray-800 hover:scale-105 transition-all duration-300 cursor-pointer group" onClick={() => window.open(`mailto:${portfolioData.email}`)}>
-                    <Mail size={10} className="md:w-4 md:h-4 text-blue-400 group-hover:animate-bounce" /> {portfolioData.email}
+                <h3 className="text-xl md:text-2xl font-mono font-bold text-white mb-2">// CONTACT_ME</h3>
+                <p className="text-gray-400 font-mono text-sm md:text-base mb-4 md:mb-6 max-w-md mx-auto">Ready to collaborate on security projects or development work</p>
+                <div className="space-y-2 max-w-sm mx-auto">
+                  <div className="flex items-center gap-2 text-gray-300 p-2 bg-gray-800/50 rounded-lg font-mono text-xs md:text-sm hover:bg-gray-800 hover:scale-105 transition-all duration-300 cursor-pointer group" onClick={() => window.open(`mailto:${portfolioData.email}`)}>
+                    <Mail size={12} className="md:w-4 md:h-4 text-blue-400 group-hover:animate-bounce" /> {portfolioData.email}
                   </div>
-                  <div className="flex items-center gap-1.5 text-gray-300 p-1.5 bg-gray-800/50 rounded-lg font-mono text-[10px] md:text-sm hover:bg-gray-800 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => window.open(`tel:${portfolioData.phone}`)}>
-                    <Phone size={10} className="md:w-4 md:h-4 text-blue-400" /> {portfolioData.phone}
+                  <div className="flex items-center gap-2 text-gray-300 p-2 bg-gray-800/50 rounded-lg font-mono text-xs md:text-sm hover:bg-gray-800 hover:scale-105 transition-all duration-300 cursor-pointer" onClick={() => window.open(`tel:${portfolioData.phone}`)}>
+                    <Phone size={12} className="md:w-4 md:h-4 text-blue-400" /> {portfolioData.phone}
                   </div>
-                  <div className="flex items-center gap-1.5 text-gray-300 p-1.5 bg-gray-800/50 rounded-lg font-mono text-[10px] md:text-sm hover:bg-gray-800 hover:scale-105 transition-all duration-300">
-                    <MapPin size={10} className="md:w-4 md:h-4 text-blue-400" /> {portfolioData.location}
+                  <div className="flex items-center gap-2 text-gray-300 p-2 bg-gray-800/50 rounded-lg font-mono text-xs md:text-sm hover:bg-gray-800 hover:scale-105 transition-all duration-300">
+                    <MapPin size={12} className="md:w-4 md:h-4 text-blue-400" /> {portfolioData.location}
                   </div>
                 </div>
               </div>
@@ -795,16 +727,16 @@ const Portfolio = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-4 md:py-8 text-center border-t border-gray-800 mt-4 md:mt-8">
-        <p className="text-gray-500 text-[8px] md:text-sm font-mono flex items-center justify-center gap-1 md:gap-2 flex-wrap px-2">
-          <Shield size={8} className="md:w-3 md:h-3 text-blue-400 animate-pulse" /> root@dhrx:~# ./portfolio --status=secure // CYBERSECURITY_PROFESSIONAL // 2024 🇳🇵
+      <footer className="py-6 md:py-8 text-center border-t border-gray-800 mt-6 md:mt-8">
+        <p className="text-gray-500 text-[10px] md:text-sm font-mono flex items-center justify-center gap-2 flex-wrap px-4">
+          <Shield size={10} className="md:w-3 md:h-3 text-blue-400 animate-pulse" /> root@dhrx:~# ./portfolio --status=secure // CYBERSECURITY_PROFESSIONAL // 2024 🇳🇵
         </p>
       </footer>
 
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-8px); }
+          50% { transform: translateY(-10px); }
         }
         @keyframes spin-slow {
           from { transform: rotate(0deg); }
@@ -812,18 +744,18 @@ const Portfolio = () => {
         }
         @keyframes scroll {
           0% { transform: translateY(0); opacity: 1; }
-          100% { transform: translateY(8px); opacity: 0; }
+          100% { transform: translateY(10px); opacity: 0; }
         }
         @keyframes fade-up {
-          from { opacity: 0; transform: translateY(15px); }
+          from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
         }
         @keyframes slide-right {
-          from { opacity: 0; transform: translateX(-15px); }
+          from { opacity: 0; transform: translateX(-20px); }
           to { opacity: 1; transform: translateX(0); }
         }
         @keyframes slide-left {
-          from { opacity: 0; transform: translateX(15px); }
+          from { opacity: 0; transform: translateX(20px); }
           to { opacity: 1; transform: translateX(0); }
         }
         @keyframes scale-up {
@@ -836,11 +768,11 @@ const Portfolio = () => {
         }
         @keyframes bounce-slow {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
+          50% { transform: translateY(-10px); }
         }
         @keyframes bounce-smooth {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-12px); }
+          50% { transform: translateY(-15px); }
         }
         @keyframes gradient {
           0%, 100% { background-position: 0% 50%; }
