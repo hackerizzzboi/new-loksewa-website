@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, BookOpen } from "lucide-react";
+import { Menu, X, BookOpen, Shield } from "lucide-react";
 
 const navItems = [
   { label: "Home", path: "/", icon: "🏠" },
@@ -11,6 +11,7 @@ const navItems = [
   { label: "Typing", path: "/typing", icon: "⌨️" },
   { label: "Notes", path: "/notes", icon: "📒" },
   { label: "News", path: "/news", icon: "📰" },
+  { label: "Admin", path: "/admin", icon: "🔒" },  // ← ADDED ADMIN LINK
 ];
 
 const Navbar = () => {
