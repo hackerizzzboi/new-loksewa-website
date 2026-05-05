@@ -4,7 +4,7 @@ import { Menu, X, BookOpen, Shield } from "lucide-react";
 
 const navItems = [
   { label: "Home", path: "/", icon: "🏠" },
-  { label: "MCQ", path: "/practice", icon: "❓" },
+  { label: "MCQ", path: "/MCQ", icon: "❓" },
   { label: "Old is Gold", path: "/old-is-gold", icon: "🏆" },
   { label: "अनलाइन परीक्षा", path: "/online-exam", icon: "📝" },
   { label: "Syllabus", path: "/syllabus", icon: "📋" },
