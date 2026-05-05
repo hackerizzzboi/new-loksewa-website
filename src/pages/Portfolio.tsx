@@ -5,23 +5,39 @@ import {
   Briefcase, GraduationCap, Code, Shield, FileText, 
   Download, Zap, Target, Eye, Heart, Star, Terminal,
   Lock, Server, Bug, User, FileJson, Sparkles, Rocket, 
-  CheckCircle, ExternalLink, Calendar, Clock, 
-  Trophy, Cpu, Wifi, Key, Globe, Database, Cloud,
-  Layers, Activity, Bell, Coffee, Compass, Crown
+  CheckCircle, Calendar, Clock, Trophy, Cpu, Wifi, 
+  Globe, Database, Cloud, Layers, Crown, GitBranch,
+  Activity, Bell, Coffee, Compass, Diamond, Feather
 } from "lucide-react";
 
 const Portfolio = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("about");
   const [isLoading, setIsLoading] = useState(true);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [scrolled, setScrolled] = useState(false);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [typedText, setTypedText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [particles, setParticles] = useState<Array<{x: number, y: number, size: number, speed: number, color: string}>>([]);
+  const [currentTime, setCurrentTime] = useState("");
+  const [terminalInput, setTerminalInput] = useState("");
+  const [terminalOutput, setTerminalOutput] = useState<string[]>(["> Welcome to DHRX Security Terminal", "> Type 'help' for commands", ""]);
   
+  const heroRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Time
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   const fullText = "> DHIRAJ SHAHI // CYBERSECURITY EXPERT // ETHICAL HACKER <";
 
   // Typing effect
@@ -44,7 +60,7 @@ const Portfolio = () => {
               clearInterval(restart);
             }
           }, 50);
-        }, 3000);
+        }, 4000);
       }
     }, 50);
     return () => clearInterval(typing);
@@ -63,11 +79,70 @@ const Portfolio = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Mouse move for custom cursor
+  // Mouse move
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => setMousePosition({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Canvas animation
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const particles: Array<{ x: number; y: number; radius: number; speedX: number; speedY: number; color: string }> = [];
+    for (let i = 0; i < 100; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 2 + 1,
+        speedX: (Math.random() - 0.5) * 1,
+        speedY: (Math.random() - 0.5) * 1,
+        color: `hsl(${Math.random() * 60 + 260}, 70%, 60%)`
+      });
+    }
+
+    let animationId: number;
+    const animate = () => {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      particles.forEach(p => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
+        
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      
+      animationId = requestAnimationFrame(animate);
+    };
+    animate();
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   // Loading progress
@@ -79,43 +154,43 @@ const Portfolio = () => {
           setTimeout(() => setIsLoading(false), 500);
           return 100;
         }
-        return prev + Math.random() * 15;
+        return prev + Math.random() * 12;
       });
     }, 100);
     return () => clearInterval(interval);
   }, []);
 
-  // Particles
-  useEffect(() => {
-    const newParticles = [];
-    for (let i = 0; i < 100; i++) {
-      newParticles.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: Math.random() * 3 + 1,
-        speed: Math.random() * 2 + 0.5,
-        color: `hsl(${Math.random() * 60 + 260}, 70%, 50%)`
-      });
+  const handleTerminalCommand = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      const cmd = terminalInput.toLowerCase();
+      let output = "";
+      if (cmd === "help") {
+        output = "Available commands: about, skills, experience, certs, contact, clear, help, whoami";
+      } else if (cmd === "whoami") {
+        output = "Dhiraj Shahi | Cybersecurity Expert | Ethical Hacker";
+      } else if (cmd === "about") {
+        output = "Cybersecurity professional with expertise in ethical hacking and network security.";
+      } else if (cmd === "skills") {
+        output = "Penetration Testing, Network Security, Kali Linux, Vulnerability Assessment";
+      } else if (cmd === "experience") {
+        output = "Senior Security Analyst | Ethical Hacking Consultant | Web Security Developer";
+      } else if (cmd === "certs") {
+        output = "CRTA, CCEP, ISO 27001 Lead Auditor";
+      } else if (cmd === "contact") {
+        output = "Email: dhirajshahif15@gmail.com | Phone: +977 9709954775";
+      } else if (cmd === "clear") {
+        setTerminalOutput([]);
+        setTerminalInput("");
+        return;
+      } else if (cmd !== "") {
+        output = `Command '${cmd}' not found. Type 'help' for available commands.`;
+      }
+      if (output) {
+        setTerminalOutput(prev => [...prev, `> ${cmd}`, output, ""]);
+      }
+      setTerminalInput("");
     }
-    setParticles(newParticles);
-
-    const animate = setInterval(() => {
-      setParticles(prev => prev.map(p => ({
-        ...p,
-        y: p.y - p.speed,
-        x: p.x + (Math.random() - 0.5) * 0.5
-      })).filter(p => p.y > 0).concat(
-        Array(5).fill(null).map(() => ({
-          x: Math.random() * window.innerWidth,
-          y: window.innerHeight,
-          size: Math.random() * 3 + 1,
-          speed: Math.random() * 2 + 0.5,
-          color: `hsl(${Math.random() * 60 + 260}, 70%, 50%)`
-        }))
-      ));
-    }, 50);
-    return () => clearInterval(animate);
-  }, []);
+  };
 
   const portfolioData = {
     name: "Dhiraj Shahi",
@@ -139,8 +214,8 @@ const Portfolio = () => {
       { title: "Web Security Developer", company: "Tech Solutions", period: "2022 - 2024", desc: "Developed secure web applications and implemented security best practices." }
     ],
     certifications: [
-      { name: "Certified Red Team Analyst (CRTA)", issuer: "Red Team Leaders", date: "2025", icon: "🔴" },
-      { name: "Certified Cybersecurity Educator (CCEP)", issuer: "Mastermind Assurance", date: "2026", icon: "🎓" },
+      { name: "Certified Red Team Analyst", issuer: "Red Team Leaders", date: "2025", icon: "🔴" },
+      { name: "Certified Cybersecurity Educator", issuer: "Mastermind Assurance", date: "2026", icon: "🎓" },
       { name: "ISO 27001 Lead Auditor", issuer: "Mastermind Assurance", date: "2025", icon: "📜" }
     ]
   };
@@ -158,8 +233,8 @@ const Portfolio = () => {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-purple-900/20 via-transparent to-red-900/20 animate-pulse"></div>
+      <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center">
+        <canvas ref={canvasRef} className="fixed inset-0 w-full h-full"></canvas>
         <div className="relative z-10 text-center">
           <div className="relative mb-8">
             <div className="w-32 h-32 mx-auto rounded-full bg-gradient-to-r from-purple-600 to-red-600 animate-ping opacity-75"></div>
@@ -170,7 +245,7 @@ const Portfolio = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <div className="h-2 w-64 bg-gray-800 rounded-full mx-auto overflow-hidden">
+            <div className="h-1 w-64 bg-gray-800 rounded-full mx-auto overflow-hidden">
               <div className="h-full bg-gradient-to-r from-purple-500 to-red-500 rounded-full transition-all duration-300" style={{ width: `${Math.min(loadingProgress, 100)}%` }}></div>
             </div>
             <p className="text-gray-400 font-mono text-sm">{Math.floor(Math.min(loadingProgress, 100))}% LOADING</p>
@@ -187,30 +262,16 @@ const Portfolio = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950/20 to-gray-950 overflow-x-hidden relative">
-      {/* Animated Particles Background */}
-      {particles.map((particle, i) => (
-        <div key={i} className="fixed rounded-full pointer-events-none" style={{
-          left: particle.x,
-          top: particle.y,
-          width: particle.size,
-          height: particle.size,
-          background: particle.color,
-          boxShadow: `0 0 ${particle.size * 2}px ${particle.color}`,
-          opacity: 0.6
-        }}></div>
-      ))}
-
-      {/* Grid Pattern Overlay */}
+      <canvas ref={canvasRef} className="fixed inset-0 w-full h-full pointer-events-none"></canvas>
+      
       <div className="fixed inset-0 bg-[linear-gradient(rgba(139,92,246,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(139,92,246,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none"></div>
 
       {/* Custom Cursor */}
-      <div className="fixed w-8 h-8 pointer-events-none z-50 hidden lg:block" style={{ transform: `translate(${mousePosition.x - 16}px, ${mousePosition.y - 16}px)` }}>
-        <div className="w-full h-full rounded-full bg-gradient-to-r from-purple-500 to-red-500 opacity-50 blur-sm animate-pulse"></div>
-        <div className="absolute top-2 left-2 w-4 h-4 rounded-full bg-white"></div>
-      </div>
+      <div className="fixed w-10 h-10 pointer-events-none z-50 hidden lg:block rounded-full bg-gradient-to-r from-purple-500 to-red-500 opacity-30 blur-md transition-all duration-75" style={{ transform: `translate(${mousePosition.x - 20}px, ${mousePosition.y - 20}px)` }}></div>
+      <div className="fixed w-3 h-3 pointer-events-none z-50 hidden lg:block rounded-full bg-white transition-all duration-100" style={{ transform: `translate(${mousePosition.x - 6}px, ${mousePosition.y - 6}px)` }}></div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? 'bg-black/95 backdrop-blur-md py-2 shadow-2xl' : 'bg-transparent py-4'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? 'bg-black/95 backdrop-blur-md py-2 shadow-2xl border-b border-purple-500/20' : 'bg-transparent py-4'}`}>
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center gap-2 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="relative">
@@ -238,7 +299,7 @@ const Portfolio = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20">
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-20">
         <div className="container mx-auto px-4 text-center">
           <div className="relative inline-block mb-8">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-red-600 blur-2xl opacity-50 animate-pulse"></div>
@@ -250,7 +311,7 @@ const Portfolio = () => {
             </div>
           </div>
           
-          <div className="font-mono text-green-400 text-sm mb-4 animate-pulse">>_ SECURE_CONNECTION_ESTABLISHED</div>
+          <div className="font-mono text-green-400 text-sm mb-4 animate-pulse">>_ SECURE_CONNECTION_ESTABLISHED | {currentTime}</div>
           
           <div className="h-16 mb-4">
             <h1 className="text-2xl md:text-4xl font-mono font-bold">
@@ -283,10 +344,41 @@ const Portfolio = () => {
           </div>
         </div>
         
-        {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
             <div className="w-1 h-3 bg-white rounded-full animate-scroll"></div>
+          </div>
+        </div>
+      </section>
+
+      {/* Terminal Section */}
+      <section className="py-10">
+        <div className="container mx-auto px-4 max-w-3xl">
+          <div className="bg-black/80 backdrop-blur rounded-xl border border-purple-500/30 overflow-hidden">
+            <div className="bg-gradient-to-r from-purple-900/50 to-red-900/50 px-4 py-2 flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="text-gray-400 text-xs ml-2">dhrx@security:~</span>
+            </div>
+            <div className="p-4 font-mono text-sm">
+              {terminalOutput.map((line, i) => (
+                <p key={i} className="text-gray-400">{line}</p>
+              ))}
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-green-400">$</span>
+                <input
+                  type="text"
+                  value={terminalInput}
+                  onChange={(e) => setTerminalInput(e.target.value)}
+                  onKeyDown={handleTerminalCommand}
+                  className="flex-1 bg-transparent outline-none text-white placeholder-gray-500"
+                  placeholder="Type 'help' to start..."
+                  autoFocus
+                />
+                <span className={`w-2 h-4 bg-white ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -312,10 +404,9 @@ const Portfolio = () => {
             ))}
           </div>
 
-          {/* Tab Content with 3D Cards */}
+          {/* Tab Content */}
           <div className="bg-white/5 backdrop-blur rounded-3xl p-8 border border-white/10 shadow-2xl animate-scale-up">
             
-            {/* About */}
             {activeTab === "about" && (
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="space-y-4">
@@ -350,7 +441,6 @@ const Portfolio = () => {
               </div>
             )}
 
-            {/* Skills with 3D Bars */}
             {activeTab === "skills" && (
               <div className="space-y-6">
                 {portfolioData.skills.map((skill, idx) => (
@@ -367,7 +457,6 @@ const Portfolio = () => {
               </div>
             )}
 
-            {/* Experience Timeline */}
             {activeTab === "experience" && (
               <div className="space-y-6">
                 {portfolioData.experience.map((exp, idx) => (
@@ -383,7 +472,6 @@ const Portfolio = () => {
               </div>
             )}
 
-            {/* Certificates Grid */}
             {activeTab === "certifications" && (
               <div className="grid md:grid-cols-3 gap-6">
                 {portfolioData.certifications.map((cert, idx) => (
@@ -397,7 +485,6 @@ const Portfolio = () => {
               </div>
             )}
 
-            {/* Contact */}
             {activeTab === "contact" && (
               <div className="text-center py-12">
                 <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-red-500 flex items-center justify-center mb-6 animate-bounce">
