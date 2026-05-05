@@ -90,7 +90,7 @@ const Index = () => {
               <span className="bg-card-red text-primary-foreground text-xs px-3 py-1 rounded-full font-semibold animate-pulse">Live</span>
             </div>
             <div className="countdown-box text-primary-foreground">
-              <p className="text-sm mb-4 opacity-90">💻 Computer Operator (Kharidar) — Written Exam</p>
+              <p className="text-sm mb-4 opacity-90">💻 Computer Operator (5th Level ) — Written Exam</p>
               {countdown.expired ? (
                 <p className="text-xl font-bold">परीक्षा सकियो! 🎉</p>
               ) : (
