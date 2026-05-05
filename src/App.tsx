@@ -24,6 +24,17 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          {/* Admin route - OUTSIDE Layout (has its own navigation) */}
+          <Route 
+            path="/admin" 
+            element={
+              <AdminGuard>
+                <Admin />
+              </AdminGuard>
+            } 
+          />
+          
+          {/* Main app routes - INSIDE Layout */}
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
             <Route path="/practice" element={<Practice />} />
@@ -35,6 +46,7 @@ const App = () => (
             <Route path="/notes" element={<Notes />} />
             <Route path="/news" element={<News />} />
           </Route>
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
