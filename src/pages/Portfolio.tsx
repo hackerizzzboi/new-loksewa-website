@@ -4,15 +4,13 @@ import {
   X, Mail, Phone, MapPin, Github, Linkedin, Facebook, Award, 
   Briefcase, GraduationCap, Code, Shield, FileText, 
   Download, Zap, Target, Sparkles, Eye, Heart, Star, Terminal,
-  Lock, Server, Bug, Key, User, Printer, Save, FileJson
+  Lock, Server, Bug, Key, User, FileJson
 } from "lucide-react";
 
 const Portfolio = () => {
   const navigate = useNavigate();
-  const portfolioRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState("about");
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -63,27 +61,6 @@ const Portfolio = () => {
     ]
   };
 
-  const exportToPDF = async () => {
-    if (!portfolioRef.current) return;
-    setIsExporting(true);
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      const opt = {
-        margin: [0.5, 0.5, 0.5, 0.5],
-        filename: `${portfolioData.name.replace(/\s/g, '_')}_Portfolio.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-      };
-      await html2pdf().set(opt).from(portfolioRef.current).save();
-    } catch (error) {
-      console.error('PDF export failed:', error);
-      alert('Failed to export PDF. Please try again.');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   const exportToJSON = () => {
     const data = { ...portfolioData, exportDate: new Date().toISOString(), version: '1.0' };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -123,17 +100,10 @@ const Portfolio = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={exportToPDF}
-              disabled={isExporting}
-              className="px-3 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 transition text-white flex items-center gap-1 text-sm"
-            >
-              <Download size={14} /> {isExporting ? "..." : "PDF"}
-            </button>
-            <button
               onClick={exportToJSON}
               className="px-3 py-1.5 rounded-lg bg-gray-700 hover:bg-gray-600 transition text-white flex items-center gap-1 text-sm"
             >
-              <FileJson size={14} /> JSON
+              <FileJson size={14} /> Export JSON
             </button>
             <button
               onClick={() => navigate(-1)}
@@ -146,7 +116,7 @@ const Portfolio = () => {
       </nav>
 
       {/* Portfolio Content */}
-      <div ref={portfolioRef} className="relative z-10 pt-16 pb-12">
+      <div className="relative z-10 pt-16 pb-12">
         <div className="container mx-auto px-4 max-w-5xl">
           
           {/* Hero Section */}
