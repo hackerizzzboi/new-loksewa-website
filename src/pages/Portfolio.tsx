@@ -25,13 +25,41 @@ const Portfolio = () => {
   const [bgType, setBgType] = useState("rain");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [shakeCard, setShakeCard] = useState<number | null>(null);
+  const [letterColors, setLetterColors] = useState<string[]>([]);
   
   const heroRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const fullName = "Dhiraj Shahi";
+  const nameLetters = fullName.split("");
   
+  // Color palette for letters
+  const colorPalette = [
+    "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", 
+    "#DFE6E9", "#FF7675", "#74B9FF", "#A29BFE", "#FDCB6E",
+    "#E17055", "#00B894", "#0984E3", "#6C5CE7", "#FD79A8",
+    "#E84393", "#F39C12", "#27AE60", "#2980B9", "#8E44AD"
+  ];
+
+  // Animate letter colors one by one
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLetterColors(prev => {
+        const newColors = [...prev];
+        const nextIndex = newColors.length;
+        if (nextIndex < nameLetters.length) {
+          newColors.push(colorPalette[nextIndex % colorPalette.length]);
+        } else {
+          // Reset and start over for continuous animation
+          return [];
+        }
+        return newColors;
+      });
+    }, 200);
+    return () => clearInterval(interval);
+  }, [nameLetters.length]);
+
   // Typing effect
   useEffect(() => {
     let i = 0;
@@ -432,6 +460,7 @@ const Portfolio = () => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center pt-16 pb-8 overflow-hidden">
         <div ref={heroRef} className="container mx-auto px-4 text-center transition-transform duration-300">
+          {/* Profile Picture with Green Checkmark OUTSIDE */}
           <div className="relative inline-block mb-6 group">
             <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 blur-2xl opacity-50 animate-pulse-slow"></div>
             <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-2xl group-hover:scale-110 transition duration-500 animate-float overflow-hidden">
@@ -440,9 +469,10 @@ const Portfolio = () => {
                 alt="Dhiraj Shahi" 
                 className="w-full h-full object-cover rounded-full"
               />
-              <div className="absolute -bottom-2 -right-2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 flex items-center justify-center border-2 border-black animate-bounce">
-                <CheckCircle size={14} className="text-black md:w-5 md:h-5" />
-              </div>
+            </div>
+            {/* Green checkmark OUTSIDE the picture */}
+            <div className="absolute -bottom-2 -right-2 w-8 h-8 md:w-10 md:h-10 rounded-full bg-green-500 flex items-center justify-center border-2 border-black animate-bounce shadow-lg">
+              <CheckCircle size={14} className="text-black md:w-5 md:h-5" />
             </div>
           </div>
           
@@ -453,10 +483,19 @@ const Portfolio = () => {
           
           <div className="mb-4">
             <h1 className="text-3xl md:text-6xl lg:text-7xl font-bold font-mono tracking-wide">
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent animate-gradient">
-                {typedText}
-              </span>
-              <span className="text-3xl md:text-6xl lg:text-7xl ml-2">🇳🇵</span>
+              {nameLetters.map((letter, index) => (
+                <span
+                  key={index}
+                  className="inline-block animate-text-glow"
+                  style={{
+                    color: letterColors[index] || "#FFFFFF",
+                    textShadow: letterColors[index] ? `0 0 10px ${letterColors[index]}` : "none",
+                    animationDelay: `${index * 0.1}s`
+                  }}
+                >
+                  {letter === " " ? "\u00A0" : letter}
+                </span>
+              ))}
               <span className={`inline-block w-1 h-6 md:h-10 bg-blue-500 ml-2 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}></span>
             </h1>
           </div>
@@ -782,6 +821,10 @@ const Portfolio = () => {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
         }
+        @keyframes text-glow {
+          0%, 100% { text-shadow: 0 0 5px currentColor; }
+          50% { text-shadow: 0 0 15px currentColor; }
+        }
         .animate-float { animation: float 4s ease-in-out infinite; }
         .animate-spin-slow { animation: spin-slow 6s linear infinite; }
         .animate-scroll { animation: scroll 1.5s ease-in-out infinite; }
@@ -793,6 +836,7 @@ const Portfolio = () => {
         .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
         .animate-bounce-smooth { animation: bounce-smooth 0.6s ease-in-out infinite; }
         .animate-gradient { background-size: 200% 200%; animation: gradient 3s ease infinite; }
+        .animate-text-glow { animation: text-glow 1.5s ease-in-out infinite; }
       `}</style>
     </div>
   );
