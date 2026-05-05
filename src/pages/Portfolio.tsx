@@ -19,7 +19,7 @@ const Portfolio = () => {
   const [typedText, setTypedText] = useState("");
   const [cursorVisible, setCursorVisible] = useState(true);
 
-  const fullText = "Dhiraj Shahi // Ethical Hacker // Cybersecurity Expert";
+  const fullText = "Dhiraj Shahi | Ethical Hacker | Cybersecurity Expert";
 
   // Typing effect
   useEffect(() => {
@@ -82,13 +82,13 @@ const Portfolio = () => {
       linkedin: "https://www.linkedin.com/in/dhiraj-shahi-a121693a2/"
     },
     skills: [
-      { name: "Ethical Hacking", level: 85, icon: "🐛", color: "purple" },
-      { name: "Cybersecurity", level: 90, icon: "🛡️", color: "blue" },
-      { name: "Network Security", level: 85, icon: "🌐", color: "green" },
-      { name: "Penetration Testing", level: 75, icon: "🔒", color: "red" },
-      { name: "Kali Linux", level: 85, icon: "💻", color: "indigo" },
-      { name: "MS Office", level: 90, icon: "📊", color: "emerald" },
-      { name: "GitHub", level: 80, icon: "📁", color: "gray" }
+      { name: "Ethical Hacking", level: 85, icon: "🐛" },
+      { name: "Cybersecurity", level: 90, icon: "🛡️" },
+      { name: "Network Security", level: 85, icon: "🌐" },
+      { name: "Penetration Testing", level: 75, icon: "🔒" },
+      { name: "Kali Linux", level: 85, icon: "💻" },
+      { name: "MS Office", level: 90, icon: "📊" },
+      { name: "GitHub", level: 80, icon: "📁" }
     ],
     experience: [
       { title: "Loksewa Preparation Website", company: "Personal Project", period: "2024 - Present", desc: "Built and managed a website for Loksewa exam preparation." },
@@ -130,7 +130,7 @@ const Portfolio = () => {
             <div className="absolute inset-0 w-24 h-24 mx-auto rounded-full border-t-4 border-purple-500 animate-spin"></div>
           </div>
           
-          <div className="font-mono text-green-400 text-sm mb-2">>_ LOADING PORTFOLIO...</div>
+          <div className="font-mono text-green-400 text-sm mb-2">Loading Portfolio...</div>
           
           <div className="w-64 md:w-80 bg-gray-800 rounded-full h-2 mx-auto mb-3 overflow-hidden">
             <div 
@@ -180,7 +180,7 @@ const Portfolio = () => {
           <div className="flex items-center gap-3">
             <Shield size={28} className="text-purple-500" />
             <span className="text-lg font-mono font-bold bg-gradient-to-r from-purple-400 to-red-400 bg-clip-text text-transparent">
-              {">_ DHRX_SEC"}
+              DHRX Security
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -188,13 +188,13 @@ const Portfolio = () => {
               onClick={exportToJSON}
               className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-red-600 text-white flex items-center gap-1 text-xs font-mono"
             >
-              <Download size={12} /> EXPORT
+              <Download size={12} /> Export JSON
             </button>
             <button
               onClick={() => navigate(-1)}
               className="px-3 py-1.5 rounded-lg bg-white/10 text-white flex items-center gap-1 text-xs font-mono"
             >
-              <X size={12} /> CLOSE
+              <X size={12} /> Close
             </button>
           </div>
         </div>
@@ -215,7 +215,7 @@ const Portfolio = () => {
               </div>
             </div>
             
-            <div className="font-mono text-green-400 text-xs mb-2">>_ ACTIVE_SESSION: ROOT</div>
+            <div className="font-mono text-green-400 text-xs mb-2">Active Session: Root</div>
             
             <div className="h-10 mb-3">
               <h1 className="text-2xl md:text-4xl font-mono font-bold">
@@ -227,9 +227,9 @@ const Portfolio = () => {
             </div>
             
             <div className="flex flex-wrap justify-center gap-2 mb-5">
-              <span className="px-3 py-1 bg-purple-500/20 rounded-full text-purple-300 text-xs font-mono border border-purple-500/30">🐛 ETHICAL_HACKER</span>
-              <span className="px-3 py-1 bg-red-500/20 rounded-full text-red-300 text-xs font-mono border border-red-500/30">🛡️ SECURITY_ANALYST</span>
-              <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-300 text-xs font-mono border border-blue-500/30">💻 PEN_TESTER</span>
+              <span className="px-3 py-1 bg-purple-500/20 rounded-full text-purple-300 text-xs font-mono border border-purple-500/30">Ethical Hacker</span>
+              <span className="px-3 py-1 bg-red-500/20 rounded-full text-red-300 text-xs font-mono border border-red-500/30">Security Analyst</span>
+              <span className="px-3 py-1 bg-blue-500/20 rounded-full text-blue-300 text-xs font-mono border border-blue-500/30">Pen Tester</span>
             </div>
             
             <p className="text-gray-400 max-w-2xl mx-auto text-sm leading-relaxed">
@@ -239,17 +239,22 @@ const Portfolio = () => {
 
           {/* Stats Row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-10">
-            {[
-              { value: "3+", label: "CERTIFICATIONS", color: "purple" },
-              { value: "10+", label: "SKILLS", color: "red" },
-              { value: "4+", label: "PROJECTS", color: "blue" },
-              { value: "500+", label: "HOURS", color: "green" }
-            ].map((stat, i) => (
-              <div key={i} className={`bg-gradient-to-br from-${stat.color}-900/20 to-${stat.color}-800/10 rounded-xl p-3 text-center border border-${stat.color}-500/30 hover:scale-105 transition-all duration-300`}>
-                <div className={`text-2xl font-bold text-${stat.color}-400`}>{stat.value}</div>
-                <div className="text-gray-500 text-[10px] font-mono mt-1">{stat.label}</div>
-              </div>
-            ))}
+            <div className="bg-gradient-to-br from-purple-900/20 to-purple-800/10 rounded-xl p-3 text-center border border-purple-500/30 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-bold text-purple-400">3+</div>
+              <div className="text-gray-500 text-xs font-mono mt-1">CERTIFICATIONS</div>
+            </div>
+            <div className="bg-gradient-to-br from-red-900/20 to-red-800/10 rounded-xl p-3 text-center border border-red-500/30 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-bold text-red-400">10+</div>
+              <div className="text-gray-500 text-xs font-mono mt-1">SKILLS</div>
+            </div>
+            <div className="bg-gradient-to-br from-blue-900/20 to-blue-800/10 rounded-xl p-3 text-center border border-blue-500/30 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-bold text-blue-400">4+</div>
+              <div className="text-gray-500 text-xs font-mono mt-1">PROJECTS</div>
+            </div>
+            <div className="bg-gradient-to-br from-green-900/20 to-green-800/10 rounded-xl p-3 text-center border border-green-500/30 hover:scale-105 transition-all duration-300">
+              <div className="text-2xl font-bold text-green-400">500+</div>
+              <div className="text-gray-500 text-xs font-mono mt-1">HOURS</div>
+            </div>
           </div>
 
           {/* Tabs */}
@@ -282,13 +287,13 @@ const Portfolio = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <h3 className="text-md font-mono font-bold text-purple-400 flex items-center gap-2">
-                    <Heart size={16} /> // WHO_AM_I
+                    <Heart size={16} /> Who Am I
                   </h3>
                   <p className="text-gray-300 text-sm leading-relaxed">{portfolioData.bio}</p>
                   
                   <div className="pt-3">
                     <h3 className="text-md font-mono font-bold text-purple-400 flex items-center gap-2 mb-2">
-                      <Star size={16} /> // SKILL_MATRIX
+                      <Star size={16} /> Core Skills
                     </h3>
                     <div className="grid grid-cols-2 gap-2">
                       {["Vulnerability Assessment", "Ethical Hacking", "Network Security", "Web Development"].map((skill, i) => (
@@ -302,7 +307,7 @@ const Portfolio = () => {
                 
                 <div className="bg-white/5 rounded-xl p-5 border border-purple-500/20">
                   <h3 className="text-md font-mono font-bold text-purple-400 flex items-center gap-2 mb-3">
-                    <Eye size={16} /> // SYSTEM_INFO
+                    <Eye size={16} /> Quick Info
                   </h3>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-gray-300 text-xs p-2 bg-white/5 rounded-lg">
@@ -317,11 +322,11 @@ const Portfolio = () => {
                   </div>
                   
                   <div className="mt-4 pt-3 border-t border-purple-500/20">
-                    <h3 className="text-xs font-mono font-bold text-purple-400 mb-2">// SOCIAL_LINKS</h3>
+                    <h3 className="text-xs font-mono font-bold text-purple-400 mb-2">Connect</h3>
                     <div className="flex gap-2">
-                      <a href={portfolioData.social.facebook} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-blue-600 transition text-sm">📘</a>
-                      <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-gray-600 transition text-sm">🐙</a>
-                      <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-blue-700 transition text-sm">🔗</a>
+                      <a href={portfolioData.social.facebook} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-blue-600 transition text-sm">FB</a>
+                      <a href={portfolioData.social.github} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-gray-600 transition text-sm">GH</a>
+                      <a href={portfolioData.social.linkedin} target="_blank" className="p-2 bg-white/10 rounded-lg hover:bg-blue-700 transition text-sm">IN</a>
                     </div>
                   </div>
                 </div>
@@ -337,10 +342,10 @@ const Portfolio = () => {
                       <span className="flex items-center gap-1 text-white text-xs font-mono">
                         <span>{skill.icon}</span> {skill.name}
                       </span>
-                      <span className={`text-${skill.color}-400 text-xs font-mono`}>{skill.level}%</span>
+                      <span className="text-purple-400 text-xs font-mono">{skill.level}%</span>
                     </div>
                     <div className="w-full bg-gray-700 rounded-full h-1.5">
-                      <div className={`h-full bg-gradient-to-r from-${skill.color}-500 to-${skill.color}-400 rounded-full`} style={{ width: `${skill.level}%` }}></div>
+                      <div className="h-full bg-gradient-to-r from-purple-500 to-red-500 rounded-full" style={{ width: `${skill.level}%` }}></div>
                     </div>
                   </div>
                 ))}
@@ -353,16 +358,16 @@ const Portfolio = () => {
                 {portfolioData.experience.map((exp, idx) => (
                   <div key={idx} className="bg-white/5 rounded-xl p-4 border-l-4 border-purple-500">
                     <h3 className="text-sm font-mono font-bold text-white">{exp.title}</h3>
-                    <p className="text-purple-400 text-xs font-mono mb-1">{exp.company} // {exp.period}</p>
+                    <p className="text-purple-400 text-xs font-mono mb-1">{exp.company} | {exp.period}</p>
                     <p className="text-gray-400 text-xs">{exp.desc}</p>
                   </div>
                 ))}
                 <div className="bg-white/5 rounded-xl p-4 border-l-4 border-blue-500">
-                  <h3 className="text-sm font-mono font-bold text-white mb-2">// EDUCATION</h3>
+                  <h3 className="text-sm font-mono font-bold text-white mb-2">Education</h3>
                   {portfolioData.education.map((edu, idx) => (
                     <div key={idx} className="mb-2">
                       <p className="text-white text-xs font-mono">{edu.degree}</p>
-                      <p className="text-gray-400 text-[10px] font-mono">{edu.institution} // {edu.year}</p>
+                      <p className="text-gray-400 text-xs font-mono">{edu.institution} | {edu.year}</p>
                     </div>
                   ))}
                 </div>
@@ -378,10 +383,10 @@ const Portfolio = () => {
                       <span className="text-2xl">🏆</span>
                       <div>
                         <h4 className="font-mono font-bold text-white text-xs">{cert.name}</h4>
-                        <p className="text-gray-400 text-[10px] font-mono">{cert.issuer}</p>
+                        <p className="text-gray-400 text-xs font-mono">{cert.issuer}</p>
                       </div>
                     </div>
-                    <p className="text-gray-500 text-[10px] font-mono mt-1">>_ ISSUED: {cert.date}</p>
+                    <p className="text-gray-500 text-xs font-mono mt-1">Issued: {cert.date}</p>
                   </div>
                 ))}
               </div>
@@ -393,8 +398,8 @@ const Portfolio = () => {
                 <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-purple-500 to-red-500 flex items-center justify-center mb-3">
                   <Mail size={28} className="text-white" />
                 </div>
-                <h3 className="text-md font-mono font-bold text-white mb-2">[CONNECT_WITH_ME]</h3>
-                <p className="text-gray-400 text-xs font-mono mb-4">>_ OPEN_FOR_OPPORTUNITIES</p>
+                <h3 className="text-md font-mono font-bold text-white mb-2">Get In Touch</h3>
+                <p className="text-gray-400 text-xs font-mono mb-4">Open for opportunities</p>
                 <div className="space-y-2 text-left max-w-xs mx-auto">
                   <div className="flex items-center gap-2 text-gray-300 text-xs p-2 bg-white/5 rounded-lg font-mono">
                     <Mail size={12} className="text-purple-400" /> {portfolioData.email}
@@ -412,8 +417,8 @@ const Portfolio = () => {
 
           {/* Footer */}
           <div className="mt-8 pt-4 text-center border-t border-purple-500/20">
-            <p className="text-gray-600 text-[10px] font-mono flex items-center justify-center gap-2">
-              <Shield size={10} /> [SECURED_BY_DHRX] // STATUS: ACTIVE
+            <p className="text-gray-600 text-xs font-mono flex items-center justify-center gap-2">
+              <Shield size={10} /> Secured by Dhiraj Shahi | Status: Active
             </p>
           </div>
         </div>
