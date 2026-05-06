@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { practiceQuestions, getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, shuffleArray, type Question } from "@/data/questions";
+import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
+import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -29,8 +30,19 @@ const QuizPage = () => {
 
   useEffect(() => {
     let qs: Question[] = [];
-    if (category === "practice" && setId && practiceQuestions[setId]) {
-      qs = shuffleArray(practiceQuestions[setId]);
+    
+    if (category === "practice" && setId) {
+      // Use the new computer operator questions
+      const questionsFromBank = computerOperatorQuestions[setId];
+      if (questionsFromBank) {
+        qs = shuffleArray([...questionsFromBank]);
+      } else {
+        // Fallback to old practiceQuestions if needed
+        const { practiceQuestions } = require("@/data/questions");
+        if (practiceQuestions[setId]) {
+          qs = shuffleArray(practiceQuestions[setId]);
+        }
+      }
     } else if (category === "old-is-gold" && setId) {
       // Use exact questions for Set 1, otherwise use generated ones
       if (setId === "set-1") {
@@ -51,6 +63,7 @@ const QuizPage = () => {
       const test = weeklyTests.find(t => t.id === setId);
       if (test) setTimeLeft(test.time * 60);
     }
+    
     setQuestions(qs);
     setAnswers({});
     setCurrent(0);
