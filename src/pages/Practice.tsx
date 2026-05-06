@@ -13,21 +13,21 @@ const Practice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
-  // Computer Operator Subjects (13 Subjects)
+  // Computer Operator Subjects (13 Subjects) - 20 Questions Each
   const computerOperatorSubjects = [
-    { id: "general-awareness", title: "General Awareness", titleNp: "सामान्य ज्ञान", icon: <Globe size={20} />, questions: 10, color: "from-orange-500 to-red-500" },
-    { id: "public-management", title: "Public Management", titleNp: "सार्वजनिक व्यवस्थापन", icon: <Users size={20} />, questions: 10, color: "from-purple-500 to-pink-500" },
-    { id: "computer-fundamentals", title: "Computer Fundamentals", titleNp: "कम्प्युटर आधारभूत", icon: <Laptop size={20} />, questions: 10, color: "from-blue-500 to-cyan-500" },
-    { id: "operating-system", title: "Operating System", icon: <Shield size={20} />, questions: 10, color: "from-teal-500 to-green-500" },
-    { id: "word-processor", title: "Word Processor", icon: <FileText size={20} />, questions: 10, color: "from-red-500 to-orange-500" },
-    { id: "spreadsheet", title: "Electronic Spreadsheet", icon: <Calculator size={20} />, questions: 10, color: "from-green-500 to-emerald-500" },
-    { id: "dbms", title: "Database Management System", icon: <Database size={20} />, questions: 10, color: "from-pink-500 to-rose-500" },
-    { id: "presentation", title: "Presentation System", icon: <Presentation size={20} />, questions: 10, color: "from-amber-500 to-yellow-500" },
-    { id: "web-design", title: "Web Designing & Social Media", icon: <Globe size={20} />, questions: 10, color: "from-cyan-500 to-blue-500" },
-    { id: "networking", title: "Computer Network", icon: <Network size={20} />, questions: 10, color: "from-indigo-500 to-purple-500" },
-    { id: "cyber-security", title: "Cyber Security", icon: <Lock size={20} />, questions: 10, color: "from-red-600 to-red-800" },
-    { id: "hardware", title: "Hardware Maintenance", icon: <Wrench size={20} />, questions: 10, color: "from-gray-600 to-gray-800" },
-    { id: "legislation", title: "Related Legislations", titleNp: "सम्बन्धित कानून", icon: <BookOpen size={20} />, questions: 10, color: "from-purple-600 to-indigo-600" },
+    { id: "general-awareness", title: "General Awareness", titleNp: "सामान्य ज्ञान", icon: <Globe size={20} />, questions: 20, color: "from-orange-500 to-red-500" },
+    { id: "public-management", title: "Public Management", titleNp: "सार्वजनिक व्यवस्थापन", icon: <Users size={20} />, questions: 20, color: "from-purple-500 to-pink-500" },
+    { id: "computer-fundamentals", title: "Computer Fundamentals", titleNp: "कम्प्युटर आधारभूत", icon: <Laptop size={20} />, questions: 20, color: "from-blue-500 to-cyan-500" },
+    { id: "operating-system", title: "Operating System", icon: <Shield size={20} />, questions: 20, color: "from-teal-500 to-green-500" },
+    { id: "word-processor", title: "Word Processor", icon: <FileText size={20} />, questions: 20, color: "from-red-500 to-orange-500" },
+    { id: "spreadsheet", title: "Electronic Spreadsheet", icon: <Calculator size={20} />, questions: 20, color: "from-green-500 to-emerald-500" },
+    { id: "dbms", title: "Database Management System", icon: <Database size={20} />, questions: 20, color: "from-pink-500 to-rose-500" },
+    { id: "presentation", title: "Presentation System", icon: <Presentation size={20} />, questions: 20, color: "from-amber-500 to-yellow-500" },
+    { id: "web-design", title: "Web Designing & Social Media", icon: <Globe size={20} />, questions: 20, color: "from-cyan-500 to-blue-500" },
+    { id: "networking", title: "Computer Network", icon: <Network size={20} />, questions: 20, color: "from-indigo-500 to-purple-500" },
+    { id: "cyber-security", title: "Cyber Security", icon: <Lock size={20} />, questions: 20, color: "from-red-600 to-red-800" },
+    { id: "hardware", title: "Hardware Maintenance", icon: <Wrench size={20} />, questions: 20, color: "from-gray-600 to-gray-800" },
+    { id: "legislation", title: "Related Legislations", titleNp: "सम्बन्धित कानून", icon: <BookOpen size={20} />, questions: 20, color: "from-purple-600 to-indigo-600" },
   ];
 
   // सामान्य ज्ञान सबै परीक्षाका लागि - GK Section
