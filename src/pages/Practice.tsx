@@ -27,7 +27,7 @@ const Practice = () => {
       "spreadsheet": 20,
       "dbms": 20,
       "presentation": 185,
-      "web-design": 20,
+      "web-design": 200,
       "networking": 20,
       "cyber-security": 20,
       "hardware": 20,
