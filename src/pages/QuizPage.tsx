@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
 import { set1Questions } from "@/data/set1Questions";
@@ -8,14 +8,31 @@ import { CheckCircle, XCircle } from "lucide-react";
 const QuizPage = () => {
   const { category, setId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number | null>>({});
   const [showResult, setShowResult] = useState(false);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [started, setStarted] = useState(false);
+  const [questionCount, setQuestionCount] = useState<number>(20);
+  const [customTitle, setCustomTitle] = useState<string>("");
+
+  // Get URL parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const countParam = params.get('count');
+    const titleParam = params.get('title');
+    if (countParam) {
+      setQuestionCount(parseInt(countParam));
+    }
+    if (titleParam) {
+      setCustomTitle(decodeURIComponent(titleParam));
+    }
+  }, [location.search]);
 
   const title = useMemo(() => {
+    if (customTitle) return customTitle;
     if (category === "practice" && setId) {
       const s = practiceSubjects.find(s => s.id === setId);
       return s ? `${s.icon} ${s.title}` : "Practice";
@@ -26,7 +43,7 @@ const QuizPage = () => {
       return t ? `📝 ${t.titleNp}` : "Online Exam";
     }
     return "Quiz";
-  }, [category, setId]);
+  }, [category, setId, customTitle]);
 
   useEffect(() => {
     let qs: Question[] = [];
@@ -35,12 +52,15 @@ const QuizPage = () => {
       // Use the new computer operator questions
       const questionsFromBank = computerOperatorQuestions[setId];
       if (questionsFromBank) {
-        qs = shuffleArray([...questionsFromBank]);
+        // Take only the selected number of questions
+        const shuffled = shuffleArray([...questionsFromBank]);
+        qs = shuffled.slice(0, questionCount);
       } else {
         // Fallback to old practiceQuestions if needed
         const { practiceQuestions } = require("@/data/questions");
         if (practiceQuestions[setId]) {
-          qs = shuffleArray(practiceQuestions[setId]);
+          const shuffled = shuffleArray(practiceQuestions[setId]);
+          qs = shuffled.slice(0, questionCount);
         }
       }
     } else if (category === "old-is-gold" && setId) {
@@ -69,7 +89,7 @@ const QuizPage = () => {
     setCurrent(0);
     setShowResult(false);
     setStarted(category !== "online-exam");
-  }, [category, setId]);
+  }, [category, setId, questionCount]);
 
   // Timer
   useEffect(() => {
@@ -231,7 +251,10 @@ const QuizPage = () => {
     <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-lg font-heading font-bold">{title}</h1>
+        <div>
+          <h1 className="text-lg font-heading font-bold">{title}</h1>
+          <p className="text-xs text-gray-500 mt-1">कुल {questions.length} प्रश्नहरू</p>
+        </div>
         {timeLeft !== null && (
           <div className={`text-lg font-heading font-bold px-4 py-2 rounded-xl ${timeLeft < 60 ? "bg-destructive text-destructive-foreground animate-pulse" : "bg-card-navy text-primary-foreground"}`}>
             ⏱ {formatTime(timeLeft)}
