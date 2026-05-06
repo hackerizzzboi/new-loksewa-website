@@ -154,19 +154,19 @@ const Index = () => {
         {/* Age Calculator + Useful Tools */}
         <div className="grid md:grid-cols-2 gap-6">
           <section className="bg-card rounded-2xl shadow-md p-6">
-            <h2 className="text-lg font-heading font-bold mb-4">🎂 Age Calculator (उमेर गणना)</h2>
+            <h2 className="text-lg font-heading font-bold mb-4">🎂 Age Calculator — BS (उमेर गणना)</h2>
             <div className="grid grid-cols-3 gap-3 mb-4">
               <div>
-                <label className="text-xs text-muted-foreground">Year</label>
-                <input type="number" placeholder="2000" value={birthYear} onChange={(e) => setBirthYear(e.target.value)} className="w-full p-2 rounded-lg border bg-background text-sm" />
+                <label className="text-xs text-muted-foreground">BS Year (साल)</label>
+                <input type="number" placeholder="२०५७" value={birthYear} onChange={(e) => setBirthYear(e.target.value)} className="w-full p-2 rounded-lg border bg-background text-sm" />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Month</label>
+                <label className="text-xs text-muted-foreground">Month (महिना)</label>
                 <input type="number" placeholder="1-12" min="1" max="12" value={birthMonth} onChange={(e) => setBirthMonth(e.target.value)} className="w-full p-2 rounded-lg border bg-background text-sm" />
               </div>
               <div>
-                <label className="text-xs text-muted-foreground">Day</label>
-                <input type="number" placeholder="1-31" min="1" max="31" value={birthDay} onChange={(e) => setBirthDay(e.target.value)} className="w-full p-2 rounded-lg border bg-background text-sm" />
+                <label className="text-xs text-muted-foreground">Day (गते)</label>
+                <input type="number" placeholder="1-32" min="1" max="32" value={birthDay} onChange={(e) => setBirthDay(e.target.value)} className="w-full p-2 rounded-lg border bg-background text-sm" />
               </div>
             </div>
             <button onClick={calculateAge} className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg font-semibold hover:opacity-90 transition-opacity">Calculate Age</button>
