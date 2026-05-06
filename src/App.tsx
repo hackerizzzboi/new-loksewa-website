@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Admin from './pages/Admin';
 import { AdminGuard } from './components/AdminGuard';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -22,32 +23,54 @@ import NepalLoadingScreen from "./components/NepalLoadingScreen";
 const queryClient = new QueryClient();
 
 const App = () => {
+  const location = useLocation();
   const [showLoading, setShowLoading] = useState(true);
+  const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
 
+  // Check if we already showed loading screen in this session
+  useEffect(() => {
+    const sessionLoaded = sessionStorage.getItem("loadingScreenShown");
+    if (sessionLoaded) {
+      setShowLoading(false);
+      setHasLoadedBefore(true);
+    } else {
+      // Only show loading on first visit
+      const timer = setTimeout(() => {
+        setShowLoading(false);
+        sessionStorage.setItem("loadingScreenShown", "true");
+      }, 3000); // 3 seconds loading time
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Prevent body scroll during loading
   useEffect(() => {
     if (showLoading) {
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
+      document.body.style.top = `-${window.scrollY}px`;
     } else {
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
+      document.body.style.top = '';
     }
     return () => {
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
+      document.body.style.top = '';
     };
   }, [showLoading]);
 
   return (
     <>
-      {/* Loading Screen - Highest z-index, covers everything */}
-      {showLoading && <NepalLoadingScreen onComplete={() => setShowLoading(false)} />}
+      {/* Loading Screen - Only shows on first visit */}
+      {showLoading && !hasLoadedBefore && <NepalLoadingScreen onComplete={() => setShowLoading(false)} />}
       
-      {/* Main App - Hidden until loading is complete */}
-      <div style={{ display: showLoading ? 'none' : 'block' }}>
+      {/* Main App */}
+      <div style={{ display: showLoading && !hasLoadedBefore ? 'none' : 'block' }}>
         <QueryClientProvider client={queryClient}>
           <TooltipProvider>
             <Sonner />
