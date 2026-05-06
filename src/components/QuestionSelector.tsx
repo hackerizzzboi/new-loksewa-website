@@ -33,19 +33,26 @@ const QuestionSelector = ({ totalQuestions, subjectName, onSelect, onClose }: Qu
         <p className="text-gray-400 text-xs mb-5">कति प्रश्न अभ्यास गर्न चाहनुहुन्छ?</p>
         
         <div className="grid grid-cols-2 gap-3 mb-6">
-          {options.map((opt) => (
-            <button
-              key={opt}
-              onClick={() => onSelect(opt)}
-              className={`py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 ${
-                opt === 20
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {opt === totalQuestions ? `सबै (${opt})` : `${opt} प्रश्नहरू`}
-            </button>
-          ))}
+          {options.map((opt) => {
+            const isAll = opt === totalQuestions;
+            const isTwenty = opt === 20;
+            
+            return (
+              <button
+                key={opt}
+                onClick={() => onSelect(opt)}
+                className={`py-3 rounded-xl font-semibold transition-all duration-300 hover:scale-105 ${
+                  isAll
+                    ? 'bg-yellow-400 hover:bg-yellow-500 text-yellow-900 shadow-md'
+                    : isTwenty
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {isAll ? `सबै (${opt})` : `${opt} प्रश्नहरू`}
+              </button>
+            );
+          })}
         </div>
         
         <p className="text-gray-400 text-xs text-center border-t pt-3 mt-2">
