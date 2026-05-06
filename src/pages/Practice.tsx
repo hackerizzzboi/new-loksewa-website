@@ -26,7 +26,7 @@ const Practice = () => {
       "word-processor": 400,
       "spreadsheet": 20,
       "dbms": 20,
-      "presentation": 20,
+      "presentation": 185,
       "web-design": 20,
       "networking": 20,
       "cyber-security": 20,
