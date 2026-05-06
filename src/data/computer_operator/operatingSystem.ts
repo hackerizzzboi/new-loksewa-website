@@ -408,5 +408,3 @@ export const operatingSystemQuestions: Question[] = [
   { id: "os399", question: "The shortcut key is used to open properties window of selected item is", options: ["Ctrl+Enter", "Shift+Enter", "Alt+Enter", "None of above"], correct: 2, explanation: "Alt+Enter opens properties window." },
   { id: "os400", question: "The shortcut key to open a task manager is:", options: ["Alt + F1", "Alt + Ctrl + Delete", "Alt + Tab", "F1"], correct: 1, explanation: "Ctrl+Alt+Delete opens Task Manager." },
 ];
-
-export default operatingSystemQuestions;
