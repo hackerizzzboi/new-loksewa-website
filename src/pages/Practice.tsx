@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { 
   Shield, BookOpen, Database, Network, Lock, Wrench,
   Globe, Presentation, FileText, Calculator, Laptop,
-  Users, Award, Star, TrendingUp, ChevronRight,
+  Users, Award, Star, ChevronRight, ChevronDown,
   Mountain, Landmark, Microscope, Scale, Compass,
   History, CloudRain, Newspaper, Dice6
 } from "lucide-react";
@@ -14,6 +14,7 @@ const Practice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSelector, setShowSelector] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<{id: string, name: string, total: number} | null>(null);
+  const [openSection, setOpenSection] = useState<string>("computer-operator");
 
   // Get total questions for each subject
   const getTotalQuestions = (subjectId: string): number => {
@@ -57,7 +58,11 @@ const Practice = () => {
     }
   };
 
-  // Computer Operator Subjects (13 Subjects)
+  const toggleSection = (section: string) => {
+    setOpenSection(openSection === section ? "" : section);
+  };
+
+  // Computer Operator Subjects
   const computerOperatorSubjects = [
     { id: "general-awareness", title: "General Awareness", titleNp: "सामान्य ज्ञान", icon: <Globe size={20} />, color: "from-orange-500 to-red-500" },
     { id: "public-management", title: "Public Management", titleNp: "सार्वजनिक व्यवस्थापन", icon: <Users size={20} />, color: "from-purple-500 to-pink-500" },
@@ -92,12 +97,12 @@ const Practice = () => {
   const importantSets = [
     { id: "old-is-gold", title: "पुराना प्रश्नपत्रहरू", description: "विगतका परीक्षामा सोधिएका प्रश्नहरू", icon: "🏆", color: "from-amber-500 to-orange-500", link: "/old-is-gold" },
     { id: "weekly-test", title: "साप्ताहिक परीक्षा", description: "हप्तागत अभ्यास परीक्षा", icon: "📝", color: "from-blue-500 to-cyan-500", link: "/online-exam" },
-    { id: "abbreviations", title: "महत्त्वपूर्ण संक्षिप्त रुप", description: "कम्प्युटर, प्रशासन, विज्ञान सम्बन्धी", icon: "📋", questions: "100+", color: "from-purple-500 to-pink-500", link: "/quiz/old-is-gold/set-75" },
-    { id: "shortcuts", title: "किबोर्ड सर्टकट", description: "विन्डोज, MS Office, महत्त्वपूर्ण सर्टकट", icon: "⌨️", questions: "100+", color: "from-green-500 to-emerald-500", link: "/quiz/old-is-gold/set-76" },
-    { id: "excel-formulas", title: "एक्सेल प्रकार्यहरू", description: "महत्त्वपूर्ण Excel फर्मुला र प्रकार्य", icon: "📊", questions: "75+", color: "from-red-500 to-orange-500", link: "/quiz/old-is-gold/set-77" },
+    { id: "abbreviations", title: "महत्त्वपूर्ण संक्षिप्त रुप", description: "कम्प्युटर, प्रशासन, विज्ञान सम्बन्धी", icon: "📋", color: "from-purple-500 to-pink-500", link: "/quiz/old-is-gold/set-75" },
+    { id: "shortcuts", title: "किबोर्ड सर्टकट", description: "विन्डोज, MS Office, महत्त्वपूर्ण सर्टकट", icon: "⌨️", color: "from-green-500 to-emerald-500", link: "/quiz/old-is-gold/set-76" },
+    { id: "excel-formulas", title: "एक्सेल प्रकार्यहरू", description: "महत्त्वपूर्ण Excel फर्मुला र प्रकार्य", icon: "📊", color: "from-red-500 to-orange-500", link: "/quiz/old-is-gold/set-77" },
   ];
 
-  const filteredSubjects = computerOperatorSubjects.filter(subject =>
+  const filteredComputerSubjects = computerOperatorSubjects.filter(subject =>
     subject.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (subject.titleNp && subject.titleNp.toLowerCase().includes(searchTerm.toLowerCase()))
   );
@@ -111,6 +116,10 @@ const Practice = () => {
     set.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     set.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const hasComputerMatches = filteredComputerSubjects.length > 0;
+  const hasGKMatches = filteredGK.length > 0;
+  const hasSetMatches = filteredSets.length > 0;
 
   return (
     <>
@@ -140,93 +149,145 @@ const Practice = () => {
           </div>
 
           {/* Computer Operator Section */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full"></div>
-              <h2 className="text-2xl font-bold text-gray-800">💻 Computer Operator</h2>
-              <span className="text-sm text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{computerOperatorSubjects.length} विषयहरू</span>
-            </div>
-            
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredSubjects.map((subject) => (
-                <button
-                  key={subject.id}
-                  onClick={() => handleStartPractice(subject.id, subject.title)}
-                  className="group bg-white rounded-xl p-5 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 w-full text-left cursor-pointer"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition`}>
-                      {subject.icon}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-800 text-sm">{subject.title}</h3>
-                      {subject.titleNp && <p className="text-gray-400 text-xs">{subject.titleNp}</p>}
-                    </div>
-                    <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition" />
+          {hasComputerMatches && (
+            <div className="mb-6">
+              <button
+                onClick={() => toggleSection("computer-operator")}
+                className="w-full flex items-center justify-between bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Shield size={22} className="text-white" />
                   </div>
-                </button>
-              ))}
+                  <div className="text-left">
+                    <h2 className="text-xl font-bold text-white">💻 Computer Operator</h2>
+                    <p className="text-white/70 text-sm">{computerOperatorSubjects.length} विषयहरू</p>
+                  </div>
+                </div>
+                <div className="text-white">
+                  {openSection === "computer-operator" ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
+                </div>
+              </button>
+              
+              {openSection === "computer-operator" && (
+                <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
+                  {filteredComputerSubjects.map((subject) => (
+                    <button
+                      key={subject.id}
+                      onClick={() => handleStartPractice(subject.id, subject.title)}
+                      className="group bg-white rounded-xl p-5 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 w-full text-left cursor-pointer"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${subject.color} flex items-center justify-center text-white shadow-md group-hover:scale-110 transition`}>
+                          {subject.icon}
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-800 text-sm">{subject.title}</h3>
+                          {subject.titleNp && <p className="text-gray-400 text-xs">{subject.titleNp}</p>}
+                        </div>
+                        <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition" />
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* GK Section */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-1 h-8 bg-gradient-to-b from-red-500 to-orange-500 rounded-full"></div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">📚 सामान्य ज्ञान <span className="text-lg font-normal text-gray-500">सबै परीक्षाका लागि</span></h2>
-                <p className="text-gray-400 text-sm mt-1">लोकसेवा, वैंकिङ, प्रहरी, सेना, शिक्षक सेवा लगायत सबै परीक्षाको तयारी</p>
-              </div>
-              <span className="text-sm text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{gkSubjects.length} सेटहरू</span>
-            </div>
-            
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredGK.map((subject) => (
-                <button
-                  key={subject.id}
-                  onClick={() => handleStartPractice(subject.id, subject.title)}
-                  className="group bg-white rounded-xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 overflow-hidden relative w-full text-left cursor-pointer"
-                >
-                  <div className={`absolute inset-0 bg-gradient-to-r ${subject.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="text-3xl group-hover:scale-110 transition">{subject.emoji}</div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-gray-800 text-sm">{subject.title}</h3>
-                        <p className="text-gray-400 text-[10px] mt-0.5 line-clamp-2">{subject.description}</p>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-100">
-                      <span className="text-orange-400 text-xs group-hover:translate-x-1 transition">अभ्यास गर्नुहोस् →</span>
-                    </div>
+          {hasGKMatches && (
+            <div className="mb-6">
+              <button
+                onClick={() => toggleSection("gk")}
+                className="w-full flex items-center justify-between bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <BookOpen size={22} className="text-white" />
                   </div>
-                </button>
-              ))}
+                  <div className="text-left">
+                    <h2 className="text-xl font-bold text-white">📚 सामान्य ज्ञान</h2>
+                    <p className="text-white/70 text-sm">सबै परीक्षाका लागि • {gkSubjects.length} सेटहरू</p>
+                  </div>
+                </div>
+                <div className="text-white">
+                  {openSection === "gk" ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
+                </div>
+              </button>
+              
+              {openSection === "gk" && (
+                <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-fade-in">
+                  {filteredGK.map((subject) => (
+                    <button
+                      key={subject.id}
+                      onClick={() => handleStartPractice(subject.id, subject.title)}
+                      className="group bg-white rounded-xl p-4 shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-gray-100 overflow-hidden relative w-full text-left cursor-pointer"
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-r ${subject.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="text-3xl group-hover:scale-110 transition">{subject.emoji}</div>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-gray-800 text-sm">{subject.title}</h3>
+                            <p className="text-gray-400 text-[10px] mt-0.5 line-clamp-2">{subject.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-100">
+                          <span className="text-orange-400 text-xs group-hover:translate-x-1 transition">अभ्यास गर्नुहोस् →</span>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Important Sets Section */}
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-1 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
-              <h2 className="text-2xl font-bold text-gray-800">⭐ Important Sets</h2>
-              <span className="text-sm text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{importantSets.length} सेटहरू</span>
+          {hasSetMatches && (
+            <div className="mb-6">
+              <button
+                onClick={() => toggleSection("important-sets")}
+                className="w-full flex items-center justify-between bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                    <Star size={22} className="text-white" />
+                  </div>
+                  <div className="text-left">
+                    <h2 className="text-xl font-bold text-white">⭐ Important Sets</h2>
+                    <p className="text-white/70 text-sm">{importantSets.length} सेटहरू</p>
+                  </div>
+                </div>
+                <div className="text-white">
+                  {openSection === "important-sets" ? <ChevronDown size={24} /> : <ChevronRight size={24} />}
+                </div>
+              </button>
+              
+              {openSection === "important-sets" && (
+                <div className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 animate-fade-in">
+                  {filteredSets.map((set) => (
+                    <a
+                      key={set.id}
+                      href={set.link}
+                      className="group bg-white rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 block text-center cursor-pointer"
+                    >
+                      <div className="text-4xl mb-2 group-hover:scale-110 transition">{set.icon}</div>
+                      <h3 className="font-semibold text-gray-800 text-sm">{set.title}</h3>
+                      <p className="text-gray-400 text-[10px] mt-1 line-clamp-2">{set.description}</p>
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
-            
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-              {filteredSets.map((set) => (
-                <a
-                  key={set.id}
-                  href={set.link}
-                  className="group bg-white rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100 block text-center cursor-pointer"
-                >
-                  <div className="text-4xl mb-2 group-hover:scale-110 transition">{set.icon}</div>
-                  <h3 className="font-semibold text-gray-800 text-sm">{set.title}</h3>
-                  <p className="text-gray-400 text-[10px] mt-1 line-clamp-2">{set.description}</p>
-                </a>
-              ))}
+          )}
+
+          {/* No Results */}
+          {!hasComputerMatches && !hasGKMatches && !hasSetMatches && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">कुनै विषय फेला परेन</p>
             </div>
-          </div>
+          )}
 
           {/* Stats Footer */}
           <div className="mt-8 pt-6 border-t border-gray-200 text-center">
