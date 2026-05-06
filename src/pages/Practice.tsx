@@ -14,7 +14,7 @@ const Practice = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showSelector, setShowSelector] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<{id: string, name: string, total: number} | null>(null);
-  const [openSection, setOpenSection] = useState<string>("computer-operator");
+  const [openSection, setOpenSection] = useState<string>(""); // All closed by default
 
   // Get total questions for each subject
   const getTotalQuestions = (subjectId: string): number => {
@@ -62,21 +62,21 @@ const Practice = () => {
     setOpenSection(openSection === section ? "" : section);
   };
 
-  // Computer Operator Subjects
+  // Computer Operator Subjects - Nepali on top, English below
   const computerOperatorSubjects = [
-    { id: "general-awareness", title: "General Awareness", titleNp: "सामान्य ज्ञान", icon: <Globe size={20} />, color: "from-orange-500 to-red-500" },
-    { id: "public-management", title: "Public Management", titleNp: "सार्वजनिक व्यवस्थापन", icon: <Users size={20} />, color: "from-purple-500 to-pink-500" },
-    { id: "computer-fundamentals", title: "Computer Fundamentals", titleNp: "कम्प्युटर आधारभूत", icon: <Laptop size={20} />, color: "from-blue-500 to-cyan-500" },
-    { id: "operating-system", title: "Operating System", icon: <Shield size={20} />, color: "from-teal-500 to-green-500" },
-    { id: "word-processor", title: "Word Processor", icon: <FileText size={20} />, color: "from-red-500 to-orange-500" },
-    { id: "spreadsheet", title: "Electronic Spreadsheet", icon: <Calculator size={20} />, color: "from-green-500 to-emerald-500" },
-    { id: "dbms", title: "Database Management System", icon: <Database size={20} />, color: "from-pink-500 to-rose-500" },
-    { id: "presentation", title: "Presentation System", icon: <Presentation size={20} />, color: "from-amber-500 to-yellow-500" },
-    { id: "web-design", title: "Web Designing & Social Media", icon: <Globe size={20} />, color: "from-cyan-500 to-blue-500" },
-    { id: "networking", title: "Computer Network", icon: <Network size={20} />, color: "from-indigo-500 to-purple-500" },
-    { id: "cyber-security", title: "Cyber Security", icon: <Lock size={20} />, color: "from-red-600 to-red-800" },
-    { id: "hardware", title: "Hardware Maintenance", icon: <Wrench size={20} />, color: "from-gray-600 to-gray-800" },
-    { id: "legislation", title: "Related Legislations", titleNp: "सम्बन्धित कानून", icon: <BookOpen size={20} />, color: "from-purple-600 to-indigo-600" },
+    { id: "general-awareness", titleNp: "सामान्य ज्ञान", title: "General Awareness", icon: <Globe size={20} />, color: "from-orange-500 to-red-500" },
+    { id: "public-management", titleNp: "सार्वजनिक व्यवस्थापन", title: "Public Management", icon: <Users size={20} />, color: "from-purple-500 to-pink-500" },
+    { id: "computer-fundamentals", titleNp: "कम्प्युटर आधारभूत", title: "Computer Fundamentals", icon: <Laptop size={20} />, color: "from-blue-500 to-cyan-500" },
+    { id: "operating-system", titleNp: "अपरेटिङ सिस्टम", title: "Operating System", icon: <Shield size={20} />, color: "from-teal-500 to-green-500" },
+    { id: "word-processor", titleNp: "वर्ड प्रोसेसर", title: "Word Processor", icon: <FileText size={20} />, color: "from-red-500 to-orange-500" },
+    { id: "spreadsheet", titleNp: "स्प्रेडसिट", title: "Electronic Spreadsheet", icon: <Calculator size={20} />, color: "from-green-500 to-emerald-500" },
+    { id: "dbms", titleNp: "डाटाबेस", title: "Database Management System", icon: <Database size={20} />, color: "from-pink-500 to-rose-500" },
+    { id: "presentation", titleNp: "प्रेजेन्टेसन", title: "Presentation System", icon: <Presentation size={20} />, color: "from-amber-500 to-yellow-500" },
+    { id: "web-design", titleNp: "वेब डिजाइनिङ", title: "Web Designing & Social Media", icon: <Globe size={20} />, color: "from-cyan-500 to-blue-500" },
+    { id: "networking", titleNp: "कम्प्युटर नेटवर्क", title: "Computer Network", icon: <Network size={20} />, color: "from-indigo-500 to-purple-500" },
+    { id: "cyber-security", titleNp: "साइबर सुरक्षा", title: "Cyber Security", icon: <Lock size={20} />, color: "from-red-600 to-red-800" },
+    { id: "hardware", titleNp: "हार्डवेयर", title: "Hardware Maintenance", icon: <Wrench size={20} />, color: "from-gray-600 to-gray-800" },
+    { id: "legislation", titleNp: "सम्बन्धित कानून", title: "Related Legislations", icon: <BookOpen size={20} />, color: "from-purple-600 to-indigo-600" },
   ];
 
   // GK Subjects
@@ -104,7 +104,7 @@ const Practice = () => {
 
   const filteredComputerSubjects = computerOperatorSubjects.filter(subject =>
     subject.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (subject.titleNp && subject.titleNp.toLowerCase().includes(searchTerm.toLowerCase()))
+    subject.titleNp.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredGK = gkSubjects.filter(subject =>
@@ -182,8 +182,8 @@ const Practice = () => {
                           {subject.icon}
                         </div>
                         <div className="flex-1">
+                          <p className="text-gray-500 text-xs">{subject.titleNp}</p>
                           <h3 className="font-semibold text-gray-800 text-sm">{subject.title}</h3>
-                          {subject.titleNp && <p className="text-gray-400 text-xs">{subject.titleNp}</p>}
                         </div>
                         <ChevronRight size={16} className="text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition" />
                       </div>
