@@ -59,7 +59,7 @@ const QuizPage = () => {
         // Fallback to old practiceQuestions if needed
         const { practiceQuestions } = require("@/data/questions");
         if (practiceQuestions[setId]) {
-          const shuffled = shuffleArray(practiceQuestions[setId]);
+          const shuffled = shuffleArray(practiceQuestions[setId] as Question[]);
           qs = shuffled.slice(0, questionCount);
         }
       }
