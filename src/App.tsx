@@ -25,23 +25,45 @@ const queryClient = new QueryClient();
 // Separate component for the main app content
 const AppContent = () => {
   const location = useLocation();
-  const [showLoading, setShowLoading] = useState(true);
-  const [hasLoadedBefore, setHasLoadedBefore] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   useEffect(() => {
-    const sessionLoaded = sessionStorage.getItem("loadingScreenShown");
-    if (sessionLoaded) {
-      setShowLoading(false);
-      setHasLoadedBefore(true);
-    } else {
-      const timer = setTimeout(() => {
+    // Check if this is a fresh page load (not client-side navigation)
+    const navigationType = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming;
+    const isReload = navigationType?.type === "reload";
+    
+    // Show loading only on homepage AND (first visit OR manual reload)
+    if (location.pathname === "/") {
+      // Check if we're coming from navigation (not full page reload)
+      const isClientSideNavigation = sessionStorage.getItem("clientSideNav") === "true";
+      
+      if (!isClientSideNavigation || isReload) {
+        setShowLoading(true);
+        // Set timeout to hide loading after 3 seconds
+        const timer = setTimeout(() => {
+          setShowLoading(false);
+        }, 3000);
+        return () => clearTimeout(timer);
+      } else {
         setShowLoading(false);
-        sessionStorage.setItem("loadingScreenShown", "true");
-      }, 3000);
-      return () => clearTimeout(timer);
+      }
+    } else {
+      setShowLoading(false);
     }
-  }, []);
+    
+    // Mark that we're doing client-side navigation
+    sessionStorage.setItem("clientSideNav", "true");
+    
+    // Reset on page unload
+    const handleBeforeUnload = () => {
+      sessionStorage.removeItem("clientSideNav");
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [location.pathname]);
 
+  // Prevent body scroll during loading
   useEffect(() => {
     if (showLoading) {
       document.body.style.overflow = 'hidden';
@@ -59,14 +81,11 @@ const AppContent = () => {
     };
   }, [showLoading]);
 
-  // Only show loading on homepage ("/") on first visit
-  const shouldShowLoading = showLoading && !hasLoadedBefore && location.pathname === "/";
-
   return (
     <>
-      {shouldShowLoading && <NepalLoadingScreen onComplete={() => setShowLoading(false)} />}
+      {showLoading && <NepalLoadingScreen onComplete={() => setShowLoading(false)} />}
       
-      <div style={{ display: shouldShowLoading ? 'none' : 'block' }}>
+      <div style={{ display: showLoading ? 'none' : 'block' }}>
         <Routes>
           <Route 
             path="/admin" 
