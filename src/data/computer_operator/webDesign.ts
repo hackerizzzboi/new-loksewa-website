@@ -208,4 +208,3 @@ export const webDesignQuestionsPart2: Question[] = [
 ];
 
 // Combine all questions
-export const allWebDesignQuestions: Question[] = [...webDesignQuestions, ...webDesignQuestionsPart2];
