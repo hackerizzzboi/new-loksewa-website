@@ -24,7 +24,7 @@ const Practice = () => {
       "computer-fundamentals": 958,
       "operating-system": 400,
       "word-processor": 400,
-      "spreadsheet": 20,
+      "spreadsheet": 400,
       "dbms": 397,
       "presentation": 184,
       "web-design": 275,
