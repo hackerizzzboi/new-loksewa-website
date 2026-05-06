@@ -11,7 +11,6 @@ const navItems = [
   { label: "Typing", path: "/typing", icon: "⌨️" },
   { label: "Notes", path: "/notes", icon: "📒" },
   { label: "Downloads", path: "/downloads", icon: "📥" },
-  { label: "Admin", path: "/admin", icon: "🔒" },
 ];
 
 const Navbar = () => {
