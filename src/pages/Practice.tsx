@@ -29,7 +29,7 @@ const Practice = () => {
       "presentation": 184,
       "web-design": 200,
       "networking": 20,
-      "cyber-security": 20,
+      "cyber-security": 253,
       "hardware": 20,
       "legislation": 20,
       "gk-nepal-geography": 100,
