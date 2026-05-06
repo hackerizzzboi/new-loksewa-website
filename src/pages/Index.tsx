@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useNepalTime, useCountdown } from "@/hooks/useNepalTime";
 import { practiceSubjects, motivationalQuotes } from "@/data/questions";
+import { calculateBSAge, bsMonthNames, toNepaliDigits, type BSDate } from "@/lib/nepaliCalendar";
 import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
 
 // Ashad 7, 2082 BS ≈ June 22, 2026 AD
@@ -26,11 +27,11 @@ const importantLinks = [
 ];
 
 const Index = () => {
-  const { timeStr, dateStr } = useNepalTime();
+  const { timeStr, dateStr, bsDate } = useNepalTime();
   const countdown = useCountdown(EXAM_DATE);
   const quote = useMemo(() => motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)], []);
 
-  // Age converter
+  // BS Age converter
   const [birthYear, setBirthYear] = useState("");
   const [birthMonth, setBirthMonth] = useState("");
   const [birthDay, setBirthDay] = useState("");
@@ -38,14 +39,9 @@ const Index = () => {
 
   const calculateAge = () => {
     if (!birthYear || !birthMonth || !birthDay) return;
-    const bd = new Date(parseInt(birthYear), parseInt(birthMonth) - 1, parseInt(birthDay));
-    const now = new Date();
-    let years = now.getFullYear() - bd.getFullYear();
-    let months = now.getMonth() - bd.getMonth();
-    let days = now.getDate() - bd.getDate();
-    if (days < 0) { months--; days += 30; }
-    if (months < 0) { years--; months += 12; }
-    setAgeResult(`तपाईँको उमेर: ${years} वर्ष, ${months} महिना, ${days} दिन`);
+    const birthBS: BSDate = { year: parseInt(birthYear), month: parseInt(birthMonth), day: parseInt(birthDay) };
+    const age = calculateBSAge(birthBS, bsDate);
+    setAgeResult(`तपाईँको उमेर: ${toNepaliDigits(age.years)} वर्ष, ${toNepaliDigits(age.months)} महिना, ${toNepaliDigits(age.days)} दिन`);
   };
 
   return (
