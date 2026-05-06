@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Users, BookOpen, FileText, Clock, BarChart3, 
-  Settings, Plus, Edit, Trash2, Save, X, Download, Upload,
-  Eye, Trophy, Calendar, TrendingUp, AlertCircle, CheckCircle,
-  Printer, Filter, Search, RefreshCw, Lock, Unlock
+import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  BookOpen, FileText, BarChart3, Settings, Plus, Edit, Trash2,
+  Save, X, Download, Upload, Trophy, TrendingUp, RefreshCw,
+  Lock, Search, Home, LogOut, ChevronDown, Eye, Calendar
 } from 'lucide-react';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
+import { practiceQuestions, practiceSubjects, oldIsGoldSets, weeklyTests } from '@/data/questions';
+import type { Question } from '@/data/questions';
 import { useToast } from '@/components/ui/use-toast';
+import { Toaster } from '@/components/ui/toaster';
 
-interface Question {
+// ── Types ──
+interface AdminQuestion {
   id: string;
   subject: string;
   question: string;
@@ -15,18 +20,7 @@ interface Question {
   correctAnswer: number;
   explanation: string;
   year?: string;
-  marks?: number;
   difficulty?: 'easy' | 'medium' | 'hard';
-}
-
-interface UserStats {
-  totalUsers: number;
-  totalQuizzes: number;
-  avgScore: number;
-  topPerformer: string;
-  totalQuestions: number;
-  passRate: number;
-  activeUsers: number;
 }
 
 interface QuizResult {
@@ -37,875 +31,661 @@ interface QuizResult {
   correct: number;
   wrong: number;
   subject: string;
+  type: string;
 }
 
+// ── Helper: load questions from data + localStorage overrides ──
+function loadAllQuestions(): AdminQuestion[] {
+  const stored = localStorage.getItem('loksewa_questions');
+  if (stored) {
+    try { return JSON.parse(stored); } catch {}
+  }
+
+  // Build from practiceQuestions data
+  const qs: AdminQuestion[] = [];
+  for (const [subjectId, questions] of Object.entries(practiceQuestions)) {
+    const subject = practiceSubjects.find(s => s.id === subjectId);
+    const subjectName = subject?.title || subjectId;
+    for (const q of questions) {
+      qs.push({
+        id: q.id,
+        subject: subjectName,
+        question: q.question,
+        options: [...q.options],
+        correctAnswer: q.correct,
+        explanation: q.explanation || '',
+        difficulty: 'medium',
+      });
+    }
+  }
+  return qs;
+}
+
+// ── Main Admin Component ──
 const Admin = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newQuestion, setNewQuestion] = useState<Partial<Question>>({});
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState('all');
-  const [stats, setStats] = useState<UserStats>({
-    totalUsers: 0,
-    totalQuizzes: 0,
-    avgScore: 0,
-    topPerformer: '',
-    totalQuestions: 0,
-    passRate: 0,
-    activeUsers: 0
-  });
-  const [quizHistory, setQuizHistory] = useState<QuizResult[]>([]);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { logout, changePassword } = useAdminAuth();
   const { toast } = useToast();
 
-  // Load data from localStorage
-  useEffect(() => {
-    loadAllData();
-  }, []);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [questions, setQuestions] = useState<AdminQuestion[]>([]);
+  const [editingQuestion, setEditingQuestion] = useState<AdminQuestion | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newQuestion, setNewQuestion] = useState<Partial<AdminQuestion>>({ options: ['', '', '', ''], correctAnswer: 0 });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState('all');
+  const [quizHistory, setQuizHistory] = useState<QuizResult[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [newPasswordInput, setNewPasswordInput] = useState('');
+  const [showMobileNav, setShowMobileNav] = useState(false);
 
-  const loadAllData = () => {
-    setIsLoading(true);
-    
-    // Load questions
-    const storedQuestions = localStorage.getItem('loksewa_questions');
-    if (storedQuestions) {
-      setQuestions(JSON.parse(storedQuestions));
-    } else {
-      // Load default questions from your existing data
-      const defaultQuestions = loadDefaultQuestions();
-      setQuestions(defaultQuestions);
-      localStorage.setItem('loksewa_questions', JSON.stringify(defaultQuestions));
+  // Exam settings
+  const [examSettings, setExamSettings] = useState({
+    questionsPerTest: parseInt(localStorage.getItem('exam_questions_count') || '50'),
+    timeLimit: parseInt(localStorage.getItem('exam_time_limit') || '60'),
+    negativeMarking: parseFloat(localStorage.getItem('negative_marking') || '0.4'),
+    passingPercentage: parseInt(localStorage.getItem('passing_percentage') || '40'),
+    oldIsGoldCount: parseInt(localStorage.getItem('old_is_gold_count') || '50'),
+  });
+
+  useEffect(() => { loadData(); }, []);
+
+  const loadData = () => {
+    const qs = loadAllQuestions();
+    setQuestions(qs);
+
+    const history = localStorage.getItem('quiz_history');
+    if (history) {
+      try { setQuizHistory(JSON.parse(history)); } catch {}
     }
-    
-    // Load quiz history
-    const storedHistory = localStorage.getItem('quiz_history');
-    if (storedHistory) {
-      const history = JSON.parse(storedHistory);
-      setQuizHistory(history);
-      
-      // Calculate stats
-      const totalQuizzes = history.length;
-      const avgScore = history.reduce((acc: number, h: any) => acc + h.score, 0) / (totalQuizzes || 1);
-      const passRate = (history.filter((h: any) => h.score >= 40).length / (totalQuizzes || 1)) * 100;
-      
-      setStats({
-        totalUsers: parseInt(localStorage.getItem('total_users') || '1'),
-        totalQuizzes: totalQuizzes,
-        avgScore: avgScore,
-        topPerformer: localStorage.getItem('top_performer') || 'You',
-        totalQuestions: questions.length,
-        passRate: passRate,
-        activeUsers: parseInt(localStorage.getItem('active_users') || '1')
-      });
-    }
-    
-    setIsLoading(false);
   };
 
-  const loadDefaultQuestions = (): Question[] => {
-    // Load from your existing questions.ts
-    const existingQuestions = localStorage.getItem('quiz_questions');
-    if (existingQuestions) {
-      return JSON.parse(existingQuestions);
-    }
-    return [
-      {
-        id: '1',
-        subject: 'Computer Fundamentals',
-        question: 'What is the full form of CPU?',
-        options: ['Central Processing Unit', 'Computer Personal Unit', 'Central Program Unit', 'Core Processing Unit'],
-        correctAnswer: 0,
-        explanation: 'CPU stands for Central Processing Unit'
-      },
-      {
-        id: '2',
-        subject: 'Operating System',
-        question: 'Which of the following is not an operating system?',
-        options: ['Windows', 'Linux', 'Oracle', 'macOS'],
-        correctAnswer: 2,
-        explanation: 'Oracle is a database management system'
-      }
-    ];
+  const saveQuestions = (updated: AdminQuestion[]) => {
+    localStorage.setItem('loksewa_questions', JSON.stringify(updated));
+    setQuestions(updated);
   };
 
-  const saveQuestions = (updatedQuestions: Question[]) => {
-    localStorage.setItem('loksewa_questions', JSON.stringify(updatedQuestions));
-    setQuestions(updatedQuestions);
-    toast({
-      title: "Success",
-      description: "Questions saved successfully",
-    });
-  };
-
+  // ── CRUD ──
   const addQuestion = () => {
-    if (!newQuestion.question || !newQuestion.subject) {
-      toast({
-        title: "Error",
-        description: "Please fill question and subject",
-        variant: "destructive",
-      });
+    if (!newQuestion.question?.trim() || !newQuestion.subject) {
+      toast({ title: "Error", description: "Question and subject are required", variant: "destructive" });
       return;
     }
-
-    const question: Question = {
-      id: Date.now().toString(),
-      subject: newQuestion.subject || 'General',
+    if (newQuestion.options?.some(o => !o.trim())) {
+      toast({ title: "Error", description: "All 4 options are required", variant: "destructive" });
+      return;
+    }
+    const q: AdminQuestion = {
+      id: `admin-${Date.now()}`,
+      subject: newQuestion.subject || '',
       question: newQuestion.question || '',
       options: newQuestion.options || ['', '', '', ''],
       correctAnswer: newQuestion.correctAnswer || 0,
       explanation: newQuestion.explanation || '',
       year: newQuestion.year,
-      marks: newQuestion.marks || 1,
-      difficulty: (newQuestion.difficulty as 'easy' | 'medium' | 'hard') || 'medium'
+      difficulty: newQuestion.difficulty || 'medium',
     };
-    
-    saveQuestions([...questions, question]);
+    saveQuestions([...questions, q]);
     setShowAddModal(false);
-    setNewQuestion({});
-    toast({
-      title: "Success",
-      description: "Question added successfully",
-    });
+    setNewQuestion({ options: ['', '', '', ''], correctAnswer: 0 });
+    toast({ title: "✅ Question Added", description: `Added to ${q.subject}` });
   };
 
   const updateQuestion = () => {
-    if (editingQuestion) {
-      const updated = questions.map(q => 
-        q.id === editingQuestion.id ? editingQuestion : q
-      );
-      saveQuestions(updated);
-      setEditingQuestion(null);
-      toast({
-        title: "Success",
-        description: "Question updated successfully",
-      });
-    }
+    if (!editingQuestion) return;
+    saveQuestions(questions.map(q => q.id === editingQuestion.id ? editingQuestion : q));
+    setEditingQuestion(null);
+    toast({ title: "✅ Updated", description: "Question saved" });
   };
 
   const deleteQuestion = (id: string) => {
     saveQuestions(questions.filter(q => q.id !== id));
     setShowDeleteConfirm(null);
-    toast({
-      title: "Deleted",
-      description: "Question deleted successfully",
-    });
+    toast({ title: "🗑️ Deleted", description: "Question removed" });
   };
 
+  // ── Import/Export ──
   const exportData = () => {
-    const data = {
-      questions,
-      quizHistory,
-      userProgress: localStorage.getItem('user_progress'),
-      exportDate: new Date().toISOString(),
-      version: '1.0'
-    };
+    const data = { questions, quizHistory, examSettings, exportDate: new Date().toISOString(), version: '2.0' };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = `loksewa_backup_${new Date().toISOString().split('T')[0]}.json`;
     a.click();
-    URL.revokeObjectURL(url);
-    
-    toast({
-      title: "Export Complete",
-      description: "Your data has been exported",
-    });
+    toast({ title: "💾 Exported", description: "Backup file downloaded" });
   };
 
-  const importData = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target?.result as string);
-          if (data.questions) {
-            saveQuestions(data.questions);
-            toast({
-              title: "Import Successful",
-              description: `Imported ${data.questions.length} questions`,
-            });
-          }
-          if (data.quizHistory) {
-            localStorage.setItem('quiz_history', JSON.stringify(data.quizHistory));
-            loadAllData();
-          }
-        } catch (error) {
-          toast({
-            title: "Import Failed",
-            description: "Invalid file format",
-            variant: "destructive",
-          });
+  const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        if (data.questions?.length) {
+          saveQuestions(data.questions);
+          toast({ title: "✅ Imported", description: `${data.questions.length} questions loaded` });
         }
-      };
-      reader.readAsText(file);
+        if (data.quizHistory) {
+          localStorage.setItem('quiz_history', JSON.stringify(data.quizHistory));
+          setQuizHistory(data.quizHistory);
+        }
+      } catch {
+        toast({ title: "❌ Error", description: "Invalid file format", variant: "destructive" });
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const resetAllData = () => {
+    if (!confirm('⚠️ This will delete ALL custom questions and quiz history. Continue?')) return;
+    localStorage.removeItem('loksewa_questions');
+    localStorage.removeItem('quiz_history');
+    loadData();
+    toast({ title: "🔄 Reset", description: "Data reset to defaults" });
+  };
+
+  const saveExamSettings = () => {
+    localStorage.setItem('exam_questions_count', examSettings.questionsPerTest.toString());
+    localStorage.setItem('exam_time_limit', examSettings.timeLimit.toString());
+    localStorage.setItem('negative_marking', examSettings.negativeMarking.toString());
+    localStorage.setItem('passing_percentage', examSettings.passingPercentage.toString());
+    localStorage.setItem('old_is_gold_count', examSettings.oldIsGoldCount.toString());
+    toast({ title: "✅ Settings Saved" });
+  };
+
+  const handleChangePassword = async () => {
+    if (newPasswordInput.length < 6) {
+      toast({ title: "Error", description: "Password must be at least 6 characters", variant: "destructive" });
+      return;
+    }
+    const ok = await changePassword(newPasswordInput);
+    if (ok) {
+      setNewPasswordInput('');
+      toast({ title: "✅ Password Changed", description: "New password set successfully" });
     }
   };
 
-  const clearAllData = () => {
-    if (confirm('⚠️ WARNING: This will delete ALL questions and quiz history. Are you sure?')) {
-      localStorage.removeItem('loksewa_questions');
-      localStorage.removeItem('quiz_history');
-      localStorage.removeItem('user_progress');
-      loadAllData();
-      toast({
-        title: "Data Cleared",
-        description: "All data has been reset",
-      });
-    }
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
-  const filteredQuestions = questions.filter(q => {
-    const matchesSearch = q.question.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSubject = selectedSubject === 'all' || q.subject === selectedSubject;
-    return matchesSearch && matchesSubject;
-  });
+  // ── Derived data ──
+  const subjects = useMemo(() => ['all', ...new Set(questions.map(q => q.subject))], [questions]);
 
-  const subjects = ['all', ...new Set(questions.map(q => q.subject))];
+  const filteredQuestions = useMemo(() =>
+    questions.filter(q => {
+      const matchSearch = q.question.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchSubject = selectedSubject === 'all' || q.subject === selectedSubject;
+      return matchSearch && matchSubject;
+    }),
+  [questions, searchTerm, selectedSubject]);
+
+  const stats = useMemo(() => {
+    const total = quizHistory.length;
+    const avg = total ? quizHistory.reduce((a, h) => a + h.score, 0) / total : 0;
+    const passRate = total ? (quizHistory.filter(h => h.score >= 40).length / total) * 100 : 0;
+    return { totalQuestions: questions.length, totalQuizzes: total, avgScore: avg, passRate };
+  }, [questions, quizHistory]);
+
+  const subjectStats = useMemo(() => {
+    const map: Record<string, number> = {};
+    questions.forEach(q => { map[q.subject] = (map[q.subject] || 0) + 1; });
+    return Object.entries(map).sort((a, b) => b[1] - a[1]);
+  }, [questions]);
 
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3, color: 'blue' },
-    { id: 'questions', label: 'Question Bank', icon: BookOpen, color: 'green' },
-    { id: 'exams', label: 'Exam Manager', icon: FileText, color: 'purple' },
-    { id: 'analytics', label: 'Analytics', icon: TrendingUp, color: 'orange' },
-    { id: 'settings', label: 'Settings', icon: Settings, color: 'gray' }
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'questions', label: 'Question Bank', icon: BookOpen },
+    { id: 'exams', label: 'Exam Config', icon: FileText },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ];
+
+  const allSubjectOptions = [
+    "General Awareness", "Public Management", "Computer Fundamentals",
+    "Operating System", "Word Processor", "Electronic Spreadsheet",
+    "Database Management System", "Presentation System", "Web Designing & Social Media",
+    "Computer Network", "Cyber Security", "Hardware Maintenance", "Related Legislations",
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Admin Header */}
-      <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white sticky top-0 z-20">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex justify-between items-center flex-wrap gap-4">
-            <div>
-              <h1 className="text-2xl font-bold flex items-center gap-2">
-                <Lock className="text-yellow-400" size={24} />
-                लोकसेवा स्मार्ट प्रिप
-                <span className="text-sm bg-yellow-600 px-2 py-1 rounded text-xs">एड्मिन</span>
-              </h1>
-              <p className="text-blue-200 text-sm mt-1">Manage Questions, Exams & User Data</p>
-            </div>
-            <div className="flex gap-2">
-              <button 
-                onClick={exportData}
-                className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg flex items-center gap-2 transition"
-              >
-                <Download size={16} /> Backup
-              </button>
-              <label className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg flex items-center gap-2 transition cursor-pointer">
-                <Upload size={16} /> Import
-                <input type="file" accept=".json" onChange={importData} className="hidden" />
-              </label>
-              <button 
-                onClick={clearAllData}
-                className="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-lg flex items-center gap-2 transition"
-              >
-                <RefreshCw size={16} /> Reset
-              </button>
-            </div>
+      <Toaster />
+      
+      {/* Header */}
+      <header className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h1 className="text-xl font-bold flex items-center gap-2">
+              <Lock size={20} className="text-yellow-400" />
+              लोकसेवा Pro Admin
+              <span className="text-[10px] bg-yellow-500/30 px-2 py-0.5 rounded ml-1">v2.0</span>
+            </h1>
           </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button onClick={exportData} className="bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-sm transition">
+              <Download size={14} /> Backup
+            </button>
+            <label className="bg-blue-600 hover:bg-blue-700 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-sm transition cursor-pointer">
+              <Upload size={14} /> Import
+              <input type="file" accept=".json" onChange={importData} className="hidden" />
+            </label>
+            <button onClick={() => navigate('/')} className="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-sm transition">
+              <Home size={14} /> Site
+            </button>
+            <button onClick={handleLogout} className="bg-red-600 hover:bg-red-700 px-3 py-1.5 rounded-lg flex items-center gap-1.5 text-sm transition">
+              <LogOut size={14} /> Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Tab Nav */}
+      <div className="bg-white shadow-sm sticky top-[52px] z-20 border-b">
+        <div className="max-w-7xl mx-auto px-4 flex gap-0.5 overflow-x-auto">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition ${
+                activeTab === tab.id
+                  ? 'text-blue-600 border-blue-600 bg-blue-50/50'
+                  : 'text-gray-500 border-transparent hover:text-blue-600'
+              }`}
+            >
+              <tab.icon size={16} />
+              {tab.label}
+              {tab.id === 'questions' && <span className="ml-1 text-[10px] bg-gray-200 px-1.5 py-0.5 rounded-full">{filteredQuestions.length}</span>}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="bg-white shadow-md sticky top-[73px] z-10">
-        <div className="container mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto">
-            {tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-5 py-3 font-medium transition-all whitespace-nowrap ${
-                  activeTab === tab.id 
-                    ? `text-${tab.color}-600 border-b-2 border-${tab.color}-600 bg-${tab.color}-50` 
-                    : 'text-gray-600 hover:text-blue-600'
-                }`}
-              >
-                <tab.icon size={18} />
-                {tab.label}
-                {tab.id === 'questions' && (
-                  <span className="ml-1 text-xs bg-gray-200 px-1.5 py-0.5 rounded-full">
-                    {filteredQuestions.length}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
-        {isLoading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        ) : (
-          <>
-            {activeTab === 'dashboard' && (
-              <div>
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500 hover:shadow-md transition">
-                    <div className="flex items-center justify-between">
+        {/* ══════ DASHBOARD ══════ */}
+        {activeTab === 'dashboard' && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: 'Total Questions', value: stats.totalQuestions, icon: BookOpen, color: 'blue', border: 'border-blue-500' },
+                { label: 'Quizzes Taken', value: stats.totalQuizzes, icon: FileText, color: 'green', border: 'border-green-500' },
+                { label: 'Avg Score', value: `${stats.avgScore.toFixed(1)}%`, icon: BarChart3, color: 'orange', border: 'border-orange-500' },
+                { label: 'Pass Rate', value: `${stats.passRate.toFixed(1)}%`, icon: Trophy, color: 'purple', border: 'border-purple-500' },
+              ].map((s, i) => (
+                <div key={i} className={`bg-white rounded-xl shadow-sm p-5 border-l-4 ${s.border} hover:shadow-md transition`}>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-gray-500 text-xs">{s.label}</p>
+                      <p className="text-2xl font-bold mt-1">{s.value}</p>
+                    </div>
+                    <s.icon size={32} className={`text-${s.color}-500 opacity-60`} />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* Recent Activity */}
+              <div className="bg-white rounded-xl shadow-sm p-5">
+                <h3 className="font-semibold mb-3 flex items-center gap-2"><Calendar size={18} /> Recent Quizzes</h3>
+                <div className="space-y-2 max-h-72 overflow-y-auto">
+                  {quizHistory.length === 0 && <p className="text-gray-400 text-center py-8">No quiz attempts yet</p>}
+                  {quizHistory.slice(0, 10).map((q, i) => (
+                    <div key={i} className="flex items-center justify-between p-2.5 bg-gray-50 rounded-lg text-sm">
                       <div>
-                        <p className="text-gray-500 text-sm">Total Questions</p>
-                        <p className="text-3xl font-bold">{questions.length}</p>
+                        <p className="font-medium">{q.subject || q.type || 'Quiz'}</p>
+                        <p className="text-xs text-gray-400">{new Date(q.date).toLocaleDateString()}</p>
                       </div>
-                      <BookOpen className="text-blue-500" size={40} />
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500 hover:shadow-md transition">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-500 text-sm">Quizzes Taken</p>
-                        <p className="text-3xl font-bold">{stats.totalQuizzes}</p>
-                      </div>
-                      <FileText className="text-green-500" size={40} />
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-orange-500 hover:shadow-md transition">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-500 text-sm">Avg. Score</p>
-                        <p className="text-3xl font-bold">{stats.avgScore.toFixed(1)}%</p>
-                      </div>
-                      <BarChart3 className="text-orange-500" size={40} />
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-purple-500 hover:shadow-md transition">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-gray-500 text-sm">Pass Rate</p>
-                        <p className="text-3xl font-bold">{stats.passRate.toFixed(1)}%</p>
-                      </div>
-                      <Trophy className="text-purple-500" size={40} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Charts and Recent Activity */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                      <Calendar size={20} />
-                      Recent Quiz Activity
-                    </h3>
-                    <div className="space-y-3 max-h-80 overflow-y-auto">
-                      {quizHistory.slice(0, 10).map((quiz, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div>
-                            <p className="font-medium">{quiz.subject}</p>
-                            <p className="text-xs text-gray-500">{new Date(quiz.date).toLocaleDateString()}</p>
-                          </div>
-                          <div className="text-right">
-                            <p className={`font-bold ${quiz.score >= 40 ? 'text-green-600' : 'text-red-600'}`}>
-                              {quiz.score}%
-                            </p>
-                            <p className="text-xs text-gray-500">{quiz.correct}/{quiz.totalQuestions} correct</p>
-                          </div>
-                        </div>
-                      ))}
-                      {quizHistory.length === 0 && (
-                        <p className="text-gray-500 text-center py-8">No quiz attempts yet</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-xl shadow-sm p-6">
-                    <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
-                      <Settings size={20} />
-                      Quick Actions
-                    </h3>
-                    <div className="space-y-3">
-                      <button 
-                        onClick={() => { setActiveTab('questions'); setShowAddModal(true); }}
-                        className="w-full text-left px-4 py-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition flex items-center gap-3"
-                      >
-                        <Plus size={18} className="text-blue-600" />
-                        <span>➕ Add New Question</span>
-                      </button>
-                      <label className="w-full block px-4 py-3 bg-green-50 rounded-lg hover:bg-green-100 transition cursor-pointer flex items-center gap-3">
-                        <Upload size={18} className="text-green-600" />
-                        <span>📥 Import Questions from JSON</span>
-                        <input type="file" accept=".json" onChange={importData} className="hidden" />
-                      </label>
-                      <button 
-                        onClick={exportData}
-                        className="w-full text-left px-4 py-3 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition flex items-center gap-3"
-                      >
-                        <Download size={18} className="text-emerald-600" />
-                        <span>💾 Export All Data</span>
-                      </button>
-                      <button 
-                        onClick={() => setActiveTab('exams')}
-                        className="w-full text-left px-4 py-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition flex items-center gap-3"
-                      >
-                        <Settings size={18} className="text-purple-600" />
-                        <span>⚙️ Configure Exam Settings</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Subject Distribution */}
-                <div className="mt-6 bg-white rounded-xl shadow-sm p-6">
-                  <h3 className="font-semibold text-lg mb-4">Subject Distribution</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {subjects.filter(s => s !== 'all').map(subject => (
-                      <div key={subject} className="px-3 py-2 bg-gray-100 rounded-lg">
-                        <span className="font-medium">{subject}</span>
-                        <span className="ml-2 text-blue-600">({questions.filter(q => q.subject === subject).length})</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'questions' && (
-              <div>
-                <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
-                  <h2 className="text-xl font-bold">📚 Question Bank</h2>
-                  <button 
-                    onClick={() => setShowAddModal(true)}
-                    className="bg-blue-600 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition shadow-sm"
-                  >
-                    <Plus size={18} /> Add Question
-                  </button>
-                </div>
-
-                {/* Filters */}
-                <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex-1 min-w-[200px]">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-                        <input 
-                          type="text" 
-                          placeholder="Search questions..." 
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                    </div>
-                    <select 
-                      value={selectedSubject}
-                      onChange={(e) => setSelectedSubject(e.target.value)}
-                      className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {subjects.map(sub => (
-                        <option key={sub} value={sub}>
-                          {sub === 'all' ? 'All Subjects' : sub}
-                        </option>
-                      ))}
-                    </select>
-                    <button 
-                      onClick={() => { setSearchTerm(''); setSelectedSubject('all'); }}
-                      className="text-gray-500 hover:text-gray-700 px-3"
-                    >
-                      <RefreshCw size={18} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Questions List */}
-                <div className="space-y-4">
-                  {filteredQuestions.map((q, idx) => (
-                    <div key={q.id} className="bg-white rounded-lg shadow-sm p-5 hover:shadow-md transition">
-                      {editingQuestion?.id === q.id ? (
-                        <div className="space-y-3">
-                          <input 
-                            type="text" 
-                            value={editingQuestion.question} 
-                            onChange={e => setEditingQuestion({...editingQuestion, question: e.target.value})}
-                            className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-blue-500"
-                            placeholder="Question"
-                          />
-                          {editingQuestion.options.map((opt, optIdx) => (
-                            <input 
-                              key={optIdx}
-                              type="text"
-                              value={opt}
-                              onChange={e => {
-                                const newOpts = [...editingQuestion.options];
-                                newOpts[optIdx] = e.target.value;
-                                setEditingQuestion({...editingQuestion, options: newOpts});
-                              }}
-                              placeholder={`Option ${optIdx + 1}`}
-                              className={`w-full border rounded-lg p-2 ${optIdx === editingQuestion.correctAnswer ? 'border-green-400 bg-green-50' : ''}`}
-                            />
-                          ))}
-                          <select
-                            value={editingQuestion.correctAnswer}
-                            onChange={e => setEditingQuestion({...editingQuestion, correctAnswer: parseInt(e.target.value)})}
-                            className="border rounded-lg p-2"
-                          >
-                            {[0, 1, 2, 3].map(i => (
-                              <option key={i} value={i}>Correct Answer: Option {i + 1}</option>
-                            ))}
-                          </select>
-                          <textarea
-                            value={editingQuestion.explanation}
-                            onChange={e => setEditingQuestion({...editingQuestion, explanation: e.target.value})}
-                            placeholder="Explanation"
-                            className="w-full border rounded-lg p-2"
-                            rows={2}
-                          />
-                          <div className="flex gap-2">
-                            <button onClick={updateQuestion} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Save Changes</button>
-                            <button onClick={() => setEditingQuestion(null)} className="bg-gray-300 px-4 py-2 rounded-lg hover:bg-gray-400">Cancel</button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div>
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                                <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">#{idx + 1}</span>
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{q.subject}</span>
-                                {q.difficulty && (
-                                  <span className={`text-xs px-2 py-1 rounded ${
-                                    q.difficulty === 'easy' ? 'bg-green-100 text-green-800' :
-                                    q.difficulty === 'hard' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-                                  }`}>
-                                    {q.difficulty}
-                                  </span>
-                                )}
-                                {q.year && <span className="text-xs bg-gray-100 px-2 py-1 rounded">वर्ष: {q.year}</span>}
-                              </div>
-                              <p className="font-medium text-gray-800 mb-3">{q.question}</p>
-                              <div className="space-y-1.5">
-                                {q.options.map((opt, i) => (
-                                  <p key={i} className={`text-sm flex items-center gap-2 ${i === q.correctAnswer ? 'text-green-700 font-medium' : 'text-gray-600'}`}>
-                                    <span className="w-6">{String.fromCharCode(65 + i)}.</span>
-                                    {opt}
-                                    {i === q.correctAnswer && <CheckCircle size={14} className="text-green-600" />}
-                                  </p>
-                                ))}
-                              </div>
-                              {q.explanation && (
-                                <div className="mt-3 p-2 bg-blue-50 rounded text-sm text-gray-600">
-                                  <span className="font-medium">📝 व्याख्या:</span> {q.explanation}
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex gap-1 ml-4">
-                              <button 
-                                onClick={() => setEditingQuestion(q)} 
-                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                                title="Edit"
-                              >
-                                <Edit size={18} />
-                              </button>
-                              <button 
-                                onClick={() => setShowDeleteConfirm(q.id)} 
-                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
-                                title="Delete"
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            </div>
-                          </div>
-                          {showDeleteConfirm === q.id && (
-                            <div className="mt-3 p-3 bg-red-50 rounded-lg flex items-center justify-between">
-                              <span className="text-sm text-red-700">Delete this question?</span>
-                              <div className="flex gap-2">
-                                <button onClick={() => deleteQuestion(q.id)} className="bg-red-600 text-white px-3 py-1 rounded text-sm">Yes, Delete</button>
-                                <button onClick={() => setShowDeleteConfirm(null)} className="bg-gray-300 px-3 py-1 rounded text-sm">Cancel</button>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      <span className={`font-bold ${q.score >= 40 ? 'text-green-600' : 'text-red-600'}`}>{q.score}%</span>
                     </div>
                   ))}
-                  {filteredQuestions.length === 0 && (
-                    <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                      <BookOpen size={48} className="mx-auto text-gray-400 mb-3" />
-                      <p className="text-gray-500">No questions found</p>
-                      <button onClick={() => setShowAddModal(true)} className="mt-3 text-blue-600 hover:underline">
-                        + Add your first question
-                      </button>
+                </div>
+              </div>
+
+              {/* Subject Distribution */}
+              <div className="bg-white rounded-xl shadow-sm p-5">
+                <h3 className="font-semibold mb-3">Subject Distribution</h3>
+                <div className="space-y-2">
+                  {subjectStats.map(([subject, count]) => (
+                    <div key={subject} className="flex items-center gap-3">
+                      <span className="text-sm flex-1 truncate">{subject}</span>
+                      <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                        <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: `${(count / stats.totalQuestions) * 100}%` }} />
+                      </div>
+                      <span className="text-xs font-medium text-gray-500 w-8 text-right">{count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="bg-white rounded-xl shadow-sm p-5">
+              <h3 className="font-semibold mb-3">Quick Actions</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button onClick={() => { setActiveTab('questions'); setShowAddModal(true); }} className="p-3 bg-blue-50 rounded-xl hover:bg-blue-100 text-sm font-medium text-blue-700 transition">➕ Add Question</button>
+                <button onClick={exportData} className="p-3 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-sm font-medium text-emerald-700 transition">💾 Export Data</button>
+                <label className="p-3 bg-green-50 rounded-xl hover:bg-green-100 text-sm font-medium text-green-700 transition cursor-pointer text-center">
+                  📥 Import Questions
+                  <input type="file" accept=".json" onChange={importData} className="hidden" />
+                </label>
+                <button onClick={resetAllData} className="p-3 bg-red-50 rounded-xl hover:bg-red-100 text-sm font-medium text-red-700 transition">🔄 Reset Data</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══════ QUESTION BANK ══════ */}
+        {activeTab === 'questions' && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap justify-between items-center gap-3">
+              <h2 className="text-xl font-bold">📚 Question Bank</h2>
+              <button onClick={() => setShowAddModal(true)} className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 text-sm transition">
+                <Plus size={16} /> Add Question
+              </button>
+            </div>
+
+            {/* Filters */}
+            <div className="bg-white rounded-lg shadow-sm p-3 flex flex-wrap gap-3">
+              <div className="flex-1 min-w-[200px] relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input type="text" placeholder="Search questions..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)}
+                  className="w-full border rounded-lg pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              </div>
+              <select value={selectedSubject} onChange={e => setSelectedSubject(e.target.value)}
+                className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                {subjects.map(s => <option key={s} value={s}>{s === 'all' ? 'All Subjects' : s}</option>)}
+              </select>
+              <button onClick={() => { setSearchTerm(''); setSelectedSubject('all'); }} className="text-gray-400 hover:text-gray-600 p-2"><RefreshCw size={16} /></button>
+            </div>
+
+            {/* Question List */}
+            <div className="space-y-3">
+              {filteredQuestions.map((q, idx) => (
+                <div key={q.id} className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition">
+                  {editingQuestion?.id === q.id ? (
+                    /* Inline Edit Mode */
+                    <div className="space-y-3">
+                      <select value={editingQuestion.subject} onChange={e => setEditingQuestion({...editingQuestion, subject: e.target.value})}
+                        className="w-full border rounded-lg p-2 text-sm">
+                        {allSubjectOptions.map(s => <option key={s}>{s}</option>)}
+                      </select>
+                      <textarea value={editingQuestion.question} onChange={e => setEditingQuestion({...editingQuestion, question: e.target.value})}
+                        className="w-full border rounded-lg p-2 text-sm" rows={2} />
+                      {editingQuestion.options.map((opt, oi) => (
+                        <div key={oi} className="flex items-center gap-2">
+                          <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${oi === editingQuestion.correctAnswer ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>
+                            {String.fromCharCode(65 + oi)}
+                          </span>
+                          <input type="text" value={opt} onChange={e => {
+                            const opts = [...editingQuestion.options]; opts[oi] = e.target.value;
+                            setEditingQuestion({...editingQuestion, options: opts});
+                          }} className="flex-1 border rounded-lg p-2 text-sm" />
+                        </div>
+                      ))}
+                      <div className="flex gap-3 items-center flex-wrap">
+                        <select value={editingQuestion.correctAnswer} onChange={e => setEditingQuestion({...editingQuestion, correctAnswer: parseInt(e.target.value)})}
+                          className="border rounded-lg p-2 text-sm">
+                          {[0,1,2,3].map(i => <option key={i} value={i}>Correct: Option {String.fromCharCode(65+i)}</option>)}
+                        </select>
+                        <select value={editingQuestion.difficulty || 'medium'} onChange={e => setEditingQuestion({...editingQuestion, difficulty: e.target.value as any})}
+                          className="border rounded-lg p-2 text-sm">
+                          <option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
+                        </select>
+                      </div>
+                      <textarea value={editingQuestion.explanation} onChange={e => setEditingQuestion({...editingQuestion, explanation: e.target.value})}
+                        placeholder="Explanation..." className="w-full border rounded-lg p-2 text-sm" rows={2} />
+                      <div className="flex gap-2">
+                        <button onClick={updateQuestion} className="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-green-700 flex items-center gap-1"><Save size={14}/>Save</button>
+                        <button onClick={() => setEditingQuestion(null)} className="bg-gray-200 px-4 py-1.5 rounded-lg text-sm hover:bg-gray-300">Cancel</button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* View Mode */
+                    <div>
+                      <div className="flex justify-between items-start gap-3">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+                            <span className="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">#{idx+1}</span>
+                            <span className="text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">{q.subject}</span>
+                            {q.difficulty && (
+                              <span className={`text-[10px] px-1.5 py-0.5 rounded ${q.difficulty==='easy'?'bg-green-100 text-green-700':q.difficulty==='hard'?'bg-red-100 text-red-700':'bg-yellow-100 text-yellow-700'}`}>{q.difficulty}</span>
+                            )}
+                            {q.year && <span className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded">{q.year}</span>}
+                          </div>
+                          <p className="font-medium text-sm text-gray-800 mb-2">{q.question}</p>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                            {q.options.map((opt, oi) => (
+                              <p key={oi} className={`text-xs flex items-center gap-1.5 p-1.5 rounded ${oi===q.correctAnswer?'bg-green-50 text-green-700 font-medium':'text-gray-500'}`}>
+                                <span className="font-bold">{String.fromCharCode(65+oi)}.</span> {opt}
+                                {oi===q.correctAnswer && <span className="text-green-500">✓</span>}
+                              </p>
+                            ))}
+                          </div>
+                          {q.explanation && <p className="mt-2 text-xs text-gray-500 bg-blue-50 p-2 rounded">💡 {q.explanation}</p>}
+                        </div>
+                        <div className="flex gap-1 shrink-0">
+                          <button onClick={() => setEditingQuestion(q)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg"><Edit size={15}/></button>
+                          <button onClick={() => setShowDeleteConfirm(q.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><Trash2 size={15}/></button>
+                        </div>
+                      </div>
+                      {showDeleteConfirm === q.id && (
+                        <div className="mt-2 p-2 bg-red-50 rounded-lg flex items-center justify-between">
+                          <span className="text-xs text-red-700">Delete this question?</span>
+                          <div className="flex gap-2">
+                            <button onClick={() => deleteQuestion(q.id)} className="bg-red-600 text-white px-3 py-1 rounded text-xs">Delete</button>
+                            <button onClick={() => setShowDeleteConfirm(null)} className="bg-gray-200 px-3 py-1 rounded text-xs">Cancel</button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
+              ))}
+              {filteredQuestions.length === 0 && (
+                <div className="bg-white rounded-lg p-12 text-center text-gray-400">
+                  <BookOpen size={40} className="mx-auto mb-3 opacity-50" />
+                  <p>No questions found</p>
+                  <button onClick={() => setShowAddModal(true)} className="mt-3 text-blue-600 text-sm hover:underline">+ Add first question</button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ══════ EXAM CONFIG ══════ */}
+        {activeTab === 'exams' && (
+          <div className="max-w-2xl space-y-6">
+            <h2 className="text-xl font-bold">📝 Exam Configuration</h2>
+            
+            <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+              <h3 className="font-semibold">Weekly Test Settings</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Questions per test', key: 'questionsPerTest' as const, type: 'number' },
+                  { label: 'Time limit (minutes)', key: 'timeLimit' as const, type: 'number' },
+                  { label: 'Negative marking/wrong', key: 'negativeMarking' as const, type: 'number' },
+                  { label: 'Passing percentage', key: 'passingPercentage' as const, type: 'number' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">{f.label}</label>
+                    <input type="number" step={f.key === 'negativeMarking' ? '0.1' : '1'}
+                      value={examSettings[f.key]}
+                      onChange={e => setExamSettings({...examSettings, [f.key]: parseFloat(e.target.value) || 0})}
+                      className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
 
-            {activeTab === 'exams' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6">📝 Exam Configuration</h2>
-                <div className="space-y-6 max-w-2xl">
-                  <div className="border rounded-lg p-5">
-                    <h3 className="font-semibold text-lg mb-4">Weekly Test Settings</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Questions per test</label>
-                        <input 
-                          type="number" 
-                          defaultValue={localStorage.getItem('exam_questions_count') || '50'} 
-                          onChange={(e) => localStorage.setItem('exam_questions_count', e.target.value)}
-                          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Time limit (minutes)</label>
-                        <input 
-                          type="number" 
-                          defaultValue={localStorage.getItem('exam_time_limit') || '60'} 
-                          onChange={(e) => localStorage.setItem('exam_time_limit', e.target.value)}
-                          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Negative marking per wrong</label>
-                        <input 
-                          type="number" 
-                          step="0.1" 
-                          defaultValue={localStorage.getItem('negative_marking') || '0.4'} 
-                          onChange={(e) => localStorage.setItem('negative_marking', e.target.value)}
-                          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Passing percentage</label>
-                        <input 
-                          type="number" 
-                          defaultValue={localStorage.getItem('passing_percentage') || '40'} 
-                          onChange={(e) => localStorage.setItem('passing_percentage', e.target.value)}
-                          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="border rounded-lg p-5">
-                    <h3 className="font-semibold text-lg mb-4">Old is Gold Settings</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Questions per paper</label>
-                        <input 
-                          type="number" 
-                          defaultValue={localStorage.getItem('old_is_gold_count') || '50'} 
-                          onChange={(e) => localStorage.setItem('old_is_gold_count', e.target.value)}
-                          className="border rounded-lg px-3 py-2 w-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
+            <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+              <h3 className="font-semibold">Old is Gold Settings</h3>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Questions per paper</label>
+                <input type="number" value={examSettings.oldIsGoldCount}
+                  onChange={e => setExamSettings({...examSettings, oldIsGoldCount: parseInt(e.target.value) || 50})}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+              </div>
+            </div>
 
-                  <button 
-                    onClick={() => {
-                      toast({
-                        title: "Settings Saved",
-                        description: "Exam configurations updated",
-                      });
-                    }}
-                    className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition"
-                  >
-                    Save All Settings
-                  </button>
+            <div className="bg-white rounded-xl shadow-sm p-5">
+              <h3 className="font-semibold mb-3">Current Site Data</h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="p-3 bg-blue-50 rounded-lg"><span className="font-medium">{practiceSubjects.length}</span> Practice Subjects</div>
+                <div className="p-3 bg-green-50 rounded-lg"><span className="font-medium">{oldIsGoldSets.length}</span> Old is Gold Sets</div>
+                <div className="p-3 bg-purple-50 rounded-lg"><span className="font-medium">{weeklyTests.length}</span> Weekly Tests</div>
+                <div className="p-3 bg-orange-50 rounded-lg"><span className="font-medium">{questions.length}</span> Total Questions</div>
+              </div>
+            </div>
+
+            <button onClick={saveExamSettings} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition text-sm font-medium">
+              Save All Settings
+            </button>
+          </div>
+        )}
+
+        {/* ══════ ANALYTICS ══════ */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-bold">📊 Performance Analytics</h2>
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              <div className="bg-white rounded-xl shadow-sm p-5">
+                <h3 className="font-semibold mb-3">Quiz Score Trend (Last 10)</h3>
+                <div className="space-y-2">
+                  {quizHistory.slice(-10).map((q, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="text-[10px] text-gray-400 w-16">{new Date(q.date).toLocaleDateString()}</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3">
+                        <div className={`h-3 rounded-full transition-all ${q.score>=40?'bg-green-500':'bg-red-500'}`} style={{width:`${Math.min(q.score,100)}%`}} />
+                      </div>
+                      <span className="text-xs font-medium w-10 text-right">{q.score}%</span>
+                    </div>
+                  ))}
+                  {quizHistory.length === 0 && <p className="text-gray-400 text-center py-8 text-sm">No data yet</p>}
                 </div>
               </div>
-            )}
 
-            {activeTab === 'analytics' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6">📊 Performance Analytics</h2>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <div className="border rounded-lg p-5">
-                    <h3 className="font-semibold mb-3">Quiz Performance Trend</h3>
-                    <div className="space-y-2">
-                      {quizHistory.slice(-10).map((quiz, idx) => (
-                        <div key={idx} className="flex items-center gap-3">
-                          <span className="text-xs text-gray-500 w-24">{new Date(quiz.date).toLocaleDateString()}</span>
-                          <div className="flex-1 bg-gray-200 rounded-full h-4">
-                            <div 
-                              className={`h-4 rounded-full ${quiz.score >= 40 ? 'bg-green-500' : 'bg-red-500'}`}
-                              style={{ width: `${quiz.score}%` }}
-                            />
-                          </div>
-                          <span className="text-sm font-medium w-12">{quiz.score}%</span>
-                        </div>
-                      ))}
+              <div className="bg-white rounded-xl shadow-sm p-5">
+                <h3 className="font-semibold mb-3">Subject Question Count</h3>
+                <div className="space-y-2">
+                  {subjectStats.map(([subject, count]) => (
+                    <div key={subject} className="flex items-center justify-between text-sm">
+                      <span className="truncate">{subject}</span>
+                      <span className="font-medium text-blue-600">{count}</span>
                     </div>
-                  </div>
-                  
-                  <div className="border rounded-lg p-5">
-                    <h3 className="font-semibold mb-3">Subject-wise Performance</h3>
-                    <div className="space-y-3">
-                      {subjects.filter(s => s !== 'all').map(subject => {
-                        const subjectQuestions = questions.filter(q => q.subject === subject);
-                        return (
-                          <div key={subject} className="flex justify-between items-center">
-                            <span className="text-sm">{subject}</span>
-                            <span className="text-sm font-medium">{subjectQuestions.length} questions</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            {activeTab === 'settings' && (
-              <div className="bg-white rounded-xl shadow-sm p-6">
-                <h2 className="text-xl font-bold mb-6">⚙️ Admin Settings</h2>
-                <div className="space-y-5 max-w-md">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Change Admin Password</label>
-                    <div className="flex gap-2">
-                      <input 
-                        type="password" 
-                        placeholder="New password" 
-                        id="newPassword"
-                        className="border rounded-lg px-3 py-2 flex-1 focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button 
-                        onClick={() => {
-                          const newPass = (document.getElementById('newPassword') as HTMLInputElement).value;
-                          if (newPass) {
-                            localStorage.setItem('admin_password', newPass);
-                            toast({
-                              title: "Password Updated",
-                              description: "Admin password has been changed",
-                            });
-                          }
-                        }}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-                      >
-                        Update
-                      </button>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Current default: Lokseva@2082</p>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Site Title</label>
-                    <input 
-                      type="text" 
-                      defaultValue="Loksewa Smart Prep" 
-                      id="siteTitle"
-                      className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  
-                  <button 
-                    onClick={() => {
-                      const title = (document.getElementById('siteTitle') as HTMLInputElement).value;
-                      localStorage.setItem('site_title', title);
-                      toast({
-                        title: "Settings Saved",
-                        description: "Site settings updated",
-                      });
-                    }}
-                    className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    Save Settings
-                  </button>
-                </div>
+        {/* ══════ SETTINGS ══════ */}
+        {activeTab === 'settings' && (
+          <div className="max-w-md space-y-6">
+            <h2 className="text-xl font-bold">⚙️ Admin Settings</h2>
+
+            <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+              <h3 className="font-semibold">Change Admin Password</h3>
+              <div className="flex gap-2">
+                <input type="password" placeholder="New password (min 6 chars)" value={newPasswordInput}
+                  onChange={e => setNewPasswordInput(e.target.value)}
+                  className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                <button onClick={handleChangePassword} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition">Update</button>
               </div>
-            )}
-          </>
+              <p className="text-[10px] text-gray-400">Password is hashed with SHA-256 before storage</p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
+              <h3 className="font-semibold">Danger Zone</h3>
+              <button onClick={resetAllData} className="w-full bg-red-50 text-red-600 p-3 rounded-lg text-sm font-medium hover:bg-red-100 transition flex items-center justify-center gap-2">
+                <RefreshCw size={14} /> Reset All Data to Defaults
+              </button>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-5">
+              <h3 className="font-semibold mb-2">Session Info</h3>
+              <p className="text-xs text-gray-500">Session expires in 2 hours. Password is never stored in plain text.</p>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Add Question Modal */}
+      {/* ══════ ADD QUESTION MODAL ══════ */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-5 border-b sticky top-0 bg-white">
-              <h3 className="text-lg font-bold flex items-center gap-2">
-                <Plus size={20} />
-                Add New Question
-              </h3>
-              <button onClick={() => setShowAddModal(false)} className="text-gray-500 hover:text-gray-700">
-                <X size={24} />
-              </button>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddModal(false)}>
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
+              <h3 className="text-lg font-bold flex items-center gap-2"><Plus size={18}/> Add New Question</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600"><X size={20}/></button>
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Subject *</label>
-                <select 
-                  onChange={e => setNewQuestion({...newQuestion, subject: e.target.value})}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                  defaultValue=""
-                >
+                <label className="block text-xs font-medium text-gray-600 mb-1">Subject *</label>
+                <select value={newQuestion.subject || ''} onChange={e => setNewQuestion({...newQuestion, subject: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                   <option value="" disabled>Select subject</option>
-                  <option>Computer Fundamentals</option>
-                  <option>Operating System</option>
-                  <option>Networking</option>
-                  <option>Database</option>
-                  <option>Programming</option>
-                  <option>General Knowledge</option>
-                  <option>Public Management</option>
+                  {allSubjectOptions.map(s => <option key={s}>{s}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Question *</label>
-                <textarea 
-                  rows={3}
-                  onChange={e => setNewQuestion({...newQuestion, question: e.target.value})}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter question here..."
-                />
+                <label className="block text-xs font-medium text-gray-600 mb-1">Question *</label>
+                <textarea rows={3} value={newQuestion.question || ''} onChange={e => setNewQuestion({...newQuestion, question: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Type your question..." />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Options *</label>
-                {[0, 1, 2, 3].map(i => (
-                  <input 
-                    key={i}
-                    type="text"
-                    placeholder={`Option ${i + 1}`}
-                    onChange={e => {
-                      const opts = [...(newQuestion.options || ['', '', '', ''])];
-                      opts[i] = e.target.value;
-                      setNewQuestion({...newQuestion, options: opts});
-                    }}
-                    className="w-full border rounded-lg px-3 py-2 mb-2 focus:ring-2 focus:ring-blue-500"
-                  />
+                <label className="block text-xs font-medium text-gray-600 mb-1">Options * (all 4 required)</label>
+                {[0,1,2,3].map(i => (
+                  <div key={i} className="flex items-center gap-2 mb-2">
+                    <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === (newQuestion.correctAnswer || 0) ? 'bg-green-500 text-white' : 'bg-gray-200'}`}>
+                      {String.fromCharCode(65+i)}
+                    </span>
+                    <input type="text" placeholder={`Option ${String.fromCharCode(65+i)}`}
+                      value={newQuestion.options?.[i] || ''}
+                      onChange={e => {
+                        const opts = [...(newQuestion.options || ['','','',''])];
+                        opts[i] = e.target.value;
+                        setNewQuestion({...newQuestion, options: opts});
+                      }}
+                      className="flex-1 border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" />
+                  </div>
                 ))}
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Correct Answer (0-3) *</label>
-                <input 
-                  type="number" 
-                  min="0" 
-                  max="3"
-                  onChange={e => setNewQuestion({...newQuestion, correctAnswer: parseInt(e.target.value)})}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                />
-                <p className="text-xs text-gray-500 mt-1">0=Option 1, 1=Option 2, 2=Option 3, 3=Option 4</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Correct Answer *</label>
+                  <select value={newQuestion.correctAnswer || 0} onChange={e => setNewQuestion({...newQuestion, correctAnswer: parseInt(e.target.value)})}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    {[0,1,2,3].map(i => <option key={i} value={i}>Option {String.fromCharCode(65+i)}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Difficulty</label>
+                  <select value={newQuestion.difficulty || 'medium'} onChange={e => setNewQuestion({...newQuestion, difficulty: e.target.value as any})}
+                    className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
+                  </select>
+                </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Explanation (Optional)</label>
-                <textarea 
-                  rows={2}
-                  onChange={e => setNewQuestion({...newQuestion, explanation: e.target.value})}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                  placeholder="Explain why this is correct..."
-                />
+                <label className="block text-xs font-medium text-gray-600 mb-1">Explanation</label>
+                <textarea rows={2} value={newQuestion.explanation || ''} onChange={e => setNewQuestion({...newQuestion, explanation: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Why is this the correct answer?" />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Year (Optional)</label>
-                <input 
-                  type="text"
-                  placeholder="e.g., 2080, 2079"
-                  onChange={e => setNewQuestion({...newQuestion, year: e.target.value})}
-                  className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-                />
+                <label className="block text-xs font-medium text-gray-600 mb-1">Year (Optional)</label>
+                <input type="text" value={newQuestion.year || ''} onChange={e => setNewQuestion({...newQuestion, year: e.target.value})}
+                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="e.g., 2080" />
               </div>
             </div>
-            <div className="flex justify-end gap-3 p-5 border-t bg-gray-50">
-              <button onClick={() => setShowAddModal(false)} className="px-5 py-2 border rounded-lg hover:bg-gray-100">Cancel</button>
-              <button onClick={addQuestion} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Add Question</button>
+            <div className="flex justify-end gap-2 p-4 border-t bg-gray-50">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded-lg text-sm hover:bg-gray-100">Cancel</button>
+              <button onClick={addQuestion} className="px-5 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 font-medium">Add Question</button>
             </div>
           </div>
         </div>
