@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { adToBS, formatBSDateFull } from "@/lib/nepaliCalendar";
 
 export function useNepalTime() {
   const [time, setTime] = useState(new Date());
@@ -15,19 +16,16 @@ export function useNepalTime() {
   const hours = nepalTime.getHours().toString().padStart(2, "0");
   const minutes = nepalTime.getMinutes().toString().padStart(2, "0");
   const seconds = nepalTime.getSeconds().toString().padStart(2, "0");
-  
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  
-  const dayName = days[nepalTime.getDay()];
-  const monthName = months[nepalTime.getMonth()];
-  const date = nepalTime.getDate();
-  const year = nepalTime.getFullYear();
+
+  // Convert to BS
+  const bsDate = adToBS(nepalTime);
+  const dateStr = formatBSDateFull(bsDate, nepalTime.getDay());
 
   return {
     timeStr: `${hours}:${minutes}:${seconds}`,
-    dateStr: `${dayName}, ${date} ${monthName} ${year} | NST`,
+    dateStr,
     nepalTime,
+    bsDate,
   };
 }
 
