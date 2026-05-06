@@ -23,7 +23,7 @@ const Practice = () => {
       "public-management": 20,
       "computer-fundamentals": 958,
       "operating-system": 400,
-      "word-processor": 20,
+      "word-processor": 400,
       "spreadsheet": 20,
       "dbms": 20,
       "presentation": 20,
