@@ -5,7 +5,7 @@ import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operato
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 
-// Only import exam1 and quiz1 (others will be added later)
+// Import only exam1 and quiz1 (the ones that actually exist with questions)
 import { exam1Questions } from "@/data/online_exam/exam1";
 import { quiz1Questions } from "@/data/online_exam/quiz1";
 
@@ -95,17 +95,26 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // Handle exam-1 and quiz-1 only for now
+      // Handle exam-1 only (others will show coming soon)
       if (setId === "exam-1") {
         qs = [...exam1Questions];
         setTimeLeft(45 * 60);
-      } else if (setId === "quiz-1") {
+      } 
+      else if (setId === "quiz-1") {
         qs = [...quiz1Questions];
         setTimeLeft(15 * 60);
-      } else {
-        // For other exams, show message or fallback
-        console.log(`No questions available for ${setId}`);
+      }
+      else if (setId.startsWith("exam-")) {
+        // For other exams, show empty array (will display "coming soon")
         qs = [];
+      }
+      else if (setId.startsWith("quiz-")) {
+        qs = [];
+      }
+      else {
+        qs = getWeeklyTestQuestions(setId);
+        const test = weeklyTests.find(t => t.id === setId);
+        if (test) setTimeLeft(test.time * 60);
       }
     }
     
@@ -170,6 +179,28 @@ const QuizPage = () => {
     const questionCount_text = isExam ? 50 : isQuiz ? 25 : 50;
     const timeMinutes = isExam ? 45 : isQuiz ? 15 : 20;
     const marks = questionCount_text * 2;
+    
+    // Check if questions are available
+    const hasQuestions = (setId === "exam-1" || setId === "quiz-1");
+    
+    if (!hasQuestions && (setId?.startsWith("exam-") || setId?.startsWith("quiz-"))) {
+      return (
+        <div className="container mx-auto px-4 py-8 max-w-2xl animate-fade-in text-center">
+          <h1 className="text-2xl font-heading font-bold mb-4">{title}</h1>
+          <div className="bg-amber-50 rounded-2xl shadow-md p-8">
+            <div className="text-6xl mb-4">🚧</div>
+            <h2 className="text-xl font-bold text-amber-800 mb-2">Coming Soon!</h2>
+            <p className="text-amber-600">This exam is under preparation. Please check back later.</p>
+            <button 
+              onClick={() => navigate(-1)} 
+              className="mt-6 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-2 rounded-xl font-bold hover:opacity-90"
+            >
+              ← Go Back
+            </button>
+          </div>
+        </div>
+      );
+    }
     
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl animate-fade-in text-center">
@@ -311,7 +342,7 @@ const QuizPage = () => {
         <span className="text-sm font-semibold">{current + 1}/{questions.length}</span>
       </div>
 
-      {/* Question Section */}
+      {/* Question Section with Purple/Blue Hover */}
       <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
         <p className="font-bold text-lg mb-6">{current + 1}. {q.question}</p>
         <div className="space-y-3">
@@ -324,19 +355,19 @@ const QuizPage = () => {
                 className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 flex items-center gap-3 ${
                   isSelected 
                     ? "bg-gradient-to-r from-purple-600 to-blue-600 border-purple-600 text-white shadow-md" 
-                    : "bg-white border-gray-200 text-gray-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-blue-600 hover:text-white hover:border-purple-600 hover:shadow-md"
+                    : "bg-white border-gray-200 text-gray-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-blue-600 hover:text-white hover:border-purple-600 hover:shadow-md hover:translate-x-1"
                 }`}
               >
-                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
                   isSelected 
                     ? "bg-white/20 text-white" 
-                    : "bg-gray-100 text-gray-700"
+                    : "bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white"
                 }`}>
                   {String.fromCharCode(65 + i)}
                 </span>
                 <span className="flex-1">{opt}</span>
                 {isSelected && (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
