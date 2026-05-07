@@ -1,13 +1,9 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
+import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question, onlineExamQuestions } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
-
-// Import only exam1 and quiz1 (the ones that actually exist with questions)
-import { exam1Questions } from "@/data/online_exam/exam1";
-import { quiz1Questions } from "@/data/online_exam/quiz1";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -95,23 +91,18 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // Handle exam-1 only (others will show coming soon)
-      if (setId === "exam-1") {
-        qs = [...exam1Questions];
-        setTimeLeft(45 * 60);
-      } 
-      else if (setId === "quiz-1") {
-        qs = [...quiz1Questions];
-        setTimeLeft(15 * 60);
-      }
-      else if (setId.startsWith("exam-")) {
-        // For other exams, show empty array (will display "coming soon")
-        qs = [];
-      }
-      else if (setId.startsWith("quiz-")) {
-        qs = [];
-      }
-      else {
+      // Use onlineExamQuestions from questions.ts
+      const examQuestions = onlineExamQuestions[setId];
+      
+      if (examQuestions && examQuestions.length > 0) {
+        qs = [...examQuestions];
+        if (setId.startsWith("exam-")) {
+          setTimeLeft(45 * 60);
+        } else if (setId.startsWith("quiz-")) {
+          setTimeLeft(15 * 60);
+        }
+      } else {
+        // Fallback to weekly tests
         qs = getWeeklyTestQuestions(setId);
         const test = weeklyTests.find(t => t.id === setId);
         if (test) setTimeLeft(test.time * 60);
@@ -145,7 +136,6 @@ const QuizPage = () => {
 
   const handleSubmit = () => setShowResult(true);
 
-  // Calculate results
   const results = useMemo(() => {
     if (questions.length === 0) {
       return { correct: 0, wrong: 0, unanswered: 0, marks: 0, total: 0, percentage: 0 };
@@ -167,7 +157,6 @@ const QuizPage = () => {
   const q = questions[current];
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 
-  // Loading state
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8 text-center">Loading questions...</div>;
   }
@@ -180,8 +169,8 @@ const QuizPage = () => {
     const timeMinutes = isExam ? 45 : isQuiz ? 15 : 20;
     const marks = questionCount_text * 2;
     
-    // Check if questions are available
-    const hasQuestions = (setId === "exam-1" || setId === "quiz-1");
+    // Check if questions exist
+    const hasQuestions = onlineExamQuestions[setId || ""]?.length > 0;
     
     if (!hasQuestions && (setId?.startsWith("exam-") || setId?.startsWith("quiz-"))) {
       return (
@@ -321,7 +310,6 @@ const QuizPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-lg font-heading font-bold">{title}</h1>
@@ -334,7 +322,6 @@ const QuizPage = () => {
         )}
       </div>
 
-      {/* Progress */}
       <div className="flex items-center gap-3 mb-4">
         <div className="flex-1 bg-muted rounded-full h-2.5">
           <div className="bg-primary h-2.5 rounded-full transition-all" style={{ width: `${((current + 1) / questions.length) * 100}%` }} />
@@ -342,7 +329,6 @@ const QuizPage = () => {
         <span className="text-sm font-semibold">{current + 1}/{questions.length}</span>
       </div>
 
-      {/* Question Section with Purple/Blue Hover */}
       <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
         <p className="font-bold text-lg mb-6">{current + 1}. {q.question}</p>
         <div className="space-y-3">
@@ -361,7 +347,7 @@ const QuizPage = () => {
                 <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
                   isSelected 
                     ? "bg-white/20 text-white" 
-                    : "bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white"
+                    : "bg-gray-100 text-gray-700"
                 }`}>
                   {String.fromCharCode(65 + i)}
                 </span>
@@ -377,7 +363,6 @@ const QuizPage = () => {
         </div>
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center justify-between">
         <button onClick={() => setCurrent(Math.max(0, current - 1))} disabled={current === 0} className="bg-muted px-5 py-2.5 rounded-xl font-semibold disabled:opacity-40 hover:bg-muted/80 transition-colors">
           ← Previous
@@ -393,7 +378,6 @@ const QuizPage = () => {
         )}
       </div>
 
-      {/* Question Navigator */}
       <div className="mt-6 bg-card rounded-2xl p-4 shadow-sm">
         <p className="text-xs text-muted-foreground mb-2">Question Navigator</p>
         <div className="flex flex-wrap gap-2">
