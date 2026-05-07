@@ -210,10 +210,100 @@ export const practiceQuestions: Record<string, Question[]> = {
 
 // ===== OLD IS GOLD SETS (ALL 77 SETS) =====
 export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?: boolean }[] = [
-  // Keep your existing oldIsGoldSets array here (I've shortened for brevity, keep your full array)
+  // Sets 1-10
   { id: "set-1", title: "नेपाल मानव अधिकार आयोग अपरेटर", year: "२०७३" },
   { id: "set-2", title: "लोक सेवा आयोग समुदाय कम्प्युटर अपरेटर", year: "२०७६" },
-  // ... keep all your sets up to set-77
+  { id: "set-3", title: "बीमा संस्थान कम्प्युटर सहायक", year: "२०७६" },
+  { id: "set-4", title: "लोक सेवा आयोग कम्प्युटर अपरेटर", year: "२०७६" },
+  { id: "set-5", title: "KUKL Computer Operator", year: "२०७४" },
+  { id: "set-6", title: "नेपाल प्रहरी कम्प्युटर अपरेटर", year: "२०७६" },
+  { id: "set-7", title: "KUKL ACO", year: "२०७४" },
+  { id: "set-8", title: "नागरिक लगानी कोष कम्प्युटर अपरेटर", year: "२०७६" },
+  { id: "set-9", title: "निधि तथा कर्म संख्याको कोष", year: "२०७६" },
+  { id: "set-10", title: "Nepal Army", year: "२०७४" },
+  
+  // Sets 11-20
+  { id: "set-11", title: "लोक सेवा आयोग सहायक कम्प्युटर अपरेटर", year: "२०७२" },
+  { id: "set-12", title: "राष्ट्रिय बाणिज्य बैंक कम्प्युटर अपरेटर", year: "२०७४" },
+  { id: "set-13", title: "नेपाल बैंक लिमिटेड कम्प्युटर अपरेटर", year: "२०७५" },
+  { id: "set-14", title: "कृषि विकास बैंक कम्प्युटर अपरेटर", year: "२०७६" },
+  { id: "set-15", title: "राष्ट्रिय बीमा संस्थान कम्प्युटर अपरेटर", year: "२०७६" },
+  { id: "set-16", title: "सामाजिक सुरक्षा कोष", year: "२०७६" },
+  { id: "set-17", title: "स्थानीय पाँचौ तह कम्प्युटर अपरेटर", year: "२०७६" },
+  { id: "set-18", title: "लोक सेवा सहायक कम्प्युटर अपरेटर", year: "२०७४" },
+  { id: "set-19", title: "कर्णाली कम्प्युटर अपरेटर", year: "२०७९-०२-१५" },
+  { id: "set-20", title: "कर्णाली सहायक कम्प्युटर अपरेटर", year: "२०७९-०३-२९" },
+  
+  // Sets 21-30
+  { id: "set-21", title: "नेपाल आयल निगम कम्प्युटर अपरेटर", year: "२०७८" },
+  { id: "set-22", title: "साझा यातायात कम्प्युटर अपरेटर", year: "२०७९" },
+  { id: "set-23", title: "नेपाल पारवहन तथा गोदाम व्यवस्था क. लि. कम्प्युटर अपरेटर", year: "२०७९" },
+  { id: "set-24", title: "लोक सेवा कम्प्युटर अपरेटर", year: "२०७९।१९।२९" },
+  { id: "set-25", title: "प्रदेश नं. १, कम्प्युटर अपरेटर", year: "२०७८" },
+  { id: "set-26", title: "कोसी प्रदेश, कम्प्युटर अपरेटर", year: "२०७९-८०" },
+  { id: "set-27", title: "नेपाल आयल निगम स.क.अ.", year: "२०७५" },
+  { id: "set-28", title: "कम्प्युटर अपरेटर संसद", year: "२०७८" },
+  { id: "set-29", title: "बागमती प्रदेश स.क.अ.", year: "२०७७" },
+  { id: "set-30", title: "गण्डकी प्रदेश कम्प्युटर अपरेटर", year: "२०७८" },
+  
+  // Sets 31-40
+  { id: "set-31", title: "लुम्बिनी प्रदेश पाँचौं तह क.अ.", year: "२०८०" },
+  { id: "set-32", title: "कोसी प्रदेश चौथो तह क.अ.", year: "२०८०" },
+  { id: "set-33", title: "स्थानीय स.क.अ.", year: "२०७६" },
+  { id: "set-34", title: "सामाजिक सुरक्षा कोष स.क.अ", year: "२०७६" },
+  { id: "set-35", title: "साझा यातायात स.क.अ.", year: "२०७९" },
+  { id: "set-36", title: "सांस्कृतिक संस्थान क.अ.", year: "२०७४" },
+  { id: "set-37", title: "लोक सेवा स.क.अ", year: "२०७८" },
+  { id: "set-38", title: "लोक सेवा स.क.अ.", year: "२०७५" },
+  { id: "set-39", title: "लोक सेवा क.अ.", year: "२०७८" },
+  { id: "set-40", title: "लोक सेवा क.अ.", year: "२०७५" },
+  
+  // Sets 41-50
+  { id: "set-41", title: "लोक सेवा क.अ.", year: "२०७३" },
+  { id: "set-42", title: "बागमती प्रदेश क.अ.", year: "२०७७" },
+  { id: "set-43", title: "पारवहन क.अ.", year: "२०७३" },
+  { id: "set-44", title: "नेपाली सेना प्रा. अ.म.", year: "२०७८" },
+  { id: "set-45", title: "मध्यपश्चिम प्रदेश कम्प्युटर अपरेटर", year: "२०७७" },
+  { id: "set-46", title: "नेपाल प्रहरी प्र.ना.नि", year: "२०७६" },
+  { id: "set-47", title: "टिम्बर कपीरेशन स.क.अ.", year: "२०७४" },
+  { id: "set-48", title: "चिया कफी विकास बोर्ड क.अ.", year: "२०७८" },
+  { id: "set-49", title: "खाद्य संस्थान क.अ.", year: "२०७१" },
+  { id: "set-50", title: "आयल निगम क.अ.", year: "२०७३" },
+  
+  // Sets 51-60
+  { id: "set-51", title: "KUKL क.अ.", year: "२०७८" },
+  { id: "set-52", title: "KUKL क.अ.", year: "२०७७" },
+  { id: "set-53", title: "सुदूरपश्चिम प्रदेश क.अ.", year: "२०८०" },
+  { id: "set-54", title: "कर्णाली प्रदेश क.अ.", year: "२०७९-१२-१९" },
+  { id: "set-55", title: "कर्णाली प्रदेश स. क.अ.", year: "२०८०-०२-०८" },
+  { id: "set-56", title: "कर्णाली प्रदेश क.अ.", year: "२०८१-०१-०८" },
+  { id: "set-57", title: "लुम्बिनी प्रदेश क.अ.", year: "२०८१-०१-१९" },
+  { id: "set-58", title: "सामाजिक सुरक्षा कोष स. क.अ.", year: "२०८१-०२-०२" },
+  { id: "set-59", title: "संघीय लोक सेवा क.अ.", year: "२०८१-०२-०४" },
+  { id: "set-60", title: "प्रदेश लोक सेवा कम्प्युटर अपरेटर", year: "२०८०" },
+  
+  // Sets 61-70
+  { id: "set-61", title: "कर्णाली प्रदेश स. क.अ.", year: "२०८१-०२-१२" },
+  { id: "set-62", title: "संघीय लोक सेवा स. क.अ.", year: "२०८१-०३-०८" },
+  { id: "set-63", title: "लुम्बिनी प्रदेश स. क.अ.", year: "२०८१-०३-१५" },
+  { id: "set-64", title: "KUKL कम्प्युटर अपरेटर", year: "२०८१-०७-३०" },
+  { id: "set-65", title: "प्रज्ञा प्रतिष्ठान कम्प्युटर अपरेटर", year: "२०८१-०८-१८" },
+  { id: "set-66", title: "पारवहन तथा गोदाम कम्पनी कम्प्युटर अपरेटर", year: "२०८१-०९-२२" },
+  { id: "set-67", title: "आयल निगम कम्प्युटर अपरेटर", year: "२०८१-०९-२९" },
+  { id: "set-68", title: "कृषि सामग्री कम्पनी लिमिटेड कम्प्युटर अपरेटर", year: "२०८१-१०-२०" },
+  { id: "set-69", title: "कम्प्युटर अपरेटर सामाजिक सुरक्षा कोष", year: "२०८२-०१-०३" },
+  { id: "set-70", title: "कम्प्युटर अपरेटर लोक सेवा", year: "२०८२-०२-०३" },
+  
+  // Sets 71-77
+  { id: "set-71", title: "कम्प्युटर अपरेटर नेपाल सेना प्रा.अ.म.", year: "२०८२-०२-०४" },
+  { id: "set-72", title: "कम्प्युटर टेक्निसियन", year: "२०८२-०२-०७" },
+  { id: "set-73", title: "कम्प्युटर अपरेटर संसद सेवा", year: "२०८२-०२-०९" },
+  { id: "set-74", title: "कम्प्युटर अपरेटर राष्ट्रिय परीक्षा बोर्ड", year: "२०८२-०७-३०" },
+  
+  // Bonus Sets (75-77)
+  { id: "set-75", title: "⭐ Important Abbreviations (महत्त्वपूर्ण संक्षिप्त रुप)", year: "Reference", isBonus: true },
+  { id: "set-76", title: "⭐ Important Keyboard Shortcuts (महत्त्वपूर्ण किबोर्ड सर्टकट)", year: "Reference", isBonus: true },
+  { id: "set-77", title: "⭐ Excel Functions & Formulas (एक्सेल प्रकार्यहरू)", year: "Reference", isBonus: true },
 ];
 
 // Generate sample questions for old is gold (reuse from different subjects)
