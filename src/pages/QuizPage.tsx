@@ -301,10 +301,10 @@ const QuizPage = () => {
         <span className="text-sm font-semibold">{current + 1}/{questions.length}</span>
       </div>
 
-      {/* Question - UPDATED with purple/blue gradient effects */}
+      {/* Question - Fixed with proper vertical stacking */}
       <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
         <p className="font-bold text-lg mb-6">{current + 1}. {q.question}</p>
-        <div className="space-y-3">
+        <div className="flex flex-col space-y-3">
           {q.options.map((opt, i) => {
             const isSelected = answers[q.id] === i;
             return (
@@ -314,7 +314,7 @@ const QuizPage = () => {
                 className={`quiz-option ${isSelected ? "quiz-option-selected" : ""}`}
               >
                 <span>{String.fromCharCode(65 + i)}</span>
-                <span className="flex-1">{opt}</span>
+                <span className="flex-1 text-left">{opt}</span>
                 {isSelected && (
                   <svg className="quiz-checkmark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
