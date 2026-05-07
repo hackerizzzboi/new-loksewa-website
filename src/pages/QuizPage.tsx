@@ -18,6 +18,7 @@ const QuizPage = () => {
   const [started, setStarted] = useState(false);
   const [questionCount, setQuestionCount] = useState<number>(20);
   const [customTitle, setCustomTitle] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
 
   // Get URL parameters
   useEffect(() => {
@@ -61,7 +62,9 @@ const QuizPage = () => {
     return "th";
   };
 
+  // Load questions
   useEffect(() => {
+    setIsLoading(true);
     let qs: Question[] = [];
     
     if (category === "practice" && setId) {
@@ -89,7 +92,6 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // FIXED: Load online exam questions
       if (setId.startsWith("exam-") || setId.startsWith("quiz-")) {
         const examQuestions = onlineExamQuestions[setId];
         if (examQuestions && examQuestions.length > 0) {
@@ -115,6 +117,7 @@ const QuizPage = () => {
     setCurrent(0);
     setShowResult(false);
     setStarted(category !== "online-exam");
+    setIsLoading(false);
   }, [category, setId, questionCount]);
 
   // Timer
@@ -136,7 +139,11 @@ const QuizPage = () => {
 
   const handleSubmit = () => setShowResult(true);
 
+  // Calculate results - FIXED: Move this AFTER q is defined or check if questions exist
   const results = useMemo(() => {
+    if (questions.length === 0) {
+      return { correct: 0, wrong: 0, unanswered: 0, marks: 0, total: 0, percentage: 0 };
+    }
     let correct = 0, wrong = 0, unanswered = 0;
     questions.forEach(q => {
       const ans = answers[q.id];
@@ -149,10 +156,15 @@ const QuizPage = () => {
     const total = questions.length * 2;
     const percentage = total > 0 ? (marks / total) * 100 : 0;
     return { correct, wrong, unanswered, marks: Math.max(0, marks), total, percentage };
-  }, [questions, answers, showResult, category]);
+  }, [questions, answers, category]);
 
   const q = questions[current];
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+
+  // Loading state
+  if (isLoading) {
+    return <div className="container mx-auto px-4 py-8 text-center">Loading questions...</div>;
+  }
 
   // Start screen for online exams
   if (!started && category === "online-exam") {
@@ -203,15 +215,15 @@ const QuizPage = () => {
 
         <h2 className="text-lg font-heading font-bold mb-4">📋 Review Answers</h2>
         <div className="space-y-4">
-          {questions.map((q, i) => {
-            const userAns = answers[q.id];
-            const isCorrect = userAns === q.correct;
+          {questions.map((question, i) => {
+            const userAns = answers[question.id];
+            const isCorrect = userAns === question.correct;
             const isUnanswered = userAns === undefined || userAns === null;
             
             return (
-              <div key={q.id} className={`bg-card rounded-xl p-4 border-l-4 ${isUnanswered ? "border-muted-foreground" : isCorrect ? "border-green-500" : "border-red-500"}`}>
+              <div key={question.id} className={`bg-card rounded-xl p-4 border-l-4 ${isUnanswered ? "border-muted-foreground" : isCorrect ? "border-green-500" : "border-red-500"}`}>
                 <div className="flex justify-between items-start mb-3">
-                  <p className="font-semibold text-sm">{i + 1}. {q.question}</p>
+                  <p className="font-semibold text-sm">{i + 1}. {question.question}</p>
                   <div className="flex items-center gap-1">
                     {!isUnanswered && (
                       isCorrect ? (
@@ -233,8 +245,8 @@ const QuizPage = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                  {q.options.map((opt, oi) => {
-                    const isCorrectOption = oi === q.correct;
+                  {question.options.map((opt, oi) => {
+                    const isCorrectOption = oi === question.correct;
                     const isUserSelectedWrong = userAns === oi && !isCorrectOption;
                     
                     return (
@@ -257,9 +269,9 @@ const QuizPage = () => {
                   })}
                 </div>
                 
-                {q.explanation && (
+                {question.explanation && (
                   <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100 italic">
-                    💡 {q.explanation}
+                    💡 {question.explanation}
                   </p>
                 )}
               </div>
@@ -275,7 +287,9 @@ const QuizPage = () => {
     );
   }
 
-  if (!q) return <div className="container mx-auto px-4 py-8 text-center">Loading questions...</div>;
+  if (!q) {
+    return <div className="container mx-auto px-4 py-8 text-center">No questions available. {questions.length === 0 ? "Please check back later." : ""}</div>;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl animate-fade-in">
@@ -300,7 +314,7 @@ const QuizPage = () => {
         <span className="text-sm font-semibold">{current + 1}/{questions.length}</span>
       </div>
 
-      {/* Question Section - SIMPLE VERTICAL OPTIONS */}
+      {/* Question Section */}
       <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
         <p className="font-bold text-lg mb-6">{current + 1}. {q.question}</p>
         <div className="space-y-3">
@@ -319,7 +333,7 @@ const QuizPage = () => {
                 <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
                   isSelected 
                     ? "bg-white/20 text-white" 
-                    : "bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white"
+                    : "bg-gray-100 text-gray-700"
                 }`}>
                   {String.fromCharCode(65 + i)}
                 </span>
@@ -355,13 +369,13 @@ const QuizPage = () => {
       <div className="mt-6 bg-card rounded-2xl p-4 shadow-sm">
         <p className="text-xs text-muted-foreground mb-2">Question Navigator</p>
         <div className="flex flex-wrap gap-2">
-          {questions.map((q, i) => (
+          {questions.map((question, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
               className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors ${
                 i === current ? "bg-primary text-primary-foreground" :
-                answers[q.id] !== undefined && answers[q.id] !== null ? "bg-green-500 text-white" :
+                answers[question.id] !== undefined && answers[question.id] !== null ? "bg-green-500 text-white" :
                 "bg-muted"
               }`}
             >
