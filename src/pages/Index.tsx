@@ -14,6 +14,7 @@ const quickAccess = [
   { label: "MCQ", icon: "❓", path: "/practice", color: "quick-card-red" },
   { label: "Old Sets", icon: "🏆", path: "/old-is-gold", color: "quick-card-green" },
   { label: "Online Exam", icon: "📝", path: "/online-exam", color: "quick-card-teal" },
+  { label: "Subjective", icon: "📖", path: "/subjective", color: "quick-card-blue" },
   { label: "Syllabus", icon: "📋", path: "/syllabus", color: "quick-card-purple" },
   { label: "Typing", icon: "⌨️", path: "/typing", color: "quick-card-amber" },
   { label: "Notes", icon: "📒", path: "/notes", color: "quick-card-navy" },
