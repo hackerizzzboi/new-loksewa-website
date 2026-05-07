@@ -92,11 +92,11 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      if (setId.startsWith("exam-") || setId.startsWith("quiz-")) {
+      if (setId.startsWith("exam-1") || setId.startsWith("quiz-1")) {
         const examQuestions = onlineExamQuestions[setId];
         if (examQuestions && examQuestions.length > 0) {
           qs = [...examQuestions];
-          if (setId.startsWith("exam-")) {
+          if (setId.startsWith("exam-1")) {
             setTimeLeft(45 * 60);
           } else {
             setTimeLeft(15 * 60);
