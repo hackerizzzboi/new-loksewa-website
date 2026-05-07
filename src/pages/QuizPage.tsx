@@ -3,8 +3,8 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
 import { set1Questions } from "@/data/set1Questions";
-import { onlineExamQuestions } from "@/data/online_exam"; // DIRECT IMPORT
 import { CheckCircle, XCircle } from "lucide-react";
+import { exam1Questions } from "@/data/online_exam/exam1";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -20,17 +20,12 @@ const QuizPage = () => {
   const [customTitle, setCustomTitle] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get URL parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const countParam = params.get('count');
     const titleParam = params.get('title');
-    if (countParam) {
-      setQuestionCount(parseInt(countParam));
-    }
-    if (titleParam) {
-      setCustomTitle(decodeURIComponent(titleParam));
-    }
+    if (countParam) setQuestionCount(parseInt(countParam));
+    if (titleParam) setCustomTitle(decodeURIComponent(titleParam));
   }, [location.search]);
 
   const title = useMemo(() => {
@@ -39,30 +34,17 @@ const QuizPage = () => {
       const s = practiceSubjects.find(s => s.id === setId);
       return s ? `${s.icon} ${s.title}` : "Practice";
     }
-    if (category === "old-is-gold") return "🏆 Old Sets";
+    if (category === "old-is-gold") return "🏆 Old is Gold";
     if (category === "online-exam") {
-      if (setId?.startsWith("exam-")) {
-        const examNumber = setId.split("-")[1];
-        return `📝 ${examNumber}${getOrdinal(parseInt(examNumber))} Exam - Operator Sample Exam 2082`;
-      }
-      if (setId?.startsWith("quiz-")) {
-        const quizNumber = setId.split("-")[1];
-        return `📋 ${quizNumber}${getOrdinal(parseInt(quizNumber))} Quiz - Public Administration`;
-      }
+      if (setId === "exam-1") return "📝 1st Exam - Operator Sample Exam 2082";
+      if (setId?.startsWith("exam-")) return "📝 Online Exam";
+      if (setId?.startsWith("quiz-")) return "📋 Public Administration Quiz";
       const t = weeklyTests.find(t => t.id === setId);
       return t ? `📝 ${t.titleNp}` : "Online Exam";
     }
     return "Quiz";
   }, [category, setId, customTitle]);
 
-  const getOrdinal = (n: number): string => {
-    if (n === 1) return "st";
-    if (n === 2) return "nd";
-    if (n === 3) return "rd";
-    return "th";
-  };
-
-  // Load questions
   useEffect(() => {
     setIsLoading(true);
     let qs: Question[] = [];
@@ -86,20 +68,12 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // Use onlineExamQuestions from direct import
-      const examQuestions = onlineExamQuestions[setId];
-      
-      if (examQuestions && examQuestions.length > 0) {
-        qs = [...examQuestions];
-        if (setId.startsWith("exam-")) {
-          setTimeLeft(45 * 60);
-        } else if (setId.startsWith("quiz-")) {
-          setTimeLeft(15 * 60);
-        }
+      // FIXED: Direct check for exam-1
+      if (setId === "exam-1") {
+        qs = [...exam1Questions];
+        setTimeLeft(45 * 60);
       } else {
-        qs = getWeeklyTestQuestions(setId);
-        const test = weeklyTests.find(t => t.id === setId);
-        if (test) setTimeLeft(test.time * 60);
+        qs = [];
       }
     }
     
@@ -164,7 +138,7 @@ const QuizPage = () => {
     const marks = questionCount_text * 2;
     
     // Check if questions exist
-    const hasQuestions = onlineExamQuestions[setId || ""]?.length > 0;
+    const hasQuestions = setId === "exam-1";
     
     if (!hasQuestions && (setId?.startsWith("exam-") || setId?.startsWith("quiz-"))) {
       return (
@@ -174,10 +148,7 @@ const QuizPage = () => {
             <div className="text-6xl mb-4">🚧</div>
             <h2 className="text-xl font-bold text-amber-800 mb-2">Coming Soon!</h2>
             <p className="text-amber-600">This exam is under preparation. Please check back later.</p>
-            <button 
-              onClick={() => navigate(-1)} 
-              className="mt-6 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-2 rounded-xl font-bold hover:opacity-90"
-            >
+            <button onClick={() => navigate(-1)} className="mt-6 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-2 rounded-xl font-bold hover:opacity-90">
               ← Go Back
             </button>
           </div>
@@ -261,16 +232,13 @@ const QuizPage = () => {
                     const isUserSelectedWrong = userAns === oi && !isCorrectOption;
                     
                     return (
-                      <div 
-                        key={oi} 
-                        className={`p-2 rounded-lg flex items-center gap-2 ${
-                          isCorrectOption 
-                            ? "bg-green-100 border border-green-400 text-green-800 font-semibold" 
-                            : isUserSelectedWrong 
-                              ? "bg-red-100 border border-red-400 text-red-800 line-through"
-                              : "bg-gray-50"
-                        }`}
-                      >
+                      <div key={oi} className={`p-2 rounded-lg flex items-center gap-2 ${
+                        isCorrectOption 
+                          ? "bg-green-100 border border-green-400 text-green-800 font-semibold" 
+                          : isUserSelectedWrong 
+                            ? "bg-red-100 border border-red-400 text-red-800 line-through"
+                            : "bg-gray-50"
+                      }`}>
                         <span className="font-bold">{String.fromCharCode(65 + oi)}.</span>
                         <span className="flex-1">{opt}</span>
                         {isCorrectOption && <CheckCircle size={16} className="text-green-600 flex-shrink-0" />}
@@ -299,7 +267,7 @@ const QuizPage = () => {
   }
 
   if (!q) {
-    return <div className="container mx-auto px-4 py-8 text-center">No questions available. {questions.length === 0 ? "Please check back later." : ""}</div>;
+    return <div className="container mx-auto px-4 py-8 text-center">No questions available.</div>;
   }
 
   return (
@@ -339,9 +307,7 @@ const QuizPage = () => {
                 }`}
               >
                 <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
-                  isSelected 
-                    ? "bg-white/20 text-white" 
-                    : "bg-gray-100 text-gray-700"
+                  isSelected ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700"
                 }`}>
                   {String.fromCharCode(65 + i)}
                 </span>
