@@ -5,6 +5,9 @@ import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operato
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 
+console.log("onlineExamQuestions from import:", onlineExamQuestions);
+console.log("Keys:", Object.keys(onlineExamQuestions || {}));
+
 const QuizPage = () => {
   const { category, setId } = useParams();
   const navigate = useNavigate();
