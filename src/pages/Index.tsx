@@ -149,10 +149,16 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Study Progress */}
+        <section className="bg-card rounded-2xl shadow-md p-6">
+          <h2 className="text-lg font-heading font-bold mb-4">📊 Your Study Progress</h2>
+          <StudyProgress />
+        </section>
+
         {/* Motivational Quote */}
         <section className="hero-gradient text-primary-foreground rounded-2xl p-6 text-center">
           <p className="text-lg md:text-xl font-heading font-semibold">"{quote}"</p>
-          <p className="text-sm opacity-80 mt-2">— Keep going, Dhiraj 💪</p>
+          <p className="text-sm opacity-80 mt-2">— Keep going! 💪</p>
         </section>
 
         {/* Age Calculator + Useful Tools */}
