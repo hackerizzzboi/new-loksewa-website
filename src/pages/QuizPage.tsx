@@ -72,12 +72,6 @@ const QuizPage = () => {
       if (questionsFromBank) {
         const shuffled = shuffleArray([...questionsFromBank]);
         qs = shuffled.slice(0, questionCount);
-      } else {
-        const { practiceQuestions } = require("@/data/questions");
-        if (practiceQuestions[setId]) {
-          const shuffled = shuffleArray(practiceQuestions[setId] as Question[]);
-          qs = shuffled.slice(0, questionCount);
-        }
       }
     } else if (category === "old-is-gold" && setId) {
       if (setId === "set-1") {
