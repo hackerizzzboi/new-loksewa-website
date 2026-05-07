@@ -41,7 +41,9 @@
   color: #888;
 }
 
-/* ===== MCQ OPTION STYLES - PURPLE/BLUE GRADIENT ===== */
+/* ===== MCQ OPTION STYLES - VERTICAL STACK WITH PURPLE/BLUE HOVER ===== */
+
+/* Force options to stack vertically */
 .quiz-option {
   display: flex !important;
   align-items: center !important;
@@ -85,6 +87,7 @@
   font-weight: 700 !important;
   font-size: 14px !important;
   transition: all 0.2s ease !important;
+  flex-shrink: 0 !important;
 }
 
 /* HOVER EFFECT ON LETTER CIRCLE */
@@ -112,4 +115,10 @@
   color: white !important;
   margin-left: auto !important;
   flex-shrink: 0 !important;
+}
+
+/* Force the container to stack options vertically */
+.flex.flex-col.space-y-3 {
+  display: flex !important;
+  flex-direction: column !important;
 }
