@@ -1,12 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question, onlineExamQuestions } from "@/data/questions";
+import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
 import { set1Questions } from "@/data/set1Questions";
+import { onlineExamQuestions } from "@/data/online_exam"; // DIRECT IMPORT
 import { CheckCircle, XCircle } from "lucide-react";
-
-console.log("onlineExamQuestions from import:", onlineExamQuestions);
-console.log("Keys:", Object.keys(onlineExamQuestions || {}));
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -94,7 +92,7 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // Use onlineExamQuestions from questions.ts
+      // Use onlineExamQuestions from direct import
       const examQuestions = onlineExamQuestions[setId];
       
       if (examQuestions && examQuestions.length > 0) {
@@ -105,7 +103,6 @@ const QuizPage = () => {
           setTimeLeft(15 * 60);
         }
       } else {
-        // Fallback to weekly tests
         qs = getWeeklyTestQuestions(setId);
         const test = weeklyTests.find(t => t.id === setId);
         if (test) setTimeLeft(test.time * 60);
