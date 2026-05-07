@@ -5,26 +5,9 @@ import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operato
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 
-// Import all exam and quiz questions directly
+// Only import exam1 and quiz1 (others will be added later)
 import { exam1Questions } from "@/data/online_exam/exam1";
-import { exam2Questions } from "@/data/online_exam/exam2";
-import { exam3Questions } from "@/data/online_exam/exam3";
-import { exam4Questions } from "@/data/online_exam/exam4";
-import { exam5Questions } from "@/data/online_exam/exam5";
-import { exam6Questions } from "@/data/online_exam/exam6";
-import { exam7Questions } from "@/data/online_exam/exam7";
-import { exam8Questions } from "@/data/online_exam/exam8";
-import { exam9Questions } from "@/data/online_exam/exam9";
-import { exam10Questions } from "@/data/online_exam/exam10";
-import { exam11Questions } from "@/data/online_exam/exam11";
-import { exam12Questions } from "@/data/online_exam/exam12";
-import { exam13Questions } from "@/data/online_exam/exam13";
-import { exam14Questions } from "@/data/online_exam/exam14";
-import { exam15Questions } from "@/data/online_exam/exam15";
 import { quiz1Questions } from "@/data/online_exam/quiz1";
-import { quiz2Questions } from "@/data/online_exam/quiz2";
-import { quiz3Questions } from "@/data/online_exam/quiz3";
-import { quiz4Questions } from "@/data/online_exam/quiz4";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -112,90 +95,17 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // DIRECT IMPORTS FOR ALL 15 EXAMS AND 4 QUIZZES
-      switch (setId) {
-        case "exam-1":
-          qs = [...exam1Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-2":
-          qs = [...exam2Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-3":
-          qs = [...exam3Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-4":
-          qs = [...exam4Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-5":
-          qs = [...exam5Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-6":
-          qs = [...exam6Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-7":
-          qs = [...exam7Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-8":
-          qs = [...exam8Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-9":
-          qs = [...exam9Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-10":
-          qs = [...exam10Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-11":
-          qs = [...exam11Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-12":
-          qs = [...exam12Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-13":
-          qs = [...exam13Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-14":
-          qs = [...exam14Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "exam-15":
-          qs = [...exam15Questions];
-          setTimeLeft(45 * 60);
-          break;
-        case "quiz-1":
-          qs = [...quiz1Questions];
-          setTimeLeft(15 * 60);
-          break;
-        case "quiz-2":
-          qs = [...quiz2Questions];
-          setTimeLeft(15 * 60);
-          break;
-        case "quiz-3":
-          qs = [...quiz3Questions];
-          setTimeLeft(15 * 60);
-          break;
-        case "quiz-4":
-          qs = [...quiz4Questions];
-          setTimeLeft(15 * 60);
-          break;
-        default:
-          // Fallback to weekly tests
-          qs = getWeeklyTestQuestions(setId);
-          const test = weeklyTests.find(t => t.id === setId);
-          if (test) setTimeLeft(test.time * 60);
-          break;
+      // Handle exam-1 and quiz-1 only for now
+      if (setId === "exam-1") {
+        qs = [...exam1Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "quiz-1") {
+        qs = [...quiz1Questions];
+        setTimeLeft(15 * 60);
+      } else {
+        // For other exams, show message or fallback
+        console.log(`No questions available for ${setId}`);
+        qs = [];
       }
     }
     
