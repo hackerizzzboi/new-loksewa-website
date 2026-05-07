@@ -39,7 +39,7 @@ const QuizPage = () => {
       const s = practiceSubjects.find(s => s.id === setId);
       return s ? `${s.icon} ${s.title}` : "Practice";
     }
-    if (category === "old-is-gold") return "🏆 Old is Gold";
+    if (category === "old-is-gold") return "🏆 Old Sets";
     if (category === "online-exam") {
       if (setId?.startsWith("exam-")) {
         const examNumber = setId.split("-")[1];
