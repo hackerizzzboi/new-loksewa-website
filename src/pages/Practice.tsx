@@ -30,7 +30,7 @@ const Practice = () => {
       "web-design": 275,
       "networking": 180,
       "cyber-security": 253,
-      "hardware": 20,
+      "hardware": 220,
       "legislation": 200,
       "gk-nepal-geography": 100,
       "gk-nepal-history": 120,
