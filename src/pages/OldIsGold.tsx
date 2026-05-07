@@ -39,7 +39,7 @@ const OldIsGold = () => {
           </div>
           <h1 className="text-5xl md:text-7xl font-black mb-4">
             <span className="bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-400 bg-clip-text text-transparent">
-              OLD IS GOLD
+              OLD SETS
             </span>
           </h1>
           <p className="text-xl text-indigo-200 mb-8 font-medium">

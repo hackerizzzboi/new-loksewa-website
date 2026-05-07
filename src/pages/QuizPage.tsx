@@ -39,7 +39,7 @@ const QuizPage = () => {
       const s = practiceSubjects.find(s => s.id === setId);
       return s ? `${s.icon} ${s.title}` : "Practice";
     }
-    if (category === "old-is-gold") return "🏆 Old is Gold";
+    if (category === "old-is-gold") return "🏆 Old Sets";
     if (category === "online-exam") {
       if (setId?.startsWith("exam-")) {
         const examNumber = setId.split("-")[1];
@@ -72,12 +72,6 @@ const QuizPage = () => {
       if (questionsFromBank) {
         const shuffled = shuffleArray([...questionsFromBank]);
         qs = shuffled.slice(0, questionCount);
-      } else {
-        const { practiceQuestions } = require("@/data/questions");
-        if (practiceQuestions[setId]) {
-          const shuffled = shuffleArray(practiceQuestions[setId] as Question[]);
-          qs = shuffled.slice(0, questionCount);
-        }
       }
     } else if (category === "old-is-gold" && setId) {
       if (setId === "set-1") {

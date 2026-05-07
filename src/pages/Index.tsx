@@ -4,14 +4,16 @@ import { useNepalTime, useCountdown } from "@/hooks/useNepalTime";
 import { practiceSubjects, motivationalQuotes } from "@/data/questions";
 import { calculateBSAge, bsMonthNames, toNepaliDigits, type BSDate } from "@/lib/nepaliCalendar";
 import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
+import QuestionOfTheDay from "@/components/QuestionOfTheDay";
+import StudyProgress from "@/components/StudyProgress";
 
 // Ashad 7, 2082 BS ≈ June 22, 2026 AD
 const EXAM_DATE = new Date("2026-06-22T10:00:00+05:45");
 
 const quickAccess = [
   { label: "MCQ", icon: "❓", path: "/practice", color: "quick-card-red" },
-  { label: "Old is Gold", icon: "🏆", path: "/old-is-gold", color: "quick-card-green" },
-  { label: "अनलाइन परीक्षा", icon: "📝", path: "/online-exam", color: "quick-card-teal" },
+  { label: "Old Sets", icon: "🏆", path: "/old-is-gold", color: "quick-card-green" },
+  { label: "Online Exam", icon: "📝", path: "/online-exam", color: "quick-card-teal" },
   { label: "Syllabus", icon: "📋", path: "/syllabus", color: "quick-card-purple" },
   { label: "Typing", icon: "⌨️", path: "/typing", color: "quick-card-amber" },
   { label: "Notes", icon: "📒", path: "/notes", color: "quick-card-navy" },
@@ -65,6 +67,9 @@ const Index = () => {
       </section>
 
       <div className="container mx-auto px-4 py-8 space-y-10">
+        {/* Question of the Day - Loads First */}
+        <QuestionOfTheDay />
+
         {/* Quick Access */}
         <section>
           <h2 className="text-xl font-heading font-bold mb-4">⚡ Quick Access</h2>
@@ -145,10 +150,16 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Study Progress */}
+        <section className="bg-card rounded-2xl shadow-md p-6">
+          <h2 className="text-lg font-heading font-bold mb-4">📊 Your Study Progress</h2>
+          <StudyProgress />
+        </section>
+
         {/* Motivational Quote */}
         <section className="hero-gradient text-primary-foreground rounded-2xl p-6 text-center">
           <p className="text-lg md:text-xl font-heading font-semibold">"{quote}"</p>
-          <p className="text-sm opacity-80 mt-2">— Keep going, Dhiraj 💪</p>
+          <p className="text-sm opacity-80 mt-2">— Keep going! 💪</p>
         </section>
 
         {/* Age Calculator + Useful Tools */}
