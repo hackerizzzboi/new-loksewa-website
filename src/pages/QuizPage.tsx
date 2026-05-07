@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
+import { onlineExamQuestions } from "@/data/online_exam"; // 👈 ADD THIS IMPORT
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -39,24 +40,39 @@ const QuizPage = () => {
     }
     if (category === "old-is-gold") return "🏆 Old is Gold";
     if (category === "online-exam") {
+      // Check if it's an exam (exam-1 to exam-15) or quiz (quiz-1 to quiz-4)
+      if (setId?.startsWith("exam-")) {
+        const examNumber = setId.split("-")[1];
+        return `📝 ${examNumber}${getOrdinal(parseInt(examNumber))} Exam - Operator Sample Exam 2082`;
+      }
+      if (setId?.startsWith("quiz-")) {
+        const quizNumber = setId.split("-")[1];
+        return `📋 ${quizNumber}${getOrdinal(parseInt(quizNumber))} Quiz - Public Administration`;
+      }
+      // Fallback to weekly test
       const t = weeklyTests.find(t => t.id === setId);
       return t ? `📝 ${t.titleNp}` : "Online Exam";
     }
     return "Quiz";
   }, [category, setId, customTitle]);
 
+  // Helper function for ordinal numbers
+  const getOrdinal = (n: number): string => {
+    if (n === 1) return "st";
+    if (n === 2) return "nd";
+    if (n === 3) return "rd";
+    return "th";
+  };
+
   useEffect(() => {
     let qs: Question[] = [];
     
     if (category === "practice" && setId) {
-      // Use the new computer operator questions
       const questionsFromBank = computerOperatorQuestions[setId];
       if (questionsFromBank) {
-        // Take only the selected number of questions
         const shuffled = shuffleArray([...questionsFromBank]);
         qs = shuffled.slice(0, questionCount);
       } else {
-        // Fallback to old practiceQuestions if needed
         const { practiceQuestions } = require("@/data/questions");
         if (practiceQuestions[setId]) {
           const shuffled = shuffleArray(practiceQuestions[setId] as Question[]);
@@ -64,9 +80,7 @@ const QuizPage = () => {
         }
       }
     } else if (category === "old-is-gold" && setId) {
-      // Use exact questions for Set 1, otherwise use generated ones
       if (setId === "set-1") {
-        // Convert set1Questions to match Question type - NO SHUFFLE
         qs = set1Questions.map(q => ({
           id: q.id.toString(),
           question: q.text,
@@ -74,14 +88,33 @@ const QuizPage = () => {
           correct: q.correctAnswer,
           explanation: q.explanation
         }));
-        // NO SHUFFLE - questions stay in original order 1 to 50
       } else {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      qs = getWeeklyTestQuestions(setId);
-      const test = weeklyTests.find(t => t.id === setId);
-      if (test) setTimeLeft(test.time * 60);
+      // 👈 NEW CODE: Handle exams and quizzes from online_exam folder
+      if (setId.startsWith("exam-") || setId.startsWith("quiz-")) {
+        // Load from onlineExamQuestions map
+        const examQuestions = onlineExamQuestions[setId];
+        if (examQuestions && examQuestions.length > 0) {
+          // Use all questions (50 for exams, 25 for quizzes)
+          qs = shuffleArray([...examQuestions]);
+          // Set timer based on exam type
+          if (setId.startsWith("exam-")) {
+            setTimeLeft(45 * 60); // 45 minutes for exams
+          } else {
+            setTimeLeft(15 * 60); // 15 minutes for quizzes
+          }
+        } else {
+          console.error(`No questions found for ${setId}`);
+          qs = [];
+        }
+      } else {
+        // Fallback to weekly tests
+        qs = getWeeklyTestQuestions(setId);
+        const test = weeklyTests.find(t => t.id === setId);
+        if (test) setTimeLeft(test.time * 60);
+      }
     }
     
     setQuestions(qs);
@@ -129,8 +162,14 @@ const QuizPage = () => {
   const q = questions[current];
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 
+  // Start screen for online exams
   if (!started && category === "online-exam") {
-    const test = weeklyTests.find(t => t.id === setId);
+    const isExam = setId?.startsWith("exam-");
+    const isQuiz = setId?.startsWith("quiz-");
+    const questionCount_text = isExam ? 50 : isQuiz ? 25 : 50;
+    const timeMinutes = isExam ? 45 : isQuiz ? 15 : 20;
+    const marks = questionCount_text * 2;
+    
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl animate-fade-in text-center">
         <h1 className="text-2xl font-heading font-bold mb-4">{title}</h1>
@@ -139,9 +178,9 @@ const QuizPage = () => {
           <p>'Start' मा क्लिक गरेपछि पेजलाई 'Refresh' नगर्नुहोला।</p>
           <p className="font-semibold">सोच विचार गरेर मात्र जवाफ दिनुहोला। शुभकामना !</p>
           <div className="pt-4 space-y-1">
-            <p><strong>प्रश्न संख्या:</strong> {test?.questions}</p>
-            <p><strong>पूर्णाङ्क:</strong> {test?.marks} (प्रत्येक गलत उत्तरमा {test?.negativeMarking} अंक कट्टा)</p>
-            <p><strong>परीक्षा समय:</strong> {test?.time} मिनेट</p>
+            <p><strong>प्रश्न संख्या:</strong> {questionCount_text}</p>
+            <p><strong>पूर्णाङ्क:</strong> {marks} (प्रत्येक गलत उत्तरमा 0.4 अंक कट्टा)</p>
+            <p><strong>परीक्षा समय:</strong> {timeMinutes} मिनेट</p>
           </div>
         </div>
         <button onClick={() => setStarted(true)} className="mt-6 bg-primary text-primary-foreground px-12 py-3 rounded-xl font-bold text-lg hover:opacity-90 transition-opacity">
@@ -170,7 +209,7 @@ const QuizPage = () => {
           </div>
         </div>
 
-        {/* Review Answers - WITH ✓ and ✗ */}
+        {/* Review Answers */}
         <h2 className="text-lg font-heading font-bold mb-4">📋 Review Answers</h2>
         <div className="space-y-4">
           {questions.map((q, i) => {
