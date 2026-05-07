@@ -43,102 +43,102 @@
 
 /* ===== QUIZ OPTION STYLES ===== */
 .quiz-option {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 1rem;
-  text-align: left;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-  font-weight: 500;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  padding: 1rem !important;
+  text-align: left !important;
+  background: white !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 0.75rem !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  gap: 0.75rem !important;
 }
 
 /* Hover effect - purple/blue gradient */
 .quiz-option:hover {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border-color: #6366f1;
-  color: white;
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  border-color: #6366f1 !important;
+  color: white !important;
+  transform: translateX(4px) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3) !important;
 }
 
 /* Hover effect for the letter circle */
 .quiz-option:hover span:first-child {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
 }
 
 /* Selected state - purple/blue gradient */
 .quiz-option-selected {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  border-color: #6366f1;
-  color: white;
-  transform: translateX(2px);
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
+  border-color: #6366f1 !important;
+  color: white !important;
+  transform: translateX(2px) !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4) !important;
 }
 
 /* Selected state for the letter circle */
 .quiz-option-selected span:first-child {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
 }
 
 /* Letter circle (A, B, C, D) */
 .quiz-option span:first-child {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  background: #f3f4f6;
-  border-radius: 9999px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  margin-right: 0.75rem;
-  transition: all 0.3s ease;
-  flex-shrink: 0;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  background: #f3f4f6 !important;
+  border-radius: 9999px !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  transition: all 0.3s ease !important;
+  flex-shrink: 0 !important;
 }
 
 /* Correct answer in review mode */
 .quiz-option-correct {
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
-  border-color: #10b981;
-  color: white;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%) !important;
+  border-color: #10b981 !important;
+  color: white !important;
 }
 
 .quiz-option-correct span:first-child {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
 }
 
 /* Wrong answer in review mode */
 .quiz-option-wrong {
-  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-  border-color: #ef4444;
-  color: white;
-  text-decoration: line-through;
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%) !important;
+  border-color: #ef4444 !important;
+  color: white !important;
+  text-decoration: line-through !important;
 }
 
 .quiz-option-wrong span:first-child {
-  background: rgba(255, 255, 255, 0.25);
-  color: white;
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
 }
 
 /* Disabled options during review */
 .quiz-option-disabled {
-  cursor: default;
-  pointer-events: none;
+  cursor: default !important;
+  pointer-events: none !important;
 }
 
 /* Checkmark icon for selected answer */
 .quiz-checkmark {
-  margin-left: auto;
-  width: 1.25rem;
-  height: 1.25rem;
-  color: white;
-  flex-shrink: 0;
+  margin-left: auto !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  color: white !important;
+  flex-shrink: 0 !important;
 }
