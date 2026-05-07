@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   BookOpen, FileText, BarChart3, Settings, Plus, Edit, Trash2,
   Save, X, Download, Upload, Trophy, TrendingUp, RefreshCw,
-  Lock, Search, Home, LogOut, ChevronDown, Eye, Calendar
+  Lock, Search, Home, LogOut, ChevronDown, Eye, Calendar, MessageCircle
 } from 'lucide-react';
 import { useAdminAuth } from '@/hooks/useAdminAuth';
 import { practiceQuestions, practiceSubjects, oldIsGoldSets, weeklyTests } from '@/data/questions';
@@ -79,6 +79,11 @@ const Admin = () => {
   const [newPasswordInput, setNewPasswordInput] = useState('');
   const [showMobileNav, setShowMobileNav] = useState(false);
 
+  // Question of the Day state
+  const [dailyQuestionText, setDailyQuestionText] = useState('');
+  const [currentDailyQuestion, setCurrentDailyQuestion] = useState<any>(null);
+  const [dailyAnswers, setDailyAnswers] = useState<any[]>([]);
+
   // Exam settings
   const [examSettings, setExamSettings] = useState({
     questionsPerTest: parseInt(localStorage.getItem('exam_questions_count') || '50'),
@@ -88,7 +93,44 @@ const Admin = () => {
     oldIsGoldCount: parseInt(localStorage.getItem('old_is_gold_count') || '50'),
   });
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => { loadData(); loadDailyQuestion(); }, []);
+
+  const loadDailyQuestion = () => {
+    const stored = localStorage.getItem('daily_question');
+    if (stored) {
+      try { setCurrentDailyQuestion(JSON.parse(stored)); } catch {}
+    }
+    const storedAnswers = localStorage.getItem('daily_question_answers');
+    if (storedAnswers) {
+      try { setDailyAnswers(JSON.parse(storedAnswers)); } catch {}
+    }
+  };
+
+  const postDailyQuestion = () => {
+    if (!dailyQuestionText.trim()) return;
+    const q = {
+      id: `dq-${Date.now()}`,
+      question: dailyQuestionText.trim(),
+      postedAt: new Date().toISOString(),
+      postedBy: 'Admin',
+    };
+    localStorage.setItem('daily_question', JSON.stringify(q));
+    localStorage.removeItem('daily_question_answers');
+    localStorage.removeItem('daily_question_submitted');
+    setCurrentDailyQuestion(q);
+    setDailyAnswers([]);
+    setDailyQuestionText('');
+    toast({ title: "✅ Posted!", description: "Question of the Day is now live on homepage" });
+  };
+
+  const removeDailyQuestion = () => {
+    localStorage.removeItem('daily_question');
+    localStorage.removeItem('daily_question_answers');
+    localStorage.removeItem('daily_question_submitted');
+    setCurrentDailyQuestion(null);
+    setDailyAnswers([]);
+    toast({ title: "🗑️ Removed", description: "Question of the Day removed from homepage" });
+  };
 
   const loadData = () => {
     const qs = loadAllQuestions();
@@ -237,6 +279,7 @@ const Admin = () => {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+    { id: 'daily-question', label: 'Daily Question', icon: MessageCircle },
     { id: 'questions', label: 'Question Bank', icon: BookOpen },
     { id: 'exams', label: 'Exam Config', icon: FileText },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
