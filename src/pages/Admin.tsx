@@ -633,7 +633,7 @@ const Admin = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm p-5 space-y-4">
-              <h3 className="font-semibold">Old is Gold Settings</h3>
+              <h3 className="font-semibold">Old Sets Settings</h3>
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Questions per paper</label>
                 <input type="number" value={examSettings.oldIsGoldCount}
