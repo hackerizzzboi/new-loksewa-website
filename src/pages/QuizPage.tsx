@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
-import { onlineExamQuestions } from "@/data/online_exam"; // 👈 ADD THIS IMPORT
+import { onlineExamQuestions } from "@/data/online_exam";
 import { set1Questions } from "@/data/set1Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 
@@ -40,7 +40,6 @@ const QuizPage = () => {
     }
     if (category === "old-is-gold") return "🏆 Old is Gold";
     if (category === "online-exam") {
-      // Check if it's an exam (exam-1 to exam-15) or quiz (quiz-1 to quiz-4)
       if (setId?.startsWith("exam-")) {
         const examNumber = setId.split("-")[1];
         return `📝 ${examNumber}${getOrdinal(parseInt(examNumber))} Exam - Operator Sample Exam 2082`;
@@ -49,7 +48,6 @@ const QuizPage = () => {
         const quizNumber = setId.split("-")[1];
         return `📋 ${quizNumber}${getOrdinal(parseInt(quizNumber))} Quiz - Public Administration`;
       }
-      // Fallback to weekly test
       const t = weeklyTests.find(t => t.id === setId);
       return t ? `📝 ${t.titleNp}` : "Online Exam";
     }
@@ -92,25 +90,20 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // 👈 NEW CODE: Handle exams and quizzes from online_exam folder
       if (setId.startsWith("exam-") || setId.startsWith("quiz-")) {
-        // Load from onlineExamQuestions map
         const examQuestions = onlineExamQuestions[setId];
         if (examQuestions && examQuestions.length > 0) {
-          // Use all questions (50 for exams, 25 for quizzes)
           qs = shuffleArray([...examQuestions]);
-          // Set timer based on exam type
           if (setId.startsWith("exam-")) {
-            setTimeLeft(45 * 60); // 45 minutes for exams
+            setTimeLeft(45 * 60);
           } else {
-            setTimeLeft(15 * 60); // 15 minutes for quizzes
+            setTimeLeft(15 * 60);
           }
         } else {
           console.error(`No questions found for ${setId}`);
           qs = [];
         }
       } else {
-        // Fallback to weekly tests
         qs = getWeeklyTestQuestions(setId);
         const test = weeklyTests.find(t => t.id === setId);
         if (test) setTimeLeft(test.time * 60);
@@ -209,7 +202,6 @@ const QuizPage = () => {
           </div>
         </div>
 
-        {/* Review Answers */}
         <h2 className="text-lg font-heading font-bold mb-4">📋 Review Answers</h2>
         <div className="space-y-4">
           {questions.map((q, i) => {
@@ -309,20 +301,28 @@ const QuizPage = () => {
         <span className="text-sm font-semibold">{current + 1}/{questions.length}</span>
       </div>
 
-      {/* Question */}
+      {/* Question - UPDATED with purple/blue gradient effects */}
       <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
         <p className="font-bold text-lg mb-6">{current + 1}. {q.question}</p>
         <div className="space-y-3">
-          {q.options.map((opt, i) => (
-            <button
-              key={i}
-              onClick={() => handleAnswer(q.id, i)}
-              className={`quiz-option ${answers[q.id] === i ? "quiz-option-selected" : ""}`}
-            >
-              <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-muted text-sm font-bold mr-3">{String.fromCharCode(65 + i)}</span>
-              {opt}
-            </button>
-          ))}
+          {q.options.map((opt, i) => {
+            const isSelected = answers[q.id] === i;
+            return (
+              <button
+                key={i}
+                onClick={() => handleAnswer(q.id, i)}
+                className={`quiz-option ${isSelected ? "quiz-option-selected" : ""}`}
+              >
+                <span>{String.fromCharCode(65 + i)}</span>
+                <span className="flex-1">{opt}</span>
+                {isSelected && (
+                  <svg className="quiz-checkmark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
