@@ -646,7 +646,7 @@ const Admin = () => {
               <h3 className="font-semibold mb-3">Current Site Data</h3>
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="p-3 bg-blue-50 rounded-lg"><span className="font-medium">{practiceSubjects.length}</span> Practice Subjects</div>
-                <div className="p-3 bg-green-50 rounded-lg"><span className="font-medium">{oldIsGoldSets.length}</span> Old is Gold Sets</div>
+                <div className="p-3 bg-green-50 rounded-lg"><span className="font-medium">{oldIsGoldSets.length}</span> Old Sets</div>
                 <div className="p-3 bg-purple-50 rounded-lg"><span className="font-medium">{weeklyTests.length}</span> Weekly Tests</div>
                 <div className="p-3 bg-orange-50 rounded-lg"><span className="font-medium">{questions.length}</span> Total Questions</div>
               </div>
