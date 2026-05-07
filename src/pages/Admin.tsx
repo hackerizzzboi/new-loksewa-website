@@ -422,6 +422,73 @@ const Admin = () => {
           </div>
         )}
 
+        {/* ══════ DAILY QUESTION ══════ */}
+        {activeTab === 'daily-question' && (
+          <div className="max-w-2xl space-y-6">
+            <h2 className="text-xl font-bold">🏆 Question of the Day</h2>
+            
+            {/* Current Question */}
+            {currentDailyQuestion && (
+              <div className="bg-white rounded-xl shadow-sm p-5 border-l-4 border-amber-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-amber-800 mb-1">Currently Active</h3>
+                    <p className="text-gray-800 font-medium">{currentDailyQuestion.question}</p>
+                    <p className="text-xs text-gray-400 mt-2">
+                      Posted: {new Date(currentDailyQuestion.postedAt).toLocaleString()} • 
+                      Expires: {new Date(new Date(currentDailyQuestion.postedAt).getTime() + 24*60*60*1000).toLocaleString()}
+                    </p>
+                  </div>
+                  <button onClick={removeDailyQuestion} className="text-red-500 hover:bg-red-50 p-2 rounded-lg">
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+                
+                {/* Answers */}
+                {dailyAnswers.length > 0 && (
+                  <div className="mt-4 pt-4 border-t">
+                    <h4 className="text-sm font-semibold mb-2">📝 Answers ({dailyAnswers.filter(a => a.questionId === currentDailyQuestion.id).length})</h4>
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {dailyAnswers.filter(a => a.questionId === currentDailyQuestion.id).map((a: any) => (
+                        <div key={a.id} className="bg-gray-50 rounded-lg p-3 text-sm">
+                          <div className="flex justify-between items-center mb-1">
+                            <span className="font-semibold text-blue-700">{a.name}</span>
+                            <span className="text-xs text-gray-400">{new Date(a.timestamp).toLocaleTimeString()}</span>
+                          </div>
+                          <p className="text-gray-600">{a.answer}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Post New */}
+            <div className="bg-white rounded-xl shadow-sm p-5">
+              <h3 className="font-semibold mb-3">{currentDailyQuestion ? '📝 Replace with New Question' : '📝 Post New Question'}</h3>
+              <textarea
+                value={dailyQuestionText}
+                onChange={e => setDailyQuestionText(e.target.value)}
+                placeholder="Write your Question of the Day here... (e.g. What is the full form of CPU?)"
+                rows={4}
+                className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none resize-none mb-3"
+                maxLength={500}
+              />
+              <button
+                onClick={postDailyQuestion}
+                disabled={!dailyQuestionText.trim()}
+                className="w-full bg-gradient-to-r from-amber-500 to-orange-600 text-white py-2.5 rounded-lg font-semibold hover:opacity-90 transition disabled:opacity-50"
+              >
+                🚀 Post to Homepage
+              </button>
+              <p className="text-xs text-gray-400 mt-2">
+                This question will appear on the homepage for 24 hours. Users can write answers with their names.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ══════ QUESTION BANK ══════ */}
         {activeTab === 'questions' && (
           <div className="space-y-4">
