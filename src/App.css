@@ -40,3 +40,105 @@
 .read-the-docs {
   color: #888;
 }
+
+/* ===== QUIZ OPTION STYLES ===== */
+.quiz-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 1rem;
+  text-align: left;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Hover effect - purple/blue gradient */
+.quiz-option:hover {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-color: #6366f1;
+  color: white;
+  transform: translateX(4px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+/* Hover effect for the letter circle */
+.quiz-option:hover span:first-child {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Selected state - purple/blue gradient */
+.quiz-option-selected {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-color: #6366f1;
+  color: white;
+  transform: translateX(2px);
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+/* Selected state for the letter circle */
+.quiz-option-selected span:first-child {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+/* Letter circle (A, B, C, D) */
+.quiz-option span:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background: #f3f4f6;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-right: 0.75rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* Correct answer in review mode */
+.quiz-option-correct {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  border-color: #10b981;
+  color: white;
+}
+
+.quiz-option-correct span:first-child {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+/* Wrong answer in review mode */
+.quiz-option-wrong {
+  background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+  border-color: #ef4444;
+  color: white;
+  text-decoration: line-through;
+}
+
+.quiz-option-wrong span:first-child {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+/* Disabled options during review */
+.quiz-option-disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Checkmark icon for selected answer */
+.quiz-checkmark {
+  margin-left: auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: white;
+  flex-shrink: 0;
+}
