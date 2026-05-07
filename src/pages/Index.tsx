@@ -4,6 +4,7 @@ import { useNepalTime, useCountdown } from "@/hooks/useNepalTime";
 import { practiceSubjects, motivationalQuotes } from "@/data/questions";
 import { calculateBSAge, bsMonthNames, toNepaliDigits, type BSDate } from "@/lib/nepaliCalendar";
 import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
+import QuestionOfTheDay from "@/components/QuestionOfTheDay";
 
 // Ashad 7, 2082 BS ≈ June 22, 2026 AD
 const EXAM_DATE = new Date("2026-06-22T10:00:00+05:45");
@@ -65,6 +66,9 @@ const Index = () => {
       </section>
 
       <div className="container mx-auto px-4 py-8 space-y-10">
+        {/* Question of the Day - Loads First */}
+        <QuestionOfTheDay />
+
         {/* Quick Access */}
         <section>
           <h2 className="text-xl font-heading font-bold mb-4">⚡ Quick Access</h2>
