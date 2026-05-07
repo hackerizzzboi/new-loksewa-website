@@ -1,3 +1,5 @@
+// src/data/questions.ts
+
 export interface Question {
   id: string;
   question: string;
@@ -24,6 +26,10 @@ export function shuffleArray<T>(arr: T[]): T[] {
   }
   return a;
 }
+
+// ===== EXPORT ALL QUESTION BANKS =====
+export * from "./computer_operator";
+export * from "./online_exam";  // 👈 ADDED THIS LINE
 
 // ===== PRACTICE QUESTIONS BY SUBJECT =====
 
@@ -215,7 +221,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-8", title: "नागरिक लगानी कोष कम्प्युटर अपरेटर", year: "२०७६" },
   { id: "set-9", title: "निधि तथा कर्म संख्याको कोष", year: "२०७६" },
   { id: "set-10", title: "Nepal Army", year: "२०७४" },
-  
   // Sets 11-20
   { id: "set-11", title: "लोक सेवा आयोग सहायक कम्प्युटर अपरेटर", year: "२०७२" },
   { id: "set-12", title: "राष्ट्रिय बाणिज्य बैंक कम्प्युटर अपरेटर", year: "२०७४" },
@@ -227,7 +232,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-18", title: "लोक सेवा सहायक कम्प्युटर अपरेटर", year: "२०७४" },
   { id: "set-19", title: "कर्णाली कम्प्युटर अपरेटर", year: "२०७९-०२-१५" },
   { id: "set-20", title: "कर्णाली सहायक कम्प्युटर अपरेटर", year: "२०७९-०३-२९" },
-  
   // Sets 21-30
   { id: "set-21", title: "नेपाल आयल निगम कम्प्युटर अपरेटर", year: "२०७८" },
   { id: "set-22", title: "साझा यातायात कम्प्युटर अपरेटर", year: "२०७९" },
@@ -239,7 +243,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-28", title: "कम्प्युटर अपरेटर संसद", year: "२०७८" },
   { id: "set-29", title: "बागमती प्रदेश स.क.अ.", year: "२०७७" },
   { id: "set-30", title: "गण्डकी प्रदेश कम्प्युटर अपरेटर", year: "२०७८" },
-  
   // Sets 31-40
   { id: "set-31", title: "लुम्बिनी प्रदेश पाँचौं तह क.अ.", year: "२०८०" },
   { id: "set-32", title: "कोसी प्रदेश चौथो तह क.अ.", year: "२०८०" },
@@ -251,7 +254,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-38", title: "लोक सेवा स.क.अ.", year: "२०७५" },
   { id: "set-39", title: "लोक सेवा क.अ.", year: "२०७८" },
   { id: "set-40", title: "लोक सेवा क.अ.", year: "२०७५" },
-  
   // Sets 41-50
   { id: "set-41", title: "लोक सेवा क.अ.", year: "२०७३" },
   { id: "set-42", title: "बागमती प्रदेश क.अ.", year: "२०७७" },
@@ -263,7 +265,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-48", title: "चिया कफी विकास बोर्ड क.अ.", year: "२०७८" },
   { id: "set-49", title: "खाद्य संस्थान क.अ.", year: "२०७१" },
   { id: "set-50", title: "आयल निगम क.अ.", year: "२०७३" },
-  
   // Sets 51-60
   { id: "set-51", title: "KUKL क.अ.", year: "२०७८" },
   { id: "set-52", title: "KUKL क.अ.", year: "२०७७" },
@@ -275,7 +276,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-58", title: "सामाजिक सुरक्षा कोष स. क.अ.", year: "२०८१-०२-०२" },
   { id: "set-59", title: "संघीय लोक सेवा क.अ.", year: "२०८१-०२-०४" },
   { id: "set-60", title: "प्रदेश लोक सेवा कम्प्युटर अपरेटर", year: "२०८०" },
-  
   // Sets 61-74
   { id: "set-61", title: "कर्णाली प्रदेश स. क.अ.", year: "२०८१-०२-१२" },
   { id: "set-62", title: "संघीय लोक सेवा स. क.अ.", year: "२०८१-०३-०८" },
@@ -291,7 +291,6 @@ export const oldIsGoldSets: { id: string; title: string; year: string; isBonus?:
   { id: "set-72", title: "कम्प्युटर टेक्निसियन", year: "२०८२-०२-०७" },
   { id: "set-73", title: "कम्प्युटर अपरेटर संसद सेवा", year: "२०८२-०२-०९" },
   { id: "set-74", title: "कम्प्युटर अपरेटर राष्ट्रिय परीक्षा बोर्ड", year: "२०८२-०७-३०" },
-  
   // Bonus Sets (75-77)
   { id: "set-75", title: "⭐ Important Abbreviations (महत्त्वपूर्ण संक्षिप्त रुप)", year: "Reference", isBonus: true },
   { id: "set-76", title: "⭐ Important Keyboard Shortcuts (महत्त्वपूर्ण किबोर्ड सर्टकट)", year: "Reference", isBonus: true },
