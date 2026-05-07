@@ -5,6 +5,7 @@ import { practiceSubjects, motivationalQuotes } from "@/data/questions";
 import { calculateBSAge, bsMonthNames, toNepaliDigits, type BSDate } from "@/lib/nepaliCalendar";
 import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
 import QuestionOfTheDay from "@/components/QuestionOfTheDay";
+import StudyProgress from "@/components/StudyProgress";
 
 // Ashad 7, 2082 BS ≈ June 22, 2026 AD
 const EXAM_DATE = new Date("2026-06-22T10:00:00+05:45");
