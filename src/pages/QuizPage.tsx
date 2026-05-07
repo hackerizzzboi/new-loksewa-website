@@ -54,7 +54,6 @@ const QuizPage = () => {
     return "Quiz";
   }, [category, setId, customTitle]);
 
-  // Helper function for ordinal numbers
   const getOrdinal = (n: number): string => {
     if (n === 1) return "st";
     if (n === 2) return "nd";
@@ -90,10 +89,11 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
+      // FIXED: Load online exam questions
       if (setId.startsWith("exam-") || setId.startsWith("quiz-")) {
         const examQuestions = onlineExamQuestions[setId];
         if (examQuestions && examQuestions.length > 0) {
-          qs = shuffleArray([...examQuestions]);
+          qs = [...examQuestions];
           if (setId.startsWith("exam-")) {
             setTimeLeft(45 * 60);
           } else {
@@ -136,7 +136,6 @@ const QuizPage = () => {
 
   const handleSubmit = () => setShowResult(true);
 
-  // Calculate results
   const results = useMemo(() => {
     let correct = 0, wrong = 0, unanswered = 0;
     questions.forEach(q => {
@@ -301,22 +300,32 @@ const QuizPage = () => {
         <span className="text-sm font-semibold">{current + 1}/{questions.length}</span>
       </div>
 
-      {/* Question - Fixed with proper vertical stacking */}
+      {/* Question Section - SIMPLE VERTICAL OPTIONS */}
       <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
         <p className="font-bold text-lg mb-6">{current + 1}. {q.question}</p>
-        <div className="flex flex-col space-y-3">
+        <div className="space-y-3">
           {q.options.map((opt, i) => {
             const isSelected = answers[q.id] === i;
             return (
               <button
                 key={i}
                 onClick={() => handleAnswer(q.id, i)}
-                className={`quiz-option ${isSelected ? "quiz-option-selected" : ""}`}
+                className={`w-full text-left px-4 py-3 rounded-xl border transition-all duration-200 flex items-center gap-3 ${
+                  isSelected 
+                    ? "bg-gradient-to-r from-purple-600 to-blue-600 border-purple-600 text-white shadow-md" 
+                    : "bg-white border-gray-200 text-gray-800 hover:bg-gradient-to-r hover:from-purple-600 hover:to-blue-600 hover:text-white hover:border-purple-600 hover:shadow-md"
+                }`}
               >
-                <span>{String.fromCharCode(65 + i)}</span>
-                <span className="flex-1 text-left">{opt}</span>
+                <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
+                  isSelected 
+                    ? "bg-white/20 text-white" 
+                    : "bg-gray-100 text-gray-700 group-hover:bg-white/20 group-hover:text-white"
+                }`}>
+                  {String.fromCharCode(65 + i)}
+                </span>
+                <span className="flex-1">{opt}</span>
                 {isSelected && (
-                  <svg className="quiz-checkmark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
