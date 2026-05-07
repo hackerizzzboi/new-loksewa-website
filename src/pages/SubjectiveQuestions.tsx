@@ -2,8 +2,7 @@ import { useState } from "react";
 import { 
   BookOpen, Search, ChevronDown, ChevronUp, 
   Printer, FileText, Database, Presentation, 
-  Cpu, Monitor, HardDrive, GitBranch, Layers, 
-  Table2, FileSpreadsheet, FileCode, Wand2
+  Cpu, Monitor, GitBranch
 } from "lucide-react";
 
 const SubjectiveQuestions = () => {
@@ -134,7 +133,7 @@ const SubjectiveQuestions = () => {
     {
       id: "spreadsheet",
       title: "Spreadsheet",
-      icon: <FileSpreadsheet size={20} />,
+      icon: <Database size={20} />,
       iconBg: "from-green-500 to-teal-500",
       questions: [
         "What is chart? What are uses of chart?",
@@ -287,7 +286,7 @@ const SubjectiveQuestions = () => {
               {/* Questions List */}
               {openTopics[topic.id] && (
                 <div className="border-t border-gray-100">
-                  {/* Regular Questions */}
+                  {/* Regular Questions - No indent */}
                   {topic.questions.length > 0 && (
                     <div className="divide-y divide-gray-50">
                       {topic.questions.map((question, idx) => (
@@ -320,7 +319,7 @@ const SubjectiveQuestions = () => {
                     </div>
                   )}
 
-                  {/* Differentiate Section */}
+                  {/* Differentiate Section - WITH INDENT (pl-8 = tab space) */}
                   {topic.differentiate.length > 0 && (
                     <div className="mt-2">
                       {/* Differentiate Header */}
@@ -336,12 +335,12 @@ const SubjectiveQuestions = () => {
                         </div>
                       </div>
 
-                      {/* Differentiate Questions */}
+                      {/* Differentiate Questions - INDENTED (pl-8 = 2rem left padding) */}
                       <div className="divide-y divide-purple-50 bg-purple-50/20">
                         {topic.differentiate.map((diff, idx) => (
                           <div
                             key={`d-${idx}`}
-                            className="p-4 hover:bg-purple-50/40 transition-colors group"
+                            className="p-4 pl-8 hover:bg-purple-50/40 transition-colors group"
                           >
                             <div className="flex items-start gap-3">
                               <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold text-[11px] flex-shrink-0 mt-0.5">
@@ -420,12 +419,6 @@ const SubjectiveQuestions = () => {
             background: white !important;
             box-shadow: none !important;
             border: 1px solid #ddd !important;
-          }
-          .bg-gradient-to-r {
-            background: #f3f4f6 !important;
-          }
-          .text-gray-700, .text-gray-800 {
-            color: black !important;
           }
         }
       `}</style>
