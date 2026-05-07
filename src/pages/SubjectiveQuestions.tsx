@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { 
-  BookOpen, Search, ChevronRight, ChevronDown, 
+  BookOpen, Search, ChevronDown, ChevronUp, 
   Printer, FileText, Database, Presentation, 
-  Globe, Shield, HardDrive, Cpu, Monitor, Keyboard,
-  Menu, X, ChevronUp
+  Cpu, Monitor, HardDrive
 } from "lucide-react";
 
 const SubjectiveQuestions = () => {
@@ -45,15 +44,9 @@ const SubjectiveQuestions = () => {
         "Write advantages of multimedia.",
         "Importance of using Unicode encoding system.",
         "Define computer hardware with its types.",
-        "Differentiate Interpreter and Compiler."
-      ]
-    },
-    {
-      id: "differentiate",
-      title: "🔄 Differentiate",
-      icon: <Menu size={20} />,
-      color: "from-purple-500 to-pink-500",
-      questions: [
+        "Differentiate Interpreter and Compiler.",
+        "",
+        "🔄 DIFFERENTIATE",
         "Hardcopy and Softcopy output device",
         "Direct and indirect entry input device",
         "Impact and non impact printer",
@@ -123,14 +116,23 @@ const SubjectiveQuestions = () => {
         "Write about Security Features in MS Word.",
         "What are the advantages of mail merge? How can you use it?",
         "Write different security techniques available in MS Word.",
-        "What are the uses of watermark in MS Word?",
-        "Differentiate: Status Bar and Scroll bar, Menu bar and status bar, tab and indentation, hyperlink and bookmark, citation and bibliography, footnote and endnote, hyperlink and embedding, save and save as"
+        "What are the uses of watermark in MS Word.",
+        "",
+        "🔄 DIFFERENTIATE",
+        "Status Bar and Scroll bar",
+        "Menu bar and status bar",
+        "Tab and indentation",
+        "Hyperlink and bookmark",
+        "Citation and bibliography",
+        "Footnote and endnote",
+        "Hyperlink and embedding",
+        "Save and save as"
       ]
     },
     {
       id: "spreadsheet",
       title: "📊 Spreadsheet",
-      icon: <Database size={20} />,
+      icon: <HardDrive size={20} />,
       color: "from-green-500 to-teal-500",
       questions: [
         "What is chart? What are uses of chart?",
@@ -150,7 +152,14 @@ const SubjectiveQuestions = () => {
         "Write about what if analysis.",
         "Write about different types of referencing method in MS Excel.",
         "Write about different types of functions available in MS-excel.",
-        "Differentiate: formula and functions, relative and absolute cell reference, line chart and pie chart, auto filter and advanced filter, sort and subtotal, data table and scenario manager"
+        "",
+        "🔄 DIFFERENTIATE",
+        "Formula and functions",
+        "Relative and absolute cell reference",
+        "Line chart and pie chart",
+        "Auto filter and advanced filter",
+        "Sort and subtotal",
+        "Data table and scenario manager"
       ]
     },
     {
@@ -175,7 +184,11 @@ const SubjectiveQuestions = () => {
         "Write about formatting and validating data in MS Access.",
         "How can you create form and report in Access?",
         "Write down services provided by DBMS.",
-        "Differentiate: Table and queries, form and report, update query and make table query"
+        "",
+        "🔄 DIFFERENTIATE",
+        "Table and queries",
+        "Form and report",
+        "Update query and make table query"
       ]
     },
     {
@@ -196,7 +209,12 @@ const SubjectiveQuestions = () => {
         "What is Microsoft PowerPoint? What are it's importance? What are its uses/application in daily life?",
         "Explain the importance of presentation application for any organization.",
         "What do you mean by presentation software? Write any 4 features of PowerPoint. What are the uses of PowerPoint in education?",
-        "Differentiate: Slide Layout and Slide Design, Animation and Transition, Slide show view and slide sorter view, Slide Master and Handout Master"
+        "",
+        "🔄 DIFFERENTIATE",
+        "Slide Layout and Slide Design",
+        "Animation and Transition",
+        "Slide show view and slide sorter view",
+        "Slide Master and Handout Master"
       ]
     }
   ];
@@ -204,7 +222,7 @@ const SubjectiveQuestions = () => {
   const filteredTopics = topics.map(topic => ({
     ...topic,
     questions: topic.questions.filter(q => 
-      q.toLowerCase().includes(searchTerm.toLowerCase())
+      q && q.toLowerCase().includes(searchTerm.toLowerCase())
     )
   })).filter(topic => topic.questions.length > 0);
 
@@ -264,33 +282,45 @@ const SubjectiveQuestions = () => {
               {/* Questions List */}
               {openTopics[topic.id] && (
                 <div className="border-t border-gray-100 divide-y divide-gray-50">
-                  {topic.questions.map((question, idx) => (
-                    <div
-                      key={idx}
-                      className="p-4 hover:bg-blue-50/30 transition-colors group"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 mt-0.5">
-                          {idx + 1}
+                  {topic.questions.map((question, idx) => {
+                    if (question === "") return <div key={idx} className="h-2 bg-gradient-to-r from-gray-100 to-transparent my-1"></div>;
+                    if (question === "🔄 DIFFERENTIATE") {
+                      return (
+                        <div key={idx} className="p-3 bg-gradient-to-r from-purple-50 to-pink-50">
+                          <h3 className="text-md font-bold text-purple-700 flex items-center gap-2">
+                            <span className="text-xl">🔄</span> {question}
+                          </h3>
                         </div>
-                        <p className="text-gray-700 group-hover:text-gray-900 leading-relaxed flex-1">
-                          {question}
-                        </p>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(question);
-                            alert("Question copied to clipboard!");
-                          }}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-500"
-                          title="Copy to clipboard"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                          </svg>
-                        </button>
+                      );
+                    }
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 hover:bg-blue-50/30 transition-colors group"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0 mt-0.5">
+                            {topic.questions.filter(q => q && q !== "" && q !== "🔄 DIFFERENTIATE").indexOf(question) + 1}
+                          </div>
+                          <p className="text-gray-700 group-hover:text-gray-900 leading-relaxed flex-1">
+                            {question}
+                          </p>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(question);
+                              alert("Question copied to clipboard!");
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-gray-400 hover:text-blue-500"
+                            title="Copy to clipboard"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                            </svg>
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>
