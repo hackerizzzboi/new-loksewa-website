@@ -7,6 +7,22 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { exam1Questions } from "@/data/online_exam/exam1";
 import { exam2Questions } from "@/data/online_exam/exam2";
 import { exam3Questions } from "@/data/online_exam/exam3";
+import { exam4Questions } from "@/data/online_exam/exam4";
+import { exam5Questions } from "@/data/online_exam/exam5";
+import { exam6Questions } from "@/data/online_exam/exam6";
+import { exam7Questions } from "@/data/online_exam/exam7";
+import { exam8Questions } from "@/data/online_exam/exam8";
+import { exam9Questions } from "@/data/online_exam/exam9";
+import { exam10Questions } from "@/data/online_exam/exam10";
+import { exam11Questions } from "@/data/online_exam/exam11";
+import { exam12Questions } from "@/data/online_exam/exam12";
+import { exam13Questions } from "@/data/online_exam/exam13";
+import { exam14Questions } from "@/data/online_exam/exam14";
+import { exam15Questions } from "@/data/online_exam/exam15";
+import { quiz1Questions } from "@/data/online_exam/quiz1";
+import { quiz2Questions } from "@/data/online_exam/quiz2";
+import { quiz3Questions } from "@/data/online_exam/quiz3";
+import { quiz4Questions } from "@/data/online_exam/quiz4";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -41,6 +57,22 @@ const QuizPage = () => {
       if (setId === "exam-1") return "📝 1st Exam - Operator Sample Exam 2082";
       if (setId === "exam-2") return "📝 2nd Exam - Operator Sample Exam 2082";
       if (setId === "exam-3") return "📝 3rd Exam - Operator Sample Exam 2082";
+      if (setId === "exam-4") return "📝 4th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-5") return "📝 5th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-6") return "📝 6th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-7") return "📝 7th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-8") return "📝 8th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-9") return "📝 9th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-10") return "📝 10th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-11") return "📝 11th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-12") return "📝 12th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-13") return "📝 13th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-14") return "📝 14th Exam - Operator Sample Exam 2082";
+      if (setId === "exam-15") return "📝 15th Exam - Operator Sample Exam 2082";
+      if (setId === "quiz-1") return "📋 1st Quiz - Public Administration";
+      if (setId === "quiz-2") return "📋 2nd Quiz - Public Administration";
+      if (setId === "quiz-3") return "📋 3rd Quiz - Public Administration";
+      if (setId === "quiz-4") return "📋 4th Quiz - Public Administration";
       if (setId?.startsWith("exam-")) return "📝 Online Exam";
       if (setId?.startsWith("quiz-")) return "📋 Public Administration Quiz";
       const t = weeklyTests.find(t => t.id === setId);
@@ -72,7 +104,7 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // Handle exam-1, exam-2, and exam-3
+      // Handle all 15 exams and 4 quizzes
       if (setId === "exam-1") {
         qs = [...exam1Questions];
         setTimeLeft(45 * 60);
@@ -82,6 +114,54 @@ const QuizPage = () => {
       } else if (setId === "exam-3") {
         qs = [...exam3Questions];
         setTimeLeft(45 * 60);
+      } else if (setId === "exam-4") {
+        qs = [...exam4Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-5") {
+        qs = [...exam5Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-6") {
+        qs = [...exam6Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-7") {
+        qs = [...exam7Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-8") {
+        qs = [...exam8Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-9") {
+        qs = [...exam9Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-10") {
+        qs = [...exam10Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-11") {
+        qs = [...exam11Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-12") {
+        qs = [...exam12Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-13") {
+        qs = [...exam13Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-14") {
+        qs = [...exam14Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-15") {
+        qs = [...exam15Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "quiz-1") {
+        qs = [...quiz1Questions];
+        setTimeLeft(15 * 60);
+      } else if (setId === "quiz-2") {
+        qs = [...quiz2Questions];
+        setTimeLeft(15 * 60);
+      } else if (setId === "quiz-3") {
+        qs = [...quiz3Questions];
+        setTimeLeft(15 * 60);
+      } else if (setId === "quiz-4") {
+        qs = [...quiz4Questions];
+        setTimeLeft(15 * 60);
       } else {
         qs = [];
       }
@@ -147,8 +227,10 @@ const QuizPage = () => {
     const timeMinutes = isExam ? 45 : isQuiz ? 15 : 20;
     const marks = questionCount_text * 2;
     
-    // Check if questions exist
-    const hasQuestions = setId === "exam-1" || setId === "exam-2" || setId === "exam-3";
+    // Check if questions exist for this exam/quiz
+    const examIds = ["exam-1", "exam-2", "exam-3", "exam-4", "exam-5", "exam-6", "exam-7", "exam-8", "exam-9", "exam-10", "exam-11", "exam-12", "exam-13", "exam-14", "exam-15"];
+    const quizIds = ["quiz-1", "quiz-2", "quiz-3", "quiz-4"];
+    const hasQuestions = [...examIds, ...quizIds].includes(setId || "");
     
     if (!hasQuestions && (setId?.startsWith("exam-") || setId?.startsWith("quiz-"))) {
       return (
