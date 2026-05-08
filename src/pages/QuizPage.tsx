@@ -56,8 +56,9 @@ const QuizPage = () => {
         qs = shuffled.slice(0, questionCount);
       }
     } else if (category === "old-is-gold" && setId) {
-      if (setId === "set-1") {
-        qs = set1Questions.map(q => ({
+      // Set 4 has the real questions (नेपाल मानव अधिकार आयोग अपरेटर)
+      if (setId === "set-4") {
+        qs = set4Questions.map(q => ({
           id: q.id.toString(),
           question: q.text,
           options: q.options,
@@ -68,7 +69,6 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // FIXED: Direct check for exam-1
       if (setId === "exam-1") {
         qs = [...exam1Questions];
         setTimeLeft(45 * 60);
@@ -85,6 +85,10 @@ const QuizPage = () => {
     setIsLoading(false);
   }, [category, setId, questionCount]);
 
+  // Rest of the code remains the same...
+  // (Timer, handleAnswer, handleSubmit, results, etc. - keep everything else as is)
+
+  // ... (the rest of your component code stays exactly the same)
   // Timer
   useEffect(() => {
     if (!started || timeLeft === null || timeLeft <= 0 || showResult) return;
