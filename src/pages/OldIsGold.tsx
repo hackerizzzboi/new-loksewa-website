@@ -146,9 +146,9 @@ const OldIsGold = () => {
                     )}
                   </div>
 
-                  {/* Title - Big and Bold */}
+                  {/* Title - Big and Bold with Year */}
                   <h3 className="font-bold text-gray-800 text-lg md:text-xl mb-3 min-h-[64px] leading-snug group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-indigo-600 group-hover:to-purple-600 transition-all">
-                    {set.title}
+                    {set.title} {set.year !== "Reference" && `(${set.year})`}
                   </h3>
 
                   {/* Meta Info */}
