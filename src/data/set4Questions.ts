@@ -1,4 +1,4 @@
-// src/data/set1Questions.ts
+// src/data/set4Questions.ts
 
 export interface Question {
   id: number;
@@ -8,7 +8,7 @@ export interface Question {
   explanation: string;
 }
 
-export const set1Questions: Question[] = [
+export const set4Questions: Question[] = [
   {
     id: 1,
     text: "Which of the following is not one of the three 'Mail Merge Helper' steps?",
