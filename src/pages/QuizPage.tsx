@@ -5,6 +5,7 @@ import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operato
 import { set4Questions } from "@/data/set4Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 import { exam1Questions } from "@/data/online_exam/exam1";
+import { exam2Questions } from "@/data/online_exam/exam2";  // 👈 ADD THIS
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -37,6 +38,7 @@ const QuizPage = () => {
     if (category === "old-is-gold") return "🏆 Old is Gold";
     if (category === "online-exam") {
       if (setId === "exam-1") return "📝 1st Exam - Operator Sample Exam 2082";
+      if (setId === "exam-2") return "📝 2nd Exam - Operator Sample Exam 2082";  // 👈 ADD THIS
       if (setId?.startsWith("exam-")) return "📝 Online Exam";
       if (setId?.startsWith("quiz-")) return "📋 Public Administration Quiz";
       const t = weeklyTests.find(t => t.id === setId);
@@ -56,7 +58,6 @@ const QuizPage = () => {
         qs = shuffled.slice(0, questionCount);
       }
     } else if (category === "old-is-gold" && setId) {
-      // Set 4 has the real questions (नेपाल मानव अधिकार आयोग अपरेटर)
       if (setId === "set-4") {
         qs = set4Questions.map(q => ({
           id: q.id.toString(),
@@ -69,8 +70,12 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
+      // Handle exam-1 and exam-2
       if (setId === "exam-1") {
         qs = [...exam1Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-2") {  // 👈 ADD THIS
+        qs = [...exam2Questions];
         setTimeLeft(45 * 60);
       } else {
         qs = [];
@@ -85,10 +90,6 @@ const QuizPage = () => {
     setIsLoading(false);
   }, [category, setId, questionCount]);
 
-  // Rest of the code remains the same...
-  // (Timer, handleAnswer, handleSubmit, results, etc. - keep everything else as is)
-
-  // ... (the rest of your component code stays exactly the same)
   // Timer
   useEffect(() => {
     if (!started || timeLeft === null || timeLeft <= 0 || showResult) return;
@@ -142,7 +143,7 @@ const QuizPage = () => {
     const marks = questionCount_text * 2;
     
     // Check if questions exist
-    const hasQuestions = setId === "exam-1";
+    const hasQuestions = setId === "exam-1" || setId === "exam-2";  // 👈 UPDATE THIS
     
     if (!hasQuestions && (setId?.startsWith("exam-") || setId?.startsWith("quiz-"))) {
       return (
