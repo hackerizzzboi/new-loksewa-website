@@ -7,6 +7,7 @@ import { CheckCircle, XCircle } from "lucide-react";
 import { exam1Questions } from "@/data/online_exam/exam1";
 import { exam2Questions } from "@/data/online_exam/exam2";  // 👈 ADD THIS
 
+
 const QuizPage = () => {
   const { category, setId } = useParams();
   const navigate = useNavigate();
