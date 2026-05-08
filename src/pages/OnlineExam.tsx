@@ -3,21 +3,21 @@ import { Link } from "react-router-dom";
 const OnlineExam = () => {
   // Create exam data for 15 exams (English names)
   const exams = [
-    { id: 1, number: "1", name: "1st Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-blue-500 to-cyan-500", bgColor: "bg-gradient-to-br from-blue-50 to-cyan-50" },
-    { id: 2, number: "2", name: "2nd Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-indigo-500 to-purple-500", bgColor: "bg-gradient-to-br from-indigo-50 to-purple-50" },
-    { id: 3, number: "3", name: "3rd Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-purple-500 to-pink-500", bgColor: "bg-gradient-to-br from-purple-50 to-pink-50" },
-    { id: 4, number: "4", name: "4th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-pink-500 to-rose-500", bgColor: "bg-gradient-to-br from-pink-50 to-rose-50" },
-    { id: 5, number: "5", name: "5th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-red-500 to-orange-500", bgColor: "bg-gradient-to-br from-red-50 to-orange-50" },
-    { id: 6, number: "6", name: "6th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-orange-500 to-amber-500", bgColor: "bg-gradient-to-br from-orange-50 to-amber-50" },
-    { id: 7, number: "7", name: "7th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-amber-500 to-yellow-500", bgColor: "bg-gradient-to-br from-amber-50 to-yellow-50" },
-    { id: 8, number: "8", name: "8th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-yellow-500 to-lime-500", bgColor: "bg-gradient-to-br from-yellow-50 to-lime-50" },
-    { id: 9, number: "9", name: "9th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-lime-500 to-green-500", bgColor: "bg-gradient-to-br from-lime-50 to-green-50" },
-    { id: 10, number: "10", name: "10th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-green-500 to-emerald-500", bgColor: "bg-gradient-to-br from-green-50 to-emerald-50" },
-    { id: 11, number: "11", name: "11th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-emerald-500 to-teal-500", bgColor: "bg-gradient-to-br from-emerald-50 to-teal-50" },
-    { id: 12, number: "12", name: "12th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-teal-500 to-cyan-500", bgColor: "bg-gradient-to-br from-teal-50 to-cyan-50" },
-    { id: 13, number: "13", name: "13th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-cyan-500 to-sky-500", bgColor: "bg-gradient-to-br from-cyan-50 to-sky-50" },
-    { id: 14, number: "14", name: "14th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-sky-500 to-blue-500", bgColor: "bg-gradient-to-br from-sky-50 to-blue-50" },
-    { id: 15, number: "15", name: "15th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 50, color: "from-blue-500 to-indigo-500", bgColor: "bg-gradient-to-br from-blue-50 to-indigo-50" },
+    { id: 1, number: "1", name: "1st Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-blue-500 to-cyan-500", bgColor: "bg-gradient-to-br from-blue-50 to-cyan-50" },
+    { id: 2, number: "2", name: "2nd Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-indigo-500 to-purple-500", bgColor: "bg-gradient-to-br from-indigo-50 to-purple-50" },
+    { id: 3, number: "3", name: "3rd Exam", titleNp: "Operator Sample Exam 2082", questions: 30, time: 45, marks: 60, color: "from-purple-500 to-pink-500", bgColor: "bg-gradient-to-br from-purple-50 to-pink-50" },
+    { id: 4, number: "4", name: "4th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-pink-500 to-rose-500", bgColor: "bg-gradient-to-br from-pink-50 to-rose-50" },
+    { id: 5, number: "5", name: "5th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-red-500 to-orange-500", bgColor: "bg-gradient-to-br from-red-50 to-orange-50" },
+    { id: 6, number: "6", name: "6th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-orange-500 to-amber-500", bgColor: "bg-gradient-to-br from-orange-50 to-amber-50" },
+    { id: 7, number: "7", name: "7th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-amber-500 to-yellow-500", bgColor: "bg-gradient-to-br from-amber-50 to-yellow-50" },
+    { id: 8, number: "8", name: "8th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-yellow-500 to-lime-500", bgColor: "bg-gradient-to-br from-yellow-50 to-lime-50" },
+    { id: 9, number: "9", name: "9th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-lime-500 to-green-500", bgColor: "bg-gradient-to-br from-lime-50 to-green-50" },
+    { id: 10, number: "10", name: "10th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-green-500 to-emerald-500", bgColor: "bg-gradient-to-br from-green-50 to-emerald-50" },
+    { id: 11, number: "11", name: "11th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-emerald-500 to-teal-500", bgColor: "bg-gradient-to-br from-emerald-50 to-teal-50" },
+    { id: 12, number: "12", name: "12th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-teal-500 to-cyan-500", bgColor: "bg-gradient-to-br from-teal-50 to-cyan-50" },
+    { id: 13, number: "13", name: "13th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-cyan-500 to-sky-500", bgColor: "bg-gradient-to-br from-cyan-50 to-sky-50" },
+    { id: 14, number: "14", name: "14th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-sky-500 to-blue-500", bgColor: "bg-gradient-to-br from-sky-50 to-blue-50" },
+    { id: 15, number: "15", name: "15th Exam", titleNp: "Operator Sample Exam 2082", questions: 50, time: 45, marks: 100, color: "from-blue-500 to-indigo-500", bgColor: "bg-gradient-to-br from-blue-50 to-indigo-50" },
   ];
 
   // Quiz data for 4 quizzes
