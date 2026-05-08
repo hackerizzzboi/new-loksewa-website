@@ -5,8 +5,8 @@ import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operato
 import { set4Questions } from "@/data/set4Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 import { exam1Questions } from "@/data/online_exam/exam1";
-import { exam2Questions } from "@/data/online_exam/exam2";  // 👈 ADD THIS
-
+import { exam2Questions } from "@/data/online_exam/exam2";
+import { exam3Questions } from "@/data/online_exam/exam3";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -39,7 +39,8 @@ const QuizPage = () => {
     if (category === "old-is-gold") return "🏆 Old is Gold";
     if (category === "online-exam") {
       if (setId === "exam-1") return "📝 1st Exam - Operator Sample Exam 2082";
-      if (setId === "exam-2") return "📝 2nd Exam - Operator Sample Exam 2082";  // 👈 ADD THIS
+      if (setId === "exam-2") return "📝 2nd Exam - Operator Sample Exam 2082";
+      if (setId === "exam-3") return "📝 3rd Exam - Operator Sample Exam 2082";
       if (setId?.startsWith("exam-")) return "📝 Online Exam";
       if (setId?.startsWith("quiz-")) return "📋 Public Administration Quiz";
       const t = weeklyTests.find(t => t.id === setId);
@@ -71,12 +72,15 @@ const QuizPage = () => {
         qs = getOldIsGoldQuestions(setId);
       }
     } else if (category === "online-exam" && setId) {
-      // Handle exam-1 and exam-2
+      // Handle exam-1, exam-2, and exam-3
       if (setId === "exam-1") {
         qs = [...exam1Questions];
         setTimeLeft(45 * 60);
-      } else if (setId === "exam-2") {  // 👈 ADD THIS
+      } else if (setId === "exam-2") {
         qs = [...exam2Questions];
+        setTimeLeft(45 * 60);
+      } else if (setId === "exam-3") {
+        qs = [...exam3Questions];
         setTimeLeft(45 * 60);
       } else {
         qs = [];
@@ -144,7 +148,7 @@ const QuizPage = () => {
     const marks = questionCount_text * 2;
     
     // Check if questions exist
-    const hasQuestions = setId === "exam-1" || setId === "exam-2";  // 👈 UPDATE THIS
+    const hasQuestions = setId === "exam-1" || setId === "exam-2" || setId === "exam-3";
     
     if (!hasQuestions && (setId?.startsWith("exam-") || setId?.startsWith("quiz-"))) {
       return (
