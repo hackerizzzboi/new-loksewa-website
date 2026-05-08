@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { getOldIsGoldQuestions, getWeeklyTestQuestions, weeklyTests, practiceSubjects, type Question } from "@/data/questions";
 import { computerOperatorQuestions, shuffleArray } from "@/data/computer_operator";
-import { set1Questions } from "@/data/set1Questions";
+import { set4Questions } from "@/data/set4Questions";
 import { CheckCircle, XCircle } from "lucide-react";
 import { exam1Questions } from "@/data/online_exam/exam1";
 
