@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Layout from "@/components/Layout";
 import Index from "./pages/Index";
 import Practice from "./pages/Practice";
@@ -121,6 +122,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
+        <SpeedInsights />
         <BrowserRouter>
           <AppContent />
         </BrowserRouter>
