@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, BookOpen } from "lucide-react";
+import { Menu, X, BookOpen, LogIn, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const navItems = [
   { label: "Home", path: "/", icon: "🏠" },
@@ -18,6 +20,13 @@ const Navbar = () => {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Signed out");
+    navigate("/");
+  };
 
   return (
     <nav className="nav-gradient sticky top-0 z-50 shadow-lg">
@@ -46,6 +55,22 @@ const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-2 text-nav-foreground">
+            {user ? (
+              <button
+                onClick={handleSignOut}
+                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium transition"
+                title={user.email || ""}
+              >
+                <LogOut size={14} /> Sign out
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/auth')}
+                className="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium transition"
+              >
+                <LogIn size={14} /> Sign in
+              </button>
+            )}
             <button
               onClick={() => navigate('/portfolio')}
               className="bg-gradient-to-r from-purple-600 to-red-600 px-4 py-1.5 rounded-full text-sm font-medium hover:scale-105 transition-all duration-300 shadow-lg cursor-pointer text-white"
@@ -76,6 +101,21 @@ const Navbar = () => {
                 {item.icon} {item.label}
               </Link>
             ))}
+            {user ? (
+              <button
+                onClick={() => { setOpen(false); handleSignOut(); }}
+                className="w-full mt-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-white/10 text-nav-foreground flex items-center justify-center gap-2"
+              >
+                <LogOut size={16} /> Sign out
+              </button>
+            ) : (
+              <button
+                onClick={() => { setOpen(false); navigate('/auth'); }}
+                className="w-full mt-2 px-4 py-2.5 rounded-lg text-sm font-medium bg-white/10 text-nav-foreground flex items-center justify-center gap-2"
+              >
+                <LogIn size={16} /> Sign in
+              </button>
+            )}
             <button
               onClick={() => {
                 setOpen(false);
