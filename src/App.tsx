@@ -19,7 +19,10 @@ import Notes from "./pages/Notes";
 import Downloads from "./pages/Downloads";
 import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 import NepalLoadingScreen from "./components/NepalLoadingScreen";
+import { AuthProvider } from "./hooks/useAuth";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -96,14 +99,15 @@ const AppContent = () => {
               </AdminGuard>
             } 
           />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/portfolio" element={<Portfolio />} />
           <Route element={<Layout />}>
             <Route path="/" element={<Index />} />
-            <Route path="/practice" element={<Practice />} />
-            <Route path="/quiz/:category/:setId?" element={<QuizPage />} />
-            <Route path="/old-is-gold" element={<OldIsGold />} />
-            <Route path="/online-exam" element={<OnlineExam />} />
-            <Route path="/subjective" element={<SubjectiveQuestions />} />
+            <Route path="/practice" element={<ProtectedRoute><Practice /></ProtectedRoute>} />
+            <Route path="/quiz/:category/:setId?" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+            <Route path="/old-is-gold" element={<ProtectedRoute><OldIsGold /></ProtectedRoute>} />
+            <Route path="/online-exam" element={<ProtectedRoute><OnlineExam /></ProtectedRoute>} />
+            <Route path="/subjective" element={<ProtectedRoute><SubjectiveQuestions /></ProtectedRoute>} />
             <Route path="/syllabus" element={<Syllabus />} />
             <Route path="/typing" element={<TypingPractice />} />
             <Route path="/notes" element={<Notes />} />
@@ -122,7 +126,9 @@ const App = () => {
       <TooltipProvider>
         <Sonner />
         <BrowserRouter>
-          <AppContent />
+          <AuthProvider>
+            <AppContent />
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
