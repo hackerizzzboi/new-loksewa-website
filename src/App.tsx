@@ -20,6 +20,8 @@ import Downloads from "./pages/Downloads";
 import Portfolio from "./pages/Portfolio";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import Leaderboard from "./pages/Leaderboard";
 import NepalLoadingScreen from "./components/NepalLoadingScreen";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -108,6 +110,8 @@ const AppContent = () => {
             <Route path="/old-is-gold" element={<ProtectedRoute><OldIsGold /></ProtectedRoute>} />
             <Route path="/online-exam" element={<ProtectedRoute><OnlineExam /></ProtectedRoute>} />
             <Route path="/subjective" element={<ProtectedRoute><SubjectiveQuestions /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
             <Route path="/syllabus" element={<Syllabus />} />
             <Route path="/typing" element={<TypingPractice />} />
             <Route path="/notes" element={<Notes />} />
