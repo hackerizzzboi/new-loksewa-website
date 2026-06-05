@@ -215,8 +215,32 @@ const QuizPage = () => {
     return { correct, wrong, unanswered, marks: Math.max(0, marks), total, percentage };
   }, [questions, answers, category]);
 
+  // Save attempt to database when results are shown
+  const [savedAttempt, setSavedAttempt] = useState(false);
+  useEffect(() => {
+    if (!showResult || savedAttempt || !user || questions.length === 0) return;
+    setSavedAttempt(true);
+    (async () => {
+      const { error } = await supabase.from("exam_attempts").insert({
+        user_id: user.id,
+        exam_type: category || "quiz",
+        category: category || null,
+        set_id: setId || null,
+        title: title,
+        score: Math.round(results.marks * 10) / 10,
+        total_questions: questions.length,
+        correct_count: results.correct,
+        wrong_count: results.wrong,
+        skipped_count: results.unanswered,
+        answers: answers as any,
+      });
+      if (error) console.error("Failed to save attempt:", error);
+    })();
+  }, [showResult, savedAttempt, user, questions.length, category, setId, title, results, answers]);
+
   const q = questions[current];
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+
 
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8 text-center">Loading questions...</div>;
