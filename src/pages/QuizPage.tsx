@@ -23,9 +23,14 @@ import { quiz1Questions } from "@/data/online_exam/quiz1";
 import { quiz2Questions } from "@/data/online_exam/quiz2";
 import { quiz3Questions } from "@/data/online_exam/quiz3";
 import { quiz4Questions } from "@/data/online_exam/quiz4";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [questions, setQuestions] = useState<Question[]>([]);
