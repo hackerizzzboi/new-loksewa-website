@@ -9,7 +9,9 @@ const navItems = [
   { label: "MCQ", path: "/practice", icon: "❓" },
   { label: "Old Sets", path: "/old-is-gold", icon: "🏆" },
   { label: "Online Exam", path: "/online-exam", icon: "📝" },
-  { label: "Subjective", path: "/subjective", icon: "📖" },  // 👈 ADD THIS
+  { label: "Subjective", path: "/subjective", icon: "📖" },
+  { label: "Dashboard", path: "/dashboard", icon: "📊" },
+  { label: "Leaderboard", path: "/leaderboard", icon: "🏅" },
   { label: "Syllabus", path: "/syllabus", icon: "📋" },
   { label: "Typing", path: "/typing", icon: "⌨️" },
   { label: "Notes", path: "/notes", icon: "📒" },
