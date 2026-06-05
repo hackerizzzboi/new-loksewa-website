@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      custom_exams: {
+        Row: {
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_published: boolean
+          question_ids: Json
+          time_limit_minutes: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          question_ids?: Json
+          time_limit_minutes?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_published?: boolean
+          question_ids?: Json
+          time_limit_minutes?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      custom_mcqs: {
+        Row: {
+          category: string | null
+          correct_index: number
+          created_at: string
+          created_by: string | null
+          explanation: string | null
+          id: string
+          is_published: boolean
+          options: Json
+          question: string
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          correct_index?: number
+          created_at?: string
+          created_by?: string | null
+          explanation?: string | null
+          id?: string
+          is_published?: boolean
+          options?: Json
+          question: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          correct_index?: number
+          created_at?: string
+          created_by?: string | null
+          explanation?: string | null
+          id?: string
+          is_published?: boolean
+          options?: Json
+          question?: string
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       exam_attempts: {
         Row: {
           answers: Json | null
