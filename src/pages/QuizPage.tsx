@@ -227,7 +227,7 @@ const QuizPage = () => {
         category: category || null,
         set_id: setId || null,
         title: title,
-        score: Math.round(results.marks * 10) / 10,
+        score: Math.round(results.marks),
         total_questions: questions.length,
         correct_count: results.correct,
         wrong_count: results.wrong,
