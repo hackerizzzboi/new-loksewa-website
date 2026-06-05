@@ -22,6 +22,8 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Leaderboard from "./pages/Leaderboard";
+import AdminPanel from "./pages/AdminPanel";
+import CloudAdminGuard from "./components/CloudAdminGuard";
 import NepalLoadingScreen from "./components/NepalLoadingScreen";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -100,6 +102,14 @@ const AppContent = () => {
                 <Admin />
               </AdminGuard>
             } 
+          />
+          <Route
+            path="/admin-panel"
+            element={
+              <CloudAdminGuard>
+                <AdminPanel />
+              </CloudAdminGuard>
+            }
           />
           <Route path="/auth" element={<Auth />} />
           <Route path="/portfolio" element={<Portfolio />} />
