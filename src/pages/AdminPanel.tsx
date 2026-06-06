@@ -373,18 +373,28 @@ const ExamsTab = () => {
 };
 
 // ──────────────── STATS ────────────────
-const StatsTab = () => {
-  const [attempts, setAttempts] = useState<AttemptRow[]>([]);
-  const [loading, setLoading] = useState(true);
+interface AttemptWithUser extends AttemptRow { id?: string; full_name?: string; }
 
-  useEffect(() => {
-    (async () => {
-      const { data, error } = await supabase.from("exam_attempts").select("*").order("created_at", { ascending: false }).limit(1000);
-      if (error) toast.error(error.message);
-      setAttempts((data || []) as any);
-      setLoading(false);
-    })();
-  }, []);
+const StatsTab = () => {
+  const [attempts, setAttempts] = useState<AttemptWithUser[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [days, setDays] = useState(30);
+
+  const load = async () => {
+    setLoading(true);
+    const since = new Date(Date.now() - days * 86400000).toISOString();
+    const [{ data: atts, error }, { data: profs }] = await Promise.all([
+      supabase.from("exam_attempts").select("*").gte("created_at", since).order("created_at", { ascending: false }).limit(1000),
+      supabase.from("profiles").select("id, full_name"),
+    ]);
+    if (error) toast.error(error.message);
+    const nameMap = new Map((profs || []).map((p: any) => [p.id, p.full_name || "Anonymous"]));
+    setAttempts(((atts || []) as any[]).map((a) => ({ ...a, full_name: nameMap.get(a.user_id) || "Anonymous" })));
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [days]);
 
   const overall = useMemo(() => {
     const total = attempts.length;
@@ -394,39 +404,50 @@ const StatsTab = () => {
     return { total, users, avg, passRate: total ? (passed / total) * 100 : 0 };
   }, [attempts]);
 
-  // Per-question stats: aggregate correctness from answers JSON
-  const perQuestion = useMemo(() => {
-    const map = new Map<string, { qText: string; correct: number; wrong: number; skipped: number; }>();
-    attempts.forEach(a => {
-      const ans = a.answers || {};
-      // answers is { [qId]: optIndex | null }; we don't know correct here.
-      // Instead, group attempts by exam title and tally aggregate.
-      Object.keys(ans).forEach(qid => {
-        const cur = map.get(qid) || { qText: qid, correct: 0, wrong: 0, skipped: 0 };
-        if (ans[qid] === null || ans[qid] === undefined) cur.skipped++;
-        map.set(qid, cur);
-      });
-    });
-    return Array.from(map.entries()).slice(0, 50);
-  }, [attempts]);
-
   const byExam = useMemo(() => {
-    const map = new Map<string, { title: string; n: number; avg: number; }>();
+    const map = new Map<string, { title: string; n: number; sum: number; top: number }>();
     attempts.forEach(a => {
       const key = a.title || a.exam_type;
       const pct = a.total_questions ? (a.score / (a.total_questions * 2)) * 100 : 0;
-      const cur = map.get(key) || { title: key, n: 0, avg: 0 };
-      cur.avg = (cur.avg * cur.n + pct) / (cur.n + 1);
-      cur.n++;
+      const cur = map.get(key) || { title: key, n: 0, sum: 0, top: 0 };
+      cur.sum += pct; cur.n++; cur.top = Math.max(cur.top, pct);
       map.set(key, cur);
     });
-    return Array.from(map.values()).sort((a, b) => b.n - a.n);
+    return Array.from(map.values()).map(r => ({ ...r, avg: r.sum / r.n })).sort((a, b) => b.n - a.n);
   }, [attempts]);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return attempts;
+    return attempts.filter(a =>
+      (a.full_name || "").toLowerCase().includes(q) ||
+      (a.title || "").toLowerCase().includes(q)
+    );
+  }, [attempts, search]);
+
+  const deleteAttempt = async (id?: string) => {
+    if (!id) return;
+    if (!confirm("Delete this attempt? This cannot be undone.")) return;
+    const { error } = await supabase.from("exam_attempts").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Attempt deleted");
+    load();
+  };
 
   if (loading) return <p className="text-center py-12">Loading stats…</p>;
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-2 flex-wrap">
+        <select value={days} onChange={e => setDays(parseInt(e.target.value))} className="px-3 py-2 rounded-lg border bg-background text-sm">
+          <option value={7}>Last 7 days</option>
+          <option value={30}>Last 30 days</option>
+          <option value={90}>Last 90 days</option>
+          <option value={365}>Last year</option>
+        </select>
+        <button onClick={load} className="px-3 py-2 rounded-lg border bg-background text-sm hover:bg-muted">↻ Refresh</button>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Total Attempts" value={overall.total} />
         <StatCard label="Unique Users" value={overall.users} />
@@ -435,18 +456,20 @@ const StatsTab = () => {
       </div>
 
       <div className="bg-card rounded-2xl shadow-sm p-5">
-        <h3 className="font-bold mb-3">📚 By Exam</h3>
-        <div className="overflow-x-auto">
+        <h3 className="font-bold mb-3">📚 By Exam ({byExam.length})</h3>
+        <div className="overflow-x-auto max-h-80">
           <table className="w-full text-sm">
-            <thead className="text-left text-muted-foreground border-b">
-              <tr><th className="py-2">Exam</th><th className="py-2 text-center">Attempts</th><th className="py-2 text-center">Avg %</th></tr>
+            <thead className="text-left text-muted-foreground border-b sticky top-0 bg-card">
+              <tr><th className="py-2">Exam</th><th className="py-2 text-center">Attempts</th><th className="py-2 text-center">Avg %</th><th className="py-2 text-center">Top %</th></tr>
             </thead>
             <tbody>
+              {byExam.length === 0 && <tr><td colSpan={4} className="text-center text-muted-foreground py-4">No data in this period.</td></tr>}
               {byExam.map((r) => (
                 <tr key={r.title} className="border-b">
-                  <td className="py-2">{r.title}</td>
+                  <td className="py-2 pr-2">{r.title}</td>
                   <td className="py-2 text-center">{r.n}</td>
-                  <td className={`py-2 text-center font-bold ${r.avg >= 40 ? "text-green-600" : "text-red-600"}`}>{r.avg.toFixed(1)}%</td>
+                  <td className={`py-2 text-center font-semibold ${r.avg >= 40 ? "text-green-600" : "text-red-600"}`}>{r.avg.toFixed(1)}%</td>
+                  <td className="py-2 text-center text-yellow-600 font-semibold">{r.top.toFixed(1)}%</td>
                 </tr>
               ))}
             </tbody>
@@ -455,22 +478,53 @@ const StatsTab = () => {
       </div>
 
       <div className="bg-card rounded-2xl shadow-sm p-5">
-        <h3 className="font-bold mb-3">❓ Per-Question Skip Rate (top 50)</h3>
-        <p className="text-xs text-muted-foreground mb-3">Number of times each question was left unanswered across all attempts.</p>
-        <div className="overflow-x-auto max-h-96">
+        <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
+          <h3 className="font-bold">📜 Recent Attempts ({filtered.length})</h3>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search user or exam…"
+            className="px-3 py-1.5 rounded-lg border bg-background text-sm w-56"
+          />
+        </div>
+        <div className="overflow-x-auto max-h-[28rem]">
           <table className="w-full text-sm">
             <thead className="text-left text-muted-foreground border-b sticky top-0 bg-card">
-              <tr><th className="py-2">Question ID</th><th className="py-2 text-center">Skipped</th></tr>
+              <tr>
+                <th className="py-2">User</th>
+                <th className="py-2">Exam</th>
+                <th className="py-2 text-center">Score</th>
+                <th className="py-2 text-center">%</th>
+                <th className="py-2 text-center">C / W / S</th>
+                <th className="py-2">When</th>
+                <th className="py-2"></th>
+              </tr>
             </thead>
             <tbody>
-              {perQuestion.map(([qid, s]) => (
-                <tr key={qid} className="border-b">
-                  <td className="py-2 font-mono text-xs">{qid}</td>
-                  <td className="py-2 text-center">{s.skipped}</td>
-                </tr>
-              ))}
+              {filtered.length === 0 && <tr><td colSpan={7} className="text-center text-muted-foreground py-6">No attempts found.</td></tr>}
+              {filtered.slice(0, 200).map((a, idx) => {
+                const pct = a.total_questions ? (a.score / (a.total_questions * 2)) * 100 : 0;
+                return (
+                  <tr key={(a.id || "") + idx} className="border-b hover:bg-muted/30">
+                    <td className="py-2 pr-2 font-medium">{a.full_name}</td>
+                    <td className="py-2 pr-2 truncate max-w-[14rem]" title={a.title || ""}>{a.title || a.exam_type}</td>
+                    <td className="py-2 text-center">{a.score}/{(a.total_questions || 0) * 2}</td>
+                    <td className={`py-2 text-center font-semibold ${pct >= 40 ? "text-green-600" : "text-red-600"}`}>{pct.toFixed(1)}%</td>
+                    <td className="py-2 text-center text-xs">
+                      <span className="text-green-600">{a.correct_count}</span> / <span className="text-red-600">{a.wrong_count}</span> / <span className="text-muted-foreground">{a.skipped_count}</span>
+                    </td>
+                    <td className="py-2 text-xs text-muted-foreground whitespace-nowrap">{new Date(a.created_at).toLocaleString()}</td>
+                    <td className="py-2 text-right">
+                      <button onClick={() => deleteAttempt(a.id)} className="p-1.5 hover:bg-red-50 text-red-600 rounded" title="Delete attempt">
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
+          {filtered.length > 200 && <p className="text-xs text-muted-foreground text-center pt-2">Showing first 200 of {filtered.length}. Use search to narrow.</p>}
         </div>
       </div>
     </div>
