@@ -25,6 +25,7 @@ import { quiz3Questions } from "@/data/online_exam/quiz3";
 import { quiz4Questions } from "@/data/online_exam/quiz4";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import SetRanking from "@/components/SetRanking";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -313,6 +314,9 @@ const QuizPage = () => {
             <div className="bg-muted rounded-xl p-3"><p className="text-2xl font-bold">{results.unanswered}</p><p>Unanswered</p></div>
           </div>
         </div>
+
+        {setId && <SetRanking setId={setId} currentScore={Math.round(results.marks)} />}
+
 
         <h2 className="text-lg font-heading font-bold mb-4">📋 Review Answers</h2>
         <div className="space-y-4">
