@@ -196,6 +196,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_leaderboard: {
+        Args: never
+        Returns: {
+          attempts: number
+          avg_pct: number
+          best_pct: number
+          full_name: string
+          total_score: number
+          user_id: string
+        }[]
+      }
+      get_set_ranking: {
+        Args: { _set_id: string }
+        Returns: {
+          attempts: number
+          best_pct: number
+          best_score: number
+          full_name: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

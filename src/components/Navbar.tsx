@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, BookOpen, LogIn, LogOut } from "lucide-react";
+import { Menu, X, BookOpen, LogIn, LogOut, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { toast } from "sonner";
 
 const navItems = [
@@ -23,6 +24,7 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const isAdmin = useIsAdmin();
 
   const handleSignOut = async () => {
     await signOut();
@@ -57,6 +59,14 @@ const Navbar = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-2 text-nav-foreground">
+            {isAdmin && (
+              <button
+                onClick={() => navigate('/admin-panel')}
+                className="flex items-center gap-1.5 bg-yellow-500/20 hover:bg-yellow-500/30 px-3 py-1.5 rounded-full text-sm font-medium transition border border-yellow-400/30"
+              >
+                <Shield size={14} /> Admin
+              </button>
+            )}
             {user ? (
               <button
                 onClick={handleSignOut}
