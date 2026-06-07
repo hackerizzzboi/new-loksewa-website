@@ -11,7 +11,7 @@ const navItems = [
   { label: "Old Sets", path: "/old-is-gold", icon: "🏆" },
   { label: "Online Exam", path: "/online-exam", icon: "📝" },
   { label: "Subjective", path: "/subjective", icon: "📖" },
-  { label: "Dashboard", path: "/dashboard", icon: "📊" },
+  
   { label: "Leaderboard", path: "/leaderboard", icon: "🏅" },
   { label: "Syllabus", path: "/syllabus", icon: "📋" },
   { label: "Typing", path: "/typing", icon: "⌨️" },

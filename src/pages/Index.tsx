@@ -6,6 +6,8 @@ import { calculateBSAge, bsMonthNames, toNepaliDigits, type BSDate } from "@/lib
 import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
 import QuestionOfTheDay from "@/components/QuestionOfTheDay";
 import StudyProgress from "@/components/StudyProgress";
+import PersonalizedDashboard from "@/components/PersonalizedDashboard";
+import { useAuth } from "@/hooks/useAuth";
 
 // Ashad 7, 2082 BS ≈ June 22, 2026 AD
 const EXAM_DATE = new Date("2026-06-22T10:00:00+05:45");
@@ -32,6 +34,7 @@ const importantLinks = [
 const Index = () => {
   const { timeStr, dateStr, bsDate } = useNepalTime();
   const countdown = useCountdown(EXAM_DATE);
+  const { user } = useAuth();
   const quote = useMemo(() => motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)], []);
 
   // BS Age converter
@@ -68,8 +71,12 @@ const Index = () => {
       </section>
 
       <div className="container mx-auto px-4 py-8 space-y-10">
-        {/* Question of the Day - Loads First */}
+        {/* Personalized snapshot (only when signed in) */}
+        {user && <PersonalizedDashboard />}
+
+        {/* Question of the Day */}
         <QuestionOfTheDay />
+
 
         {/* Quick Access */}
         <section>
