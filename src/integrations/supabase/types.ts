@@ -95,6 +95,74 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_mcq_responses: {
+        Row: {
+          created_at: string
+          daily_mcq_id: string
+          id: string
+          is_correct: boolean
+          selected_index: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_mcq_id: string
+          id?: string
+          is_correct: boolean
+          selected_index: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_mcq_id?: string
+          id?: string
+          is_correct?: boolean
+          selected_index?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_mcq_responses_daily_mcq_id_fkey"
+            columns: ["daily_mcq_id"]
+            isOneToOne: false
+            referencedRelation: "daily_mcqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_mcqs: {
+        Row: {
+          correct_index: number
+          created_at: string
+          created_by: string | null
+          explanation: string | null
+          for_date: string
+          id: string
+          options: Json
+          question: string
+        }
+        Insert: {
+          correct_index: number
+          created_at?: string
+          created_by?: string | null
+          explanation?: string | null
+          for_date?: string
+          id?: string
+          options: Json
+          question: string
+        }
+        Update: {
+          correct_index?: number
+          created_at?: string
+          created_by?: string | null
+          explanation?: string | null
+          for_date?: string
+          id?: string
+          options?: Json
+          question?: string
+        }
+        Relationships: []
+      }
       exam_attempts: {
         Row: {
           answers: Json | null
@@ -150,29 +218,59 @@ export type Database = {
         Row: {
           avatar_url: string | null
           created_at: string
+          current_streak: number
           full_name: string | null
           id: string
           is_online: boolean | null
           last_active: string | null
+          last_attempt_date: string | null
+          longest_streak: number
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
+          current_streak?: number
           full_name?: string | null
           id: string
           is_online?: boolean | null
           last_active?: string | null
+          last_attempt_date?: string | null
+          longest_streak?: number
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
+          current_streak?: number
           full_name?: string | null
           id?: string
           is_online?: boolean | null
           last_active?: string | null
+          last_attempt_date?: string | null
+          longest_streak?: number
           updated_at?: string
+        }
+        Relationships: []
+      }
+      user_badges: {
+        Row: {
+          awarded_at: string
+          badge_code: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          badge_code: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          badge_code?: string
+          id?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -202,6 +300,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_daily_mcq_responders: {
+        Args: { _mcq_id: string }
+        Returns: {
+          created_at: string
+          full_name: string
+          is_correct: boolean
+          selected_index: number
+          user_id: string
+        }[]
+      }
       get_leaderboard: {
         Args: never
         Returns: {
@@ -223,12 +331,33 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_today_daily_mcq: {
+        Args: never
+        Returns: {
+          correct_index: number
+          correct_responses: number
+          explanation: string
+          id: string
+          my_correct: boolean
+          my_selected: number
+          options: Json
+          question: string
+          total_responses: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
         Returns: boolean
+      }
+      update_streak: {
+        Args: never
+        Returns: {
+          current_streak: number
+          longest_streak: number
+        }[]
       }
     }
     Enums: {
