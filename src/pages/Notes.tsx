@@ -1,4 +1,8 @@
 import { useState, useEffect } from "react";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useAuth } from "@/hooks/useAuth";
+import { Lock, Shield } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface Note {
   id: string;
@@ -16,6 +20,8 @@ const defaultNotes: Note[] = [
 ];
 
 const Notes = () => {
+  const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const [notes, setNotes] = useState<Note[]>(() => {
     const saved = localStorage.getItem("loksewa-notes");
     return saved ? JSON.parse(saved) : defaultNotes;
@@ -57,26 +63,35 @@ const Notes = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 animate-fade-in">
-      <h1 className="text-2xl font-heading font-bold mb-2">📒 Notes</h1>
-      <p className="text-muted-foreground mb-6">आफ्ना नोट्स राख्नुहोस् र अध्ययन गर्नुहोस्।</p>
-
-      {/* Add/Edit */}
-      <div className="bg-card rounded-2xl shadow-md p-6 mb-6">
-        <h2 className="font-heading font-bold mb-3">{editing ? "✏️ Edit Note" : "➕ Add New Note"}</h2>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Note title..." className="w-full p-3 rounded-xl border bg-background mb-3 text-sm" />
-        <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write your notes here..." className="w-full p-3 rounded-xl border bg-background mb-3 text-sm resize-none h-32" />
-        <div className="flex gap-3">
-          <select value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 rounded-xl border bg-background text-sm">
-            {["General", "Computer", "Networking", "Excel", "Word", "Shortcuts", "Legislation", "GK", "OS"].map(c => (
-              <option key={c} value={c}>{c}</option>
-            ))}
-          </select>
-          <button onClick={saveNote} className="bg-primary text-primary-foreground px-6 py-2 rounded-xl font-semibold hover:opacity-90 transition-opacity">
-            {editing ? "Update" : "Save"}
-          </button>
-          {editing && <button onClick={() => { setEditing(null); setTitle(""); setContent(""); }} className="bg-muted px-4 py-2 rounded-xl">Cancel</button>}
-        </div>
+      <div className="flex items-center justify-between flex-wrap gap-2 mb-2">
+        <h1 className="text-2xl font-heading font-bold">📒 Notes</h1>
+        {isAdmin && <span className="text-xs bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1"><Shield size={12} /> Admin mode</span>}
       </div>
+      <p className="text-muted-foreground mb-6">अध्ययन सामग्री — only admin can add/edit notes.</p>
+
+      {/* Add/Edit — admin only */}
+      {isAdmin ? (
+        <div className="bg-card rounded-2xl shadow-md p-6 mb-6 border-2 border-yellow-300/40">
+          <h2 className="font-heading font-bold mb-3">{editing ? "✏️ Edit Note" : "➕ Add New Note"}</h2>
+          <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Note title..." className="w-full p-3 rounded-xl border bg-background mb-3 text-sm" />
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write your notes here..." className="w-full p-3 rounded-xl border bg-background mb-3 text-sm resize-none h-32" />
+          <div className="flex gap-3 flex-wrap">
+            <select value={category} onChange={(e) => setCategory(e.target.value)} className="p-2 rounded-xl border bg-background text-sm">
+              {["General", "Computer", "Networking", "Excel", "Word", "Shortcuts", "Legislation", "GK", "OS"].map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+            <button onClick={saveNote} className="bg-primary text-primary-foreground px-6 py-2 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+              {editing ? "Update" : "Save"}
+            </button>
+            {editing && <button onClick={() => { setEditing(null); setTitle(""); setContent(""); }} className="bg-muted px-4 py-2 rounded-xl">Cancel</button>}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-muted/50 border border-dashed rounded-2xl p-4 mb-6 flex items-center gap-3 text-sm text-muted-foreground">
+          <Lock size={16} /> Only admins can post or edit notes. {!user && <Link to="/auth" className="text-primary underline">Sign in</Link>}
+        </div>
+      )}
 
       {/* Search */}
       <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="🔍 Search notes..." className="w-full p-3 rounded-xl border bg-card mb-6 text-sm" />
@@ -87,10 +102,12 @@ const Notes = () => {
           <div key={note.id} className="bg-card rounded-2xl shadow-md p-5 card-hover">
             <div className="flex items-start justify-between mb-2">
               <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-medium">{note.category}</span>
-              <div className="flex gap-1">
-                <button onClick={() => editNote(note)} className="text-xs text-muted-foreground hover:text-primary">✏️</button>
-                <button onClick={() => deleteNote(note.id)} className="text-xs text-muted-foreground hover:text-destructive">🗑️</button>
-              </div>
+              {isAdmin && (
+                <div className="flex gap-1">
+                  <button onClick={() => editNote(note)} className="text-xs text-muted-foreground hover:text-primary">✏️</button>
+                  <button onClick={() => deleteNote(note.id)} className="text-xs text-muted-foreground hover:text-destructive">🗑️</button>
+                </div>
+              )}
             </div>
             <h3 className="font-semibold text-sm mb-2">{note.title}</h3>
             <pre className="text-xs text-muted-foreground whitespace-pre-wrap font-body">{note.content}</pre>
