@@ -25,6 +25,7 @@ import Leaderboard from "./pages/Leaderboard";
 import AdminPanel from "./pages/AdminPanel";
 import CloudAdminGuard from "./components/CloudAdminGuard";
 import NepalLoadingScreen from "./components/NepalLoadingScreen";
+import DailyMCQPage from "./pages/DailyMCQPage";
 import { AuthProvider } from "./hooks/useAuth";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -126,6 +127,7 @@ const AppContent = () => {
             <Route path="/typing" element={<TypingPractice />} />
             <Route path="/notes" element={<Notes />} />
             <Route path="/downloads" element={<Downloads />} />
+            <Route path="/daily-mcq" element={<DailyMCQPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

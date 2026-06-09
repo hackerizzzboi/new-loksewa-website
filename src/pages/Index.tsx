@@ -7,6 +7,7 @@ import dhirajPhoto from "@/assets/dhiraj-photo.jpg";
 import QuestionOfTheDay from "@/components/QuestionOfTheDay";
 import StudyProgress from "@/components/StudyProgress";
 import PersonalizedDashboard from "@/components/PersonalizedDashboard";
+import DailyMCQCard from "@/components/DailyMCQCard";
 import { useAuth } from "@/hooks/useAuth";
 
 // Ashad 7, 2082 BS ≈ June 22, 2026 AD
@@ -73,6 +74,9 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8 space-y-10">
         {/* Personalized snapshot (only when signed in) */}
         {user && <PersonalizedDashboard />}
+
+        {/* Daily MCQ — admin posts daily, users compete */}
+        <DailyMCQCard />
 
         {/* Question of the Day */}
         <QuestionOfTheDay />

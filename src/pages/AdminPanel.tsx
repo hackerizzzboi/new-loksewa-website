@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Users, BookOpen, BarChart3, Trash2, Edit, Plus, Shield, ShieldOff, X, Save } from "lucide-react";
+import { Users, BookOpen, BarChart3, Trash2, Edit, Plus, Shield, ShieldOff, X, Save, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import DailyMCQAdmin from "@/components/admin/DailyMCQAdmin";
 
-type Tab = "users" | "mcqs" | "exams" | "stats";
+type Tab = "users" | "daily" | "mcqs" | "exams" | "stats";
 
 interface ProfileRow { id: string; full_name: string | null; created_at: string; isAdmin?: boolean; attempts?: number; }
 interface MCQ { id: string; question: string; options: string[]; correct_index: number; explanation: string | null; category: string | null; subject: string | null; is_published: boolean; }
@@ -29,6 +30,7 @@ const AdminPanel = () => {
         <div className="container mx-auto px-4 flex gap-1 overflow-x-auto">
           {[
             { id: "users", label: "Users", icon: Users },
+            { id: "daily", label: "Daily MCQ", icon: Calendar },
             { id: "mcqs", label: "MCQs", icon: BookOpen },
             { id: "exams", label: "Exams", icon: BookOpen },
             { id: "stats", label: "Stats", icon: BarChart3 },
@@ -48,6 +50,7 @@ const AdminPanel = () => {
 
       <main className="container mx-auto px-4 py-6">
         {tab === "users" && <UsersTab />}
+        {tab === "daily" && <DailyMCQAdmin />}
         {tab === "mcqs" && <MCQsTab />}
         {tab === "exams" && <ExamsTab />}
         {tab === "stats" && <StatsTab />}
