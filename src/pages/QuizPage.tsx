@@ -26,6 +26,7 @@ import { quiz4Questions } from "@/data/online_exam/quiz4";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import SetRanking from "@/components/SetRanking";
+import AchievementsPanel from "@/components/AchievementsPanel";
 
 const QuizPage = () => {
   const { category, setId } = useParams();
@@ -314,6 +315,8 @@ const QuizPage = () => {
             <div className="bg-muted rounded-xl p-3"><p className="text-2xl font-bold">{results.unanswered}</p><p>Unanswered</p></div>
           </div>
         </div>
+
+        <AchievementsPanel scorePct={results.percentage} correct={results.correct} total={questions.length} />
 
         {setId && <SetRanking setId={setId} currentScore={Math.round(results.marks)} />}
 

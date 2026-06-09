@@ -7,11 +7,11 @@ import { toast } from "sonner";
 
 const navItems = [
   { label: "Home", path: "/", icon: "🏠" },
+  { label: "Daily MCQ", path: "/daily-mcq", icon: "📅" },
   { label: "MCQ", path: "/practice", icon: "❓" },
   { label: "Old Sets", path: "/old-is-gold", icon: "🏆" },
   { label: "Online Exam", path: "/online-exam", icon: "📝" },
   { label: "Subjective", path: "/subjective", icon: "📖" },
-  
   { label: "Leaderboard", path: "/leaderboard", icon: "🏅" },
   { label: "Syllabus", path: "/syllabus", icon: "📋" },
   { label: "Typing", path: "/typing", icon: "⌨️" },
