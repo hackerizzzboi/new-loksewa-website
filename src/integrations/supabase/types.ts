@@ -300,6 +300,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_daily_mcq_leaderboard: {
+        Args: never
+        Returns: {
+          correct_count: number
+          first_correct_at: string
+          full_name: string
+          total_answered: number
+          user_id: string
+        }[]
+      }
       get_daily_mcq_responders: {
         Args: { _mcq_id: string }
         Returns: {
@@ -336,6 +346,21 @@ export type Database = {
         Returns: {
           correct_index: number
           correct_responses: number
+          explanation: string
+          id: string
+          my_correct: boolean
+          my_selected: number
+          options: Json
+          question: string
+          total_responses: number
+        }[]
+      }
+      get_today_daily_mcqs: {
+        Args: never
+        Returns: {
+          correct_index: number
+          correct_responses: number
+          created_at: string
           explanation: string
           id: string
           my_correct: boolean
