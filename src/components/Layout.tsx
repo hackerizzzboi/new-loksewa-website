@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import AIChatbot from "./AIChatbot";
+import ThemeToggle from "./ThemeToggle";
 
 const Layout = () => {
   return (
@@ -12,6 +13,7 @@ const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      <ThemeToggle />
       <AIChatbot />
     </div>
   );

@@ -237,6 +237,9 @@ const QuizPage = () => {
         answers: answers as any,
       });
       if (error) console.error("Failed to save attempt:", error);
+      // Update daily streak (handles consecutive days / reset)
+      const { error: sErr } = await (supabase.rpc as any)("update_streak");
+      if (sErr) console.error("Failed to update streak:", sErr);
     })();
   }, [showResult, savedAttempt, user, questions.length, category, setId, title, results, answers]);
 

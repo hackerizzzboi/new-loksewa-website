@@ -81,11 +81,21 @@ const DailyMCQAdmin = () => {
     load();
   };
 
+  const todayCount = rows.filter(r => r.for_date === new Date().toISOString().slice(0, 10)).length;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h2 className="font-bold text-lg flex items-center gap-2"><Calendar size={18} /> Daily MCQs</h2>
-        <button onClick={() => setEditing({ ...empty })} className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5">
+        <div>
+          <h2 className="font-bold text-lg flex items-center gap-2"><Calendar size={18} /> Daily MCQs</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">Up to 5 questions per day · {todayCount}/5 posted for today</p>
+        </div>
+        <button
+          onClick={() => setEditing({ ...empty })}
+          disabled={todayCount >= 5}
+          title={todayCount >= 5 ? "5 questions already posted for today" : ""}
+          className="bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm font-semibold inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           <Plus size={16} /> Post New Daily MCQ
         </button>
       </div>
